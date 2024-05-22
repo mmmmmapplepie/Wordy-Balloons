@@ -1355,7 +1355,7 @@ GameObject:
   - component: {fileID: 4210114236034526105}
   - component: {fileID: -535104307114174010}
   m_Layer: 5
-  m_Name: LobbyPlayer
+  m_Name: NGOLobbyPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

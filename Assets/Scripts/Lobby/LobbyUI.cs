@@ -6,6 +6,7 @@ using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 using Unity.Services.Relay;
+using UnityEditor.PackageManager.Requests;
 
 public class LobbyUI : MonoBehaviour {
 
@@ -20,28 +21,21 @@ public class LobbyUI : MonoBehaviour {
 
 		MyLobby.Instance.AuthenticationBegin += OpenLoadingPanel;//
 		MyLobby.Instance.AuthenticationSuccess += CloseTransitionPanels;//
-		MyLobby.Instance.UnityServiceFailure += UnityServiceFail;//
 		MyLobby.Instance.AuthenticationFailure += AuthenticationFail;//
 
 		MyLobby.Instance.LobbyCreationBegin += OpenLoadingPanel;//
-		MyLobby.Instance.LobbyCreationSuccess += LobbyCreated;//
+		MyLobby.Instance.LobbyCreationSuccess += LobbyCreationSuccess;//not done have to chnage so that it only happens when nGO is done
 		MyLobby.Instance.LobbyCreationFailure += LobbyCreationFail;//
-		MyLobby.Instance.LobbyCreationFailureRelay += LobbyCreationRelayFail;
-		MyLobby.Instance.RelayFailure += RelayFail;
 
 		MyLobby.Instance.HearbeatFailure += HearbeatFail;
 
 		MyLobby.Instance.LobbyJoinBegin += OpenLoadingPanel;//
-		MyLobby.Instance.LobbyJoinSuccess += CloseTransitionPanels;
+		MyLobby.Instance.LobbyJoinSuccess += CloseTransitionPanels;//not done have to chnage so that it only happens when nGO is done
 		MyLobby.Instance.LobbyJoinFailure += LobbyJoinFail;
 
-		MyLobby.Instance.LeaveLobbyBegin += OpenLoadingPanel;//
-		MyLobby.Instance.LeaveLobbySuccess += CloseTransitionPanels;
-		MyLobby.Instance.LeaveLobbyFailure += LobbyLeaveFail;
-
-		MyLobby.Instance.DeleteLobbyBegin += OpenLoadingPanel;//
-		MyLobby.Instance.DeleteLobbySuccess += CloseTransitionPanels;
-		MyLobby.Instance.DeleteLobbyFailure += LobbyDeleteFail;
+		MyLobby.Instance.LeaveLobbyBegin += LeaveLobbyBegin;
+		MyLobby.Instance.LeaveLobbySuccess += LeaveLobbySuccess;
+		MyLobby.Instance.LeaveLobbyFailure += LeaveLobbyFail;
 
 		MyLobby.Instance.ListLobbySuccess += LobbyListFound;
 		MyLobby.Instance.ListLobbyFailure += ListLobbiesFail;
@@ -79,14 +73,14 @@ public class LobbyUI : MonoBehaviour {
 	}
 
 	[SerializeField] TextMeshProUGUI ErrorTxtBx;
-	void UnityServiceFail(RequestFailedException e) {
+	void UnityServiceFail() {
 		ErrorTxtBx.text = "Connection failed";
 		HidePanelsInDefaultStateExceptChosen(ErrorPanel);
 		RetryAuthenticationBtn.SetActive(true);
 		CloseErrorPanelBtn.SetActive(false);
 	}
 
-	void AuthenticationFail(AuthenticationException e) {
+	void AuthenticationFail() {
 		ErrorTxtBx.text = "Connection failed";
 		HidePanelsInDefaultStateExceptChosen(ErrorPanel);
 		RetryAuthenticationBtn.SetActive(true);
@@ -96,11 +90,14 @@ public class LobbyUI : MonoBehaviour {
 
 	[SerializeField] GameObject LobbyCreation;
 	[SerializeField] CanvasGroup Lobby;
-	void LobbyCreated() {
+	void LobbyCreationSuccess() {
 		LobbyCreation.SetActive(false);
 
 		Lobby.alpha = 1;
 		Lobby.interactable = true;
+
+
+		//have to start the NGO
 
 		//update things to lobby:
 		//players should be "already made"
@@ -112,11 +109,11 @@ public class LobbyUI : MonoBehaviour {
 		CloseTransitionPanels();
 	}
 
-	void RelayFail(RelayServiceException e) {
+	void RelayFail() {
 
 	}
 
-	void LobbyCreationFail(LobbyServiceException e) {
+	void LobbyCreationFail() {
 		ErrorTxtBx.text = "Unable to create lobby.";
 		HidePanelsInDefaultStateExceptChosen(ErrorPanel);
 	}
@@ -145,27 +142,35 @@ public class LobbyUI : MonoBehaviour {
 
 
 	void HearbeatFail() {
-
+		ErrorTxtBx.text = "Connection failed";
+		HidePanelsInDefaultStateExceptChosen(ErrorPanel);
+		RetryAuthenticationBtn.SetActive(true);
+		CloseErrorPanelBtn.SetActive(false);
 	}
 	void LobbyUpdate(ILobbyChanges lobbyChanges = null) {
 
 	}
-	void LobbyJoinFail(LobbyServiceException e) {
+	void LobbyJoinFail() {
 
 	}
 
-	void LobbyLeaveFail(LobbyServiceException e) {
+	void LeaveLobbyBegin() {
+		//have to hide the lobby panel and reset stuff there.
+		//disconnect from NGO on the NGO script
+	}
+	void LeaveLobbySuccess() {
 
 	}
-	void LobbyDeleteFail(LobbyServiceException e) {
+	void LeaveLobbyFail() {
 
 	}
+
 
 	void LobbyListFound(List<Lobby> lobbies) {
 
 	}
 
-	void ListLobbiesFail(LobbyServiceException e) {
+	void ListLobbiesFail() {
 
 	}
 
