@@ -7,6 +7,9 @@ using TMPro;
 using System.Collections.Generic;
 using Unity.Services.Relay;
 using UnityEditor.PackageManager.Requests;
+using UnityEngine.SceneManagement;
+using System.Threading.Tasks;
+using UnityEngine.UI;
 
 public class LobbyUI : MonoBehaviour {
 
@@ -16,29 +19,38 @@ public class LobbyUI : MonoBehaviour {
 	// i have to make sure that error cases fire only one event until exited the situation.
 	void Start() {
 		if (MyLobby.Instance == null) return;
-		MyLobby.Instance.LobbyChangedEvent += LobbyUpdate;
-
-
 		MyLobby.Instance.AuthenticationBegin += OpenLoadingPanel;//
 		MyLobby.Instance.AuthenticationSuccess += CloseTransitionPanels;//
 		MyLobby.Instance.AuthenticationFailure += AuthenticationFail;//
 
+
+
 		MyLobby.Instance.LobbyCreationBegin += OpenLoadingPanel;//
-		MyLobby.Instance.LobbyCreationSuccess += LobbyCreationSuccess;//not done have to chnage so that it only happens when nGO is done
+
+		//not done have to chnage so that it only happens when NGO is done
+		MyLobby.Instance.LobbyCreationSuccess += LobbyCreationSuccess;
+
 		MyLobby.Instance.LobbyCreationFailure += LobbyCreationFail;//
 
-		MyLobby.Instance.HearbeatFailure += HearbeatFail;
+
+
+		MyLobby.Instance.HearbeatFailure += HearbeatFail;//
+
+
 
 		MyLobby.Instance.LobbyJoinBegin += OpenLoadingPanel;//
-		MyLobby.Instance.LobbyJoinSuccess += CloseTransitionPanels;//not done have to chnage so that it only happens when nGO is done
-		MyLobby.Instance.LobbyJoinFailure += LobbyJoinFail;
 
-		MyLobby.Instance.LeaveLobbyBegin += LeaveLobbyBegin;
-		MyLobby.Instance.LeaveLobbySuccess += LeaveLobbySuccess;
-		MyLobby.Instance.LeaveLobbyFailure += LeaveLobbyFail;
+		//not done have to chnage so that it only happens when nGO is done
+		MyLobby.Instance.LobbyJoinSuccess += LobbyJoined;
 
-		MyLobby.Instance.ListLobbySuccess += LobbyListFound;
-		MyLobby.Instance.ListLobbyFailure += ListLobbiesFail;
+		MyLobby.Instance.LobbyJoinFailure += LobbyJoinFail;//
+
+
+
+		MyLobby.Instance.LeaveLobbyBegin += LeaveLobbyBegin;//
+
+		MyLobby.Instance.ListLobbySuccess += LobbyListFound;//
+		MyLobby.Instance.ListLobbyFailure += ListLobbiesFail;//
 	}
 
 
@@ -46,18 +58,100 @@ public class LobbyUI : MonoBehaviour {
 
 	#endregion
 
+	#region Interaction functions
+	public void GoToMainMenu() {
+		//have to stop NGO and lobby
+		SceneManager.LoadScene("MainMenu");
+	}
+	public void RetryAuthentication() {
+		MyLobby.Instance.Authentication();
+	}
+
+
+	[SerializeField] GameObject lobbyCreationPanel;
+	public TMP_InputField lobbyName, lobbyCode;
+	public TMP_Dropdown lobbyModeDropDown, lobbyPlayerNumDropDown;
+	public void GoToCreateLobby() {
+		//reset lobby name and mode and maxplayer
+		lobbyModeDropDown.value = 0;
+		lobbyPlayerNumDropDown.value = 0;
+		lobbyName.text = "New Lobby";
+		lobbyCreationPanel.SetActive(true);
+	}
+
+	//imma disable changing lobby mode and name once started.
+	public string ConvertDropDownValueToGameMode(int index) {
+		switch (index) {
+			case 0:
+				return "Normal";
+			case 1:
+				return "Eraser";
+			case 2:
+				return "OwnEnemy";
+			case 3:
+				return "Pacifist";
+			default:
+				return "Normal";
+		}
+	}
+	public void ConvertGameModeToDropDownValue(string newMode) {
+		int index = 0;
+		switch (newMode) {
+			case "Normal":
+				index = 0;
+				break;
+			case "Eraser":
+				index = 1;
+				break;
+			case "OwnEnemy":
+				index = 2;
+				break;
+			case "Pacifist":
+				index = 3;
+				break;
+		}
+		lobbyModeDropDown.value = index;
+	}
+	public void CreateLobby() {
+		MyLobby.Instance.CreateLobby(lobbyName.text, ConvertDropDownValueToGameMode(lobbyModeDropDown.value), lobbyPlayerNumDropDown.value + 2);
+	}
+	public void QuickJoin() {
+		MyLobby.Instance.QuickJoinLobby();
+	}
+	public void JoinLobbyByCode() {
+		MyLobby.Instance.JoinLobbyByCode(lobbyCode.text);
+		lobbyCode.text = "";
+	}
+
+	public void LeaveLobby() {
+		//you need to add UI stuff here as leave lobby itself i decided not to add ui stuff (as it is called EVERYWHERE)
+		MyLobby.Instance.LeaveLobby();
+	}
+
+
+	public void ListLobbyRefresh() {
+		Task list = MyLobby.Instance.ListLobbies();
+	}
+
+
+	#endregion
+
+
+
+
+
+
 
 	#region Event Functions
 	[SerializeField] GameObject LoadingPanel, ErrorPanel;
 	[SerializeField] GameObject MainMenuBtn, RetryAuthenticationBtn, CloseErrorPanelBtn;
-
 	void OpenLoadingPanel() {
-		HidePanelsInDefaultStateExceptChosen(LoadingPanel);
+		HidePanelsExceptChosen(LoadingPanel);
 	}
 	public void CloseTransitionPanels() {
-		HidePanelsInDefaultStateExceptChosen(null);
+		HidePanelsExceptChosen(null);
 	}
-	void HidePanelsInDefaultStateExceptChosen(GameObject panelToOpen = null) {
+	void HidePanelsExceptChosen(GameObject panelToOpen = null) {
 		//disable non basic items
 		LoadingPanel.SetActive(false);
 		ErrorPanel.SetActive(false);
@@ -73,29 +167,21 @@ public class LobbyUI : MonoBehaviour {
 	}
 
 	[SerializeField] TextMeshProUGUI ErrorTxtBx;
-	void UnityServiceFail() {
-		ErrorTxtBx.text = "Connection failed";
-		HidePanelsInDefaultStateExceptChosen(ErrorPanel);
-		RetryAuthenticationBtn.SetActive(true);
-		CloseErrorPanelBtn.SetActive(false);
-	}
-
 	void AuthenticationFail() {
 		ErrorTxtBx.text = "Connection failed";
-		HidePanelsInDefaultStateExceptChosen(ErrorPanel);
+		HidePanelsExceptChosen(ErrorPanel);
 		RetryAuthenticationBtn.SetActive(true);
 		CloseErrorPanelBtn.SetActive(false);
 	}
 
+	[SerializeField] CanvasGroup lobbyPanel;
 
-	[SerializeField] GameObject LobbyCreation;
-	[SerializeField] CanvasGroup Lobby;
+	//shoudl be called when NGO host is connected.
 	void LobbyCreationSuccess() {
-		LobbyCreation.SetActive(false);
-
-		Lobby.alpha = 1;
-		Lobby.interactable = true;
-
+		lobbyCreationPanel.SetActive(false);
+		ToggleLobby(true);
+		lobbyPanel.alpha = 1;
+		lobbyPanel.interactable = true;
 
 		//have to start the NGO
 
@@ -108,14 +194,14 @@ public class LobbyUI : MonoBehaviour {
 
 		CloseTransitionPanels();
 	}
-
-	void RelayFail() {
-
+	void ToggleLobby(bool interactable) {
+		lobbyPanel.interactable = interactable;
+		lobbyPanel.alpha = interactable ? 1 : 0;
 	}
 
 	void LobbyCreationFail() {
 		ErrorTxtBx.text = "Unable to create lobby.";
-		HidePanelsInDefaultStateExceptChosen(ErrorPanel);
+		HidePanelsExceptChosen(ErrorPanel);
 	}
 
 
@@ -126,159 +212,53 @@ public class LobbyUI : MonoBehaviour {
 	void LobbyJoined() {
 		Lobby joinedLobby = MyLobby.Instance.joinedLobby;
 		if (joinedLobby == null) return;
-
-		//update the lobby stuff
+		ToggleLobby(true);
+		LobbyUpdate(joinedLobby);
 	}
-
-
-	void LobbyCreationRelayFail() {
-		ErrorTxtBx.text = "Unable to create lobby.";
-		HidePanelsInDefaultStateExceptChosen(ErrorPanel);
+	void LobbyUpdate(Lobby lobby) {
+		//update mode
 	}
-
-
-
-
-
 
 	void HearbeatFail() {
 		ErrorTxtBx.text = "Connection failed";
-		HidePanelsInDefaultStateExceptChosen(ErrorPanel);
-		RetryAuthenticationBtn.SetActive(true);
-		CloseErrorPanelBtn.SetActive(false);
+		HidePanelsExceptChosen(ErrorPanel);
 	}
-	void LobbyUpdate(ILobbyChanges lobbyChanges = null) {
 
-	}
 	void LobbyJoinFail() {
-
+		ErrorTxtBx.text = "Unable to join lobby";
+		HidePanelsExceptChosen(ErrorPanel);
 	}
 
+	//dont forget to start shutdown for NGO.
 	void LeaveLobbyBegin() {
-		//have to hide the lobby panel and reset stuff there.
-		//disconnect from NGO on the NGO script
-	}
-	void LeaveLobbySuccess() {
-
-	}
-	void LeaveLobbyFail() {
-
+		ToggleLobby(false);
 	}
 
-
+	public Transform lobbiesListHolder, lobbyOptionPrefab;
 	void LobbyListFound(List<Lobby> lobbies) {
-
+		foreach (Transform t in lobbiesListHolder) {
+			Destroy(t);
+		}
+		foreach (Lobby l in lobbies) {
+			Transform newOption = Instantiate(lobbyOptionPrefab, lobbiesListHolder);
+			//set the values for the script and give it a listener for the join lobby by ID thingy
+			LobbyOption lobbyOption = newOption.GetComponent<LobbyOption>();
+			lobbyOption.SetOption(l);
+		}
 	}
-
+	public GameObject lobbyListFindingFailNotificationObject;
 	void ListLobbiesFail() {
-
+		lobbyListFindingFailNotificationObject.SetActive(true);
 	}
-
-
-
 
 	#endregion
 
 
 
-	// #region LobbySettingsUI
-	// [SerializeField] GameObject ModeDropdown;
-	// [SerializeField] CanvasGroup LobbyPanel;
-	// void OpenLobbyPanel(bool isHost) {
-	// 	if (isHost) lobbyCodeTxt.text = lobbyCode;
-	// 	LobbyPanel.blocksRaycasts = true;
-	// 	LobbyPanel.alpha = 1f;
-	// 	ModeDropdown.GetComponent<TMP_Dropdown>().interactable = isHost;
-	// 	//if host then enable buttons etc matching that for the host.
-	// }
-
-	// int lobbyMaxPlayerNumber = 2;
-	// public void ChangePlayerNumber(int num) {
-	// 	lobbyMaxPlayerNumber = num + 2;
-	// }
-
-	// string mode = "Normal";
-
-
-	// string lobbyName = "New Lobby";
-	// public void ChangeLobbyName(string newName) {
-	// 	lobbyName = newName;
-	// }
-
-	// public GameObject CreateLobbyPanel;
-	// public TMP_Dropdown PlayerCountDropdown;
-	// public void OpenLobbyCreationPanel(bool open) {
-	// 	PlayerCountDropdown.value = 0;
-	// 	lobbyMaxPlayerNumber = 2;
-	// 	CreateLobbyPanel.SetActive(open);
-	// }
-
-
-	// string lobbyCode = "";
-
-
-	// #endregion
-
-
-
-
-	// void DisplayLobby(Lobby lobby) {
-	// 	foreach (Transform t in lobbyListHolder) {
-	// 		Destroy(t.gameObject);
-	// 	}
-	// 	GameObject lobbyItem = Instantiate(lobbyListItemPrefab, lobbyListHolder);
-	// 	lobbyItem.GetComponent<LobbyOption>().SetOption(lobby, this);
-	// }
 
 
 
 
 
-
-
-
-	// public void ChangeGameMode(int index) {
-	// 	switch (index) {
-	// 		case 0:
-	// 			mode = "Normal";
-	// 			break;
-	// 		case 1:
-	// 			mode = "Eraser";
-	// 			break;
-	// 		case 2:
-	// 			mode = "OwnEnemy";
-	// 			break;
-	// 		case 3:
-	// 			mode = "Pacifist";
-	// 			break;
-	// 	}
-	// 	if (hostLobby != null) {
-	// 		UpdateLobbyData();
-	// 	}
-	// }
-	// [SerializeField] TMP_Dropdown modeDisplayDropdown;
-	// public void ChangeGameModeDisplay(string newMode) {
-	// 	int index = 0;
-	// 	switch (newMode) {
-	// 		case "Normal":
-	// 			index = 0;
-	// 			mode = newMode;
-	// 			break;
-	// 		case "Eraser":
-	// 			index = 1;
-	// 			mode = newMode;
-	// 			break;
-	// 		case "OwnEnemy":
-	// 			index = 2;
-	// 			mode = newMode;
-	// 			break;
-	// 		case "Pacifist":
-	// 			index = 3;
-	// 			mode = newMode;
-	// 			break;
-	// 	}
-	// 	modeDisplayDropdown.value = index;
-
-	// }
 
 }

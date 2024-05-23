@@ -22,7 +22,6 @@ public class MyLobby : MonoBehaviour {
 	public const string GameMode = "GameMode";
 	public const string PlayerName = "PlayerName";
 
-
 	CancellationTokenSource ExitScene;
 	CancellationToken ExitToken;
 
@@ -73,8 +72,7 @@ public class MyLobby : MonoBehaviour {
 	[HideInInspector] public string authenticationID;
 	[HideInInspector] public string playerName;
 	[HideInInspector] public string lobbyCode;
-	public Lobby hostLobby;
-	public Lobby joinedLobby;
+	public Lobby hostLobby, joinedLobby;
 	DateTime latestLobbyInteraction;
 
 	#region Events
@@ -103,11 +101,16 @@ public class MyLobby : MonoBehaviour {
 
 	#region lobby heartbeat & pull
 
-	float heartBeatElapsed = 0, heartBeatPeriod = 5f;
-	// float updateElapsed = 0, updatePeriod = 1.5f;
+	float heartBeatElapsed = 0, heartBeatPeriod = 15f;
+	float lobbyListRefreshElapsed = 0, lobbyListRefreshPeriod = 5f;
+	float updateElapsed = 0, updatePeriod = 3f;
 	void Update() {
 		LobbyHeartbeat();
-		// LobbyPull();
+
+		//you will probably need polling for edges cases where the events dont work for some reason.
+		// LobbyPoll();
+
+		// LobbyListRefresh()
 	}
 	async void LobbyHeartbeat() {
 		if (hostLobby == null) { heartBeatElapsed = 0; return; }
@@ -124,25 +127,43 @@ public class MyLobby : MonoBehaviour {
 			heartBeatElapsed += Time.deltaTime;
 		}
 	}
+	async void LobbyListRefresh() {
+		if (joinedLobby != null) { lobbyListRefreshElapsed = 0; return; }
+		if (lobbyListRefreshElapsed > lobbyListRefreshPeriod) {
+			lobbyListRefreshElapsed = 0f;
+			try {
+				await ListLobbies();
+			} catch (Exception e) {
+				print(e);
+				LeaveLobby();
+				HearbeatFailure?.Invoke();
+			}
+		} else {
+			lobbyListRefreshElapsed += Time.deltaTime;
+		}
+	}
 
-	// async void LobbyPull() {
-	// 	if (joinedLobby == null) return;
-	// 	if (updateElapsed > updatePeriod) {
-	// 		updateElapsed = 0f;
-	// 		try {
-	// 			joinedLobby = await LobbyService.Instance.GetLobbyAsync(joinedLobby.Id);
-	// 			if (hostLobby != null) {
-	// 				hostLobby = joinedLobby;
-	// 			}
-	// 			print(joinedLobby.I);
-
-	// 		} catch (LobbyServiceException e) {
-	// 			print(e.Reason);
-	// 		}
-	// 	} else {
-	// 		updateElapsed += Time.deltaTime;
-	// 	}
-	// }
+	async void LobbyPoll() {
+		if (joinedLobby == null) { updateElapsed = 0; return; }
+		if (updateElapsed > updatePeriod) {
+			updateElapsed = 0f;
+			try {
+				joinedLobby = await LobbyService.Instance.GetLobbyAsync(joinedLobby.Id);
+				if (hostLobby != null) {
+					hostLobby = joinedLobby;
+				}
+				if (joinedLobby.Players.Find(x => x.Id == authenticationID) == null) {
+					LeaveLobby();
+					return;
+				}
+			} catch (LobbyServiceException e) {
+				print(e);
+				LeaveLobby();
+			}
+		} else {
+			updateElapsed += Time.deltaTime;
+		}
+	}
 	#endregion
 
 
@@ -227,8 +248,7 @@ public class MyLobby : MonoBehaviour {
 	void LobbyChanged(ILobbyChanges changes) {
 		if (joinedLobby == null) return;
 
-
-		//in case i fail to get out of the lobby events
+		//in case i fail unsub to the lobby events
 		DateTime now = DateTime.Now;
 		TimeSpan changesTimespan = now - changes.LastUpdated.Value;
 		TimeSpan latestInteractionTimespan = now - latestLobbyInteraction;
@@ -248,16 +268,12 @@ public class MyLobby : MonoBehaviour {
 			return;
 		}
 
-		if (changes.PlayerJoined.Value != null && hostLobby != null) {
+		if (hostLobby != null && changes.PlayerJoined.Value != null) {
 			foreach (LobbyPlayerJoined p in changes.PlayerJoined.Value) {
 				Player player = p.Player;
 				print(player.Id);
 				//make the player object etc
 			}
-		}
-
-		if (changes.Data.Value != null) {
-			//change appropriately look up documentation for details on the data type passed around.
 		}
 	}
 
@@ -378,7 +394,7 @@ public class MyLobby : MonoBehaviour {
 
 
 
-	public async void ListLobbies() {
+	public async Task ListLobbies() {
 		try {
 			QueryLobbiesOptions filter = new QueryLobbiesOptions {
 				Count = 25,

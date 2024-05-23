@@ -5,9 +5,11 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class LobbyOption : MonoBehaviour {
-	public void SetOption(Lobby lobby, MyLobby lobbyScript) {
-		GetComponent<Button>().onClick.AddListener(() => lobbyScript.JoinLobbyByID(lobby.Id));
-		transform.Find("Name").GetComponent<TextMeshProUGUI>().text = lobby.Name;
-		transform.Find("Mode").GetComponent<TextMeshProUGUI>().text = lobby.Data[MyLobby.GameMode].Value;
+	public TextMeshProUGUI lobbyName, lobbyMode, lobbyPopulation;
+	public void SetOption(Lobby lobby) {
+		GetComponent<Button>().onClick.AddListener(() => MyLobby.Instance.JoinLobbyByID(lobby.Id));
+		lobbyName.text = lobby.Name;
+		lobbyMode.text = lobby.Data[MyLobby.GameMode].Value;
+		lobbyPopulation.text = (lobby.MaxPlayers - lobby.AvailableSlots) + "/" + lobby.MaxPlayers;
 	}
 }

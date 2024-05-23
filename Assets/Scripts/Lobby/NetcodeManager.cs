@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using Unity.Netcode;
-using UnityEngine;
 
-public class TeamManager : NetworkBehaviour {
+public class NetcodeManager : NetworkBehaviour {
 
 	// #region BasicMiscellaneous
 	// [SerializeField] GameObject lobbyListItemPrefab, lobbyPlayerPrefab, loadingPanel;
