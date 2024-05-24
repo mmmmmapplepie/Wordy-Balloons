@@ -71,7 +71,6 @@ public class MyLobby : MonoBehaviour {
 	public static MyLobby Instance;
 	[HideInInspector] public string authenticationID;
 	[HideInInspector] public string playerName;
-	[HideInInspector] public string lobbyCode;
 	public Lobby hostLobby, joinedLobby;
 	DateTime latestLobbyInteraction;
 

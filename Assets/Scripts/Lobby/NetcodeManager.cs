@@ -3,6 +3,25 @@ using Unity.Netcode;
 
 public class NetcodeManager : NetworkBehaviour {
 
+	//things to e done:
+	//connecting on creating lobby as host
+	//connecting on join lobby as client
+	//obvious subbing and unsubbing to ngo events for stuff
+	//when connected send the respective "successful" events throught MyLobby script
+
+	//disconnecting when leaving
+	//leaving lobby when network disconnect
+	//rpcs for sending client data once joined.
+
+	//creating player netobjects in lobby (and destroying them)
+	//keeping traack of lobby and client IDs
+	//keeping track of teams and color.
+
+
+
+
+
+
 	// #region BasicMiscellaneous
 	// [SerializeField] GameObject lobbyListItemPrefab, lobbyPlayerPrefab, loadingPanel;
 	// [SerializeField] Transform lobbyListHolder, team1ListHolder, team2ListHolder;

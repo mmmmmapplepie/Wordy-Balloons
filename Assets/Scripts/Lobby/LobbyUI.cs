@@ -9,7 +9,6 @@ using Unity.Services.Relay;
 using UnityEditor.PackageManager.Requests;
 using UnityEngine.SceneManagement;
 using System.Threading.Tasks;
-using UnityEngine.UI;
 
 public class LobbyUI : MonoBehaviour {
 
@@ -77,6 +76,9 @@ public class LobbyUI : MonoBehaviour {
 		lobbyPlayerNumDropDown.value = 0;
 		lobbyName.text = "New Lobby";
 		lobbyCreationPanel.SetActive(true);
+	}
+	public void CloseLobbyCreation() {
+		lobbyCreationPanel.SetActive(false);
 	}
 
 	//imma disable changing lobby mode and name once started.
@@ -158,6 +160,7 @@ public class LobbyUI : MonoBehaviour {
 
 
 		RetryAuthenticationBtn.SetActive(false);
+		MainMenuBtn.SetActive(false);
 		CloseErrorPanelBtn.SetActive(true);
 
 		//only open the one you want.
@@ -172,18 +175,15 @@ public class LobbyUI : MonoBehaviour {
 		HidePanelsExceptChosen(ErrorPanel);
 		RetryAuthenticationBtn.SetActive(true);
 		CloseErrorPanelBtn.SetActive(false);
+		MainMenuBtn.SetActive(true);
 	}
 
 	[SerializeField] CanvasGroup lobbyPanel;
 
 	//shoudl be called when NGO host is connected.
 	void LobbyCreationSuccess() {
-		lobbyCreationPanel.SetActive(false);
-		ToggleLobby(true);
-		lobbyPanel.alpha = 1;
-		lobbyPanel.interactable = true;
-
 		//have to start the NGO
+
 
 		//update things to lobby:
 		//players should be "already made"
@@ -192,6 +192,9 @@ public class LobbyUI : MonoBehaviour {
 		//lobby name
 		//lobby player number
 
+		lobbyCreationPanel.SetActive(false);
+		LobbyUpdate(MyLobby.Instance.hostLobby);
+		ToggleLobby(true);
 		CloseTransitionPanels();
 	}
 	void ToggleLobby(bool interactable) {
@@ -212,11 +215,15 @@ public class LobbyUI : MonoBehaviour {
 	void LobbyJoined() {
 		Lobby joinedLobby = MyLobby.Instance.joinedLobby;
 		if (joinedLobby == null) return;
-		ToggleLobby(true);
 		LobbyUpdate(joinedLobby);
+		ToggleLobby(true);
 	}
+	[SerializeField] TextMeshProUGUI lobbyModeTxt, lobbyCodeTxt;
 	void LobbyUpdate(Lobby lobby) {
-		//update mode
+		lobbyModeTxt.text = lobby.Data[MyLobby.GameMode].Value;
+		if (MyLobby.Instance.hostLobby != null) {
+			lobbyCodeTxt.text = lobby.LobbyCode;
+		}
 	}
 
 	void HearbeatFail() {
@@ -246,9 +253,9 @@ public class LobbyUI : MonoBehaviour {
 			lobbyOption.SetOption(l);
 		}
 	}
-	public GameObject lobbyListFindingFailNotificationObject;
+	public GameObject lobbyListingFailNotificationObject;
 	void ListLobbiesFail() {
-		lobbyListFindingFailNotificationObject.SetActive(true);
+		lobbyListingFailNotificationObject.SetActive(true);
 	}
 
 	#endregion
