@@ -88,7 +88,7 @@ public class MyLobby : MonoBehaviour {
 
 	public event Action HearbeatFailure;
 
-	public event Action LobbyJoinBegin, LobbyJoinSuccess, LobbyJoinFailure;
+	public event Action LobbyJoinBegin, LobbyJoinSuccess, LobbyJoinFailure, JoinLobbyNetcode;
 	public event Action<string> LobbyJoined;
 
 	public event Action LeaveLobbyBegin, LeaveLobbySuccess, LeaveLobbyFailure;
@@ -108,7 +108,7 @@ public class MyLobby : MonoBehaviour {
 		LobbyHeartbeat();
 
 		//you will probably need polling for edges cases where the events dont work for some reason.
-		// LobbyPoll();
+		LobbyPoll();
 
 		// LobbyListRefresh()
 	}
@@ -153,16 +153,24 @@ public class MyLobby : MonoBehaviour {
 					hostLobby = joinedLobby;
 				}
 				if (joinedLobby.Players.Find(x => x.Id == authenticationID) == null) {
-					LeaveLobby();
+					OutOfLobby(false);
 					return;
 				}
 			} catch (LobbyServiceException e) {
 				print(e);
-				LeaveLobby();
+				OutOfLobby(true);
 			}
 		} else {
 			updateElapsed += Time.deltaTime;
 		}
+	}
+	void OutOfLobby(bool lobbyDeleted) {
+		if (!NetworkManager.Singleton.IsConnectedClient && !lobbyDeleted) {
+			LobbyJoinFailure?.Invoke();
+		} else {
+			LobbyJoinSuccess?.Invoke();
+		}
+		LeaveLobby();
 	}
 	#endregion
 
@@ -256,8 +264,7 @@ public class MyLobby : MonoBehaviour {
 		if (hostLobby != null) hostLobby = joinedLobby;
 		LobbyChangedEvent?.Invoke(changes);
 
-		//lobby deleted/kicked
-		if (changes.LobbyDeleted || joinedLobby.Players.Find(x => x.Id == authenticationID) == null) {
+		if (changes.LobbyDeleted) {
 			LeaveLobby();
 			return;
 		}
@@ -267,13 +274,15 @@ public class MyLobby : MonoBehaviour {
 					LobbyJoined?.Invoke(p.Player.Id);
 				}
 			}
-			if (changes.PlayerLeft.Value != null && changes.PlayerLeft.Value.Count > 0) {
-				print(changes.PlayerLeft.Value.Count);
-				print(changes.PlayerLeft.Value[0]);
+			if (changes.PlayerLeft.Value != null) {
 				PlayersLeft(hostLobby.Players);
 			}
 		}
 	}
+
+
+
+
 
 	public async void JoinLobbyByID(string lobbyID) {
 		if (joinedLobby != null) return;
@@ -287,8 +296,8 @@ public class MyLobby : MonoBehaviour {
 			};
 
 			joinedLobby = await Lobbies.Instance.JoinLobbyByIdAsync(lobbyID, options);
-
 			await JoinLobby();
+			JoinLobbyNetcode?.Invoke();
 		} catch (Exception e) {
 			print(e);
 			LobbyJoinFailure?.Invoke();
@@ -357,7 +366,7 @@ public class MyLobby : MonoBehaviour {
 
 
 	public async void KickFromLobby(string id) {
-		if (hostLobby != null) return;
+		if (hostLobby == null) return;
 		if (joinedLobby != null) {
 			try {
 				await LobbyService.Instance.RemovePlayerAsync(joinedLobby.Id, id);

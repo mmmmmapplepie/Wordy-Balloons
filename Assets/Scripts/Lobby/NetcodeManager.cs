@@ -15,8 +15,8 @@ public class NetcodeManager : NetworkBehaviour {
 	NetworkList<Color> colorsBeingUsed;
 	Dictionary<ulong, Color> ClientID_KEY_Color_VAL = new Dictionary<ulong, Color>();
 	Dictionary<string, ulong> LobbyID_KEY_ClientID_VAL = new Dictionary<string, ulong>();
-	List<LobbyPlayer> objectListForPlayersInLobby = new List<LobbyPlayer>();
 	HashSet<string> team1 = new HashSet<string>(), team2 = new HashSet<string>();
+	List<LobbyPlayer> playersObjects = new List<LobbyPlayer>();
 	int team1Max = 0; int team2Max = 0;
 
 	void Awake() {
@@ -31,25 +31,27 @@ public class NetcodeManager : NetworkBehaviour {
 	void Start() {
 		//events from lobby
 		MyLobby.Instance.LobbyCreated += JoinAsHost;
-		MyLobby.Instance.LobbyJoined += JoinedLobbyAsClient;
+		MyLobby.Instance.LobbyJoined += PlayerJoinedLobby;
+		MyLobby.Instance.JoinLobbyNetcode += JoinAsClient;
 		MyLobby.Instance.LeaveLobbyBegin += ShutDownNetwork;
 		MyLobby.Instance.PlayersLeft += PlayersLeft;
 	}
 	public override void OnDestroy() {
 		//events from lobby
-		MyLobby.Instance.LobbyCreated += JoinAsHost;
-		MyLobby.Instance.LobbyJoined += JoinedLobbyAsClient;
-		MyLobby.Instance.LeaveLobbyBegin += ShutDownNetwork;
-		MyLobby.Instance.PlayersLeft += PlayersLeft;
+		if (MyLobby.Instance != null) {
+			MyLobby.Instance.LobbyCreated -= JoinAsHost;
+			MyLobby.Instance.LobbyJoined -= PlayerJoinedLobby;
+			MyLobby.Instance.JoinLobbyNetcode -= JoinAsClient;
+			MyLobby.Instance.LeaveLobbyBegin -= ShutDownNetwork;
+			MyLobby.Instance.PlayersLeft -= PlayersLeft;
+		}
 		base.OnDestroy();
 	}
 
-	List<LobbyPlayer> playersObjects = new List<LobbyPlayer>();
 
 	#region connecting as host
 	Coroutine startingHost;
 	void JoinAsHost() {
-		print("startingHost");
 		if (startingHost != null) StopCoroutine(startingHost);
 		NetworkManager.Singleton.StartHost();
 		HostActive();
@@ -117,7 +119,7 @@ public class NetcodeManager : NetworkBehaviour {
 		Transform newP = Instantiate(lobbyPlayerPrefab, targetHolder);
 		LobbyPlayer script = newP.GetComponent<LobbyPlayer>();
 		script.lobbyID = lobbyID;
-		newP.GetComponent<NetworkObject>().Spawn();
+		newP.GetComponent<NetworkObject>().Spawn(true);
 		newP.GetComponent<NetworkObject>().TrySetParent(targetHolder);
 		playersObjects.Add(script);
 		return script;
@@ -153,7 +155,10 @@ public class NetcodeManager : NetworkBehaviour {
 
 
 	#region joining as clinet
-	void JoinedLobbyAsClient(string newJoinedLobbyID) {
+	void JoinAsClient() {
+		// NetworkManager.Singleton.StartClient();
+	}
+	void PlayerJoinedLobby(string newJoinedLobbyID) {
 		if (NetworkManager.Singleton.IsServer) {
 			int team = AddNewPlayerToTeam(newJoinedLobbyID);
 			CreatePlayerObject(newJoinedLobbyID, team);
@@ -208,7 +213,7 @@ public class NetcodeManager : NetworkBehaviour {
 	}
 
 	LobbyPlayer FindPlayerFromLobbyID(string lobbyID) {
-		foreach (LobbyPlayer p in objectListForPlayersInLobby) {
+		foreach (LobbyPlayer p in playersObjects) {
 			if (p.lobbyID == lobbyID) return p;
 		}
 		return null;
@@ -243,9 +248,9 @@ public class NetcodeManager : NetworkBehaviour {
 			LobbyID_KEY_ClientID_VAL.Remove(id);
 			team1.Remove(id);
 			team2.Remove(id);
-			LobbyPlayer playerObj = objectListForPlayersInLobby.Find(x => x.lobbyID == id);
+			LobbyPlayer playerObj = playersObjects.Find(x => x.lobbyID == id);
 			if (playerObj != null) {
-				Destroy(playerObj);
+				playerObj.GetComponent<NetworkObject>().Despawn(true);
 			}
 			NetworkManager.DisconnectClient(clientID);
 		}

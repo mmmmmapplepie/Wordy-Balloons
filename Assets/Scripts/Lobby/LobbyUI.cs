@@ -39,8 +39,7 @@ public class LobbyUI : MonoBehaviour {
 
 		MyLobby.Instance.LobbyJoinBegin += OpenLoadingPanel;//
 
-		//not done have to chnage so that it only happens when nGO is done
-		MyLobby.Instance.LobbyJoinSuccess += LobbyJoined;
+		MyLobby.Instance.LobbyJoinSuccess += LobbyJoined;//
 
 		MyLobby.Instance.LobbyJoinFailure += LobbyJoinFail;//
 
@@ -182,16 +181,6 @@ public class LobbyUI : MonoBehaviour {
 
 	//shoudl be called when NGO host is connected.
 	void LobbyCreationSuccess() {
-		//have to start the NGO
-
-
-		//update things to lobby:
-		//players should be "already made"
-		//lobby code
-		//lobby mode
-		//lobby name
-		//lobby player number
-
 		lobbyCreationPanel.SetActive(false);
 		LobbyUpdate(MyLobby.Instance.hostLobby);
 		ToggleLobby(true);
@@ -214,13 +203,13 @@ public class LobbyUI : MonoBehaviour {
 
 
 	void LobbyJoined() {
-		Lobby joinedLobby = MyLobby.Instance.joinedLobby;
-		if (joinedLobby == null) return;
-		LobbyUpdate(joinedLobby);
+		HidePanelsExceptChosen();
+		LobbyUpdate(MyLobby.Instance.joinedLobby);
 		ToggleLobby(true);
 	}
 	[SerializeField] TextMeshProUGUI lobbyModeTxt, lobbyCodeTxt;
 	void LobbyUpdate(Lobby lobby) {
+		if (lobby == null) return;
 		lobbyModeTxt.text = lobby.Data[MyLobby.GameMode].Value;
 		if (MyLobby.Instance.hostLobby != null) {
 			lobbyCodeTxt.text = lobby.LobbyCode;

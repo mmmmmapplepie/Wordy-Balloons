@@ -66,7 +66,6 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 		useColor.Value = data.Color;
 
 		if (timeOutRoutine != null) StopCoroutine(timeOutRoutine);
-
 		if (NetworkManager.Singleton.IsServer) {
 			if (lobbyID != AuthenticationService.Instance.PlayerId) {
 				kickBtn.SetActive(true);
