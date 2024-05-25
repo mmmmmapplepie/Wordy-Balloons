@@ -12,7 +12,6 @@ using System.Threading;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
-using Unity.VisualScripting;
 
 [DefaultExecutionOrder(-100)]
 public class MyLobby : MonoBehaviour {
@@ -66,6 +65,7 @@ public class MyLobby : MonoBehaviour {
 		AuthenticationService.Instance.SignOut();
 		ExitScene.Cancel();
 		ExitScene.Dispose();
+		if (Instance == this) Instance = null;
 	}
 
 	public static MyLobby Instance;
@@ -82,23 +82,24 @@ public class MyLobby : MonoBehaviour {
 	public event Action AuthenticationBegin, AuthenticationSuccess, AuthenticationFailure;
 
 
-	public event Action LobbyCreationBegin, LobbyCreationSuccess, LobbyCreationFailure;
+	public event Action LobbyCreationBegin, LobbyCreated, LobbyCreationSuccess, LobbyCreationFailure;
 
 	public event Action RelayFailure;
 
 	public event Action HearbeatFailure;
 
 	public event Action LobbyJoinBegin, LobbyJoinSuccess, LobbyJoinFailure;
-
+	public event Action<string> LobbyJoined;
 
 	public event Action LeaveLobbyBegin, LeaveLobbySuccess, LeaveLobbyFailure;
+	public event Action<List<Player>> PlayersLeft;
 
 
 	public event Action<List<Lobby>> ListLobbySuccess;
 	public event Action ListLobbyFailure;
 	#endregion
 
-	#region lobby heartbeat & pull
+	#region lobby heartbeat & poll & listRefresh
 
 	float heartBeatElapsed = 0, heartBeatPeriod = 15f;
 	float lobbyListRefreshElapsed = 0, lobbyListRefreshPeriod = 5f;
@@ -165,15 +166,6 @@ public class MyLobby : MonoBehaviour {
 	}
 	#endregion
 
-
-
-
-	public void CL() {
-		CreateLobby("ye", "YEP", 4);
-	}
-
-
-
 	public async void CreateLobby(string lobbyName, string mode, int lobbyMaxPlayerNumber) {
 		if (hostLobby != null) return;
 		LobbyCreationBegin?.Invoke();
@@ -184,7 +176,7 @@ public class MyLobby : MonoBehaviour {
 		try {
 			//create lobby
 			CreateLobbyOptions lobbyDetails = new CreateLobbyOptions {
-				IsPrivate = false,
+				IsPrivate = true,
 				Player = GetNewPlayer(playerName),
 				Data = new Dictionary<string, DataObject> {
 					{GameMode, new DataObject(DataObject.VisibilityOptions.Public, mode, DataObject.IndexOptions.S1)},
@@ -208,14 +200,20 @@ public class MyLobby : MonoBehaviour {
 			joinedLobby = hostLobby;
 			await SubscribeToLobbyEvents(true);
 			//have to make your own player objects (as you won't be getting events for players being added as that "already happened") -- only for the host.
-			LobbyCreationSuccess?.Invoke();
+			LobbyCreated?.Invoke();
 		} catch (Exception e) {
 			print(e);
 			LeaveLobby();
 			LobbyCreationFailure?.Invoke();
 		}
 	}
-
+	public void LobbyCreationSuccessful(bool succesful) {
+		if (succesful) {
+			LobbyCreationSuccess?.Invoke();
+		} else {
+			LobbyCreationFailure?.Invoke();
+		}
+	}
 	Player GetNewPlayer(string name) {
 		return new Player {
 			Data = new Dictionary<string, PlayerDataObject>{
@@ -253,25 +251,26 @@ public class MyLobby : MonoBehaviour {
 		TimeSpan latestInteractionTimespan = now - latestLobbyInteraction;
 		if (changesTimespan > latestInteractionTimespan) return;
 
-
 		changes.ApplyToLobby(joinedLobby);
+
 		if (hostLobby != null) hostLobby = joinedLobby;
 		LobbyChangedEvent?.Invoke(changes);
-
-
-
 
 		//lobby deleted/kicked
 		if (changes.LobbyDeleted || joinedLobby.Players.Find(x => x.Id == authenticationID) == null) {
 			LeaveLobby();
 			return;
 		}
-
-		if (hostLobby != null && changes.PlayerJoined.Value != null) {
-			foreach (LobbyPlayerJoined p in changes.PlayerJoined.Value) {
-				Player player = p.Player;
-				print(player.Id);
-				//make the player object etc
+		if (hostLobby != null) {
+			if (changes.PlayerJoined.Value != null) {
+				foreach (LobbyPlayerJoined p in changes.PlayerJoined.Value) {
+					LobbyJoined?.Invoke(p.Player.Id);
+				}
+			}
+			if (changes.PlayerLeft.Value != null && changes.PlayerLeft.Value.Count > 0) {
+				print(changes.PlayerLeft.Value.Count);
+				print(changes.PlayerLeft.Value[0]);
+				PlayersLeft(hostLobby.Players);
 			}
 		}
 	}
@@ -340,10 +339,16 @@ public class MyLobby : MonoBehaviour {
 			JoinAllocation joinRelayAlloc = await JoinRelay(relayCode);
 			await SubscribeToLobbyEvents(true);
 			NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinRelayAlloc, "dtls"));
-			LobbyJoinSuccess?.Invoke();
 		} catch (Exception e) {
 			LeaveLobby();
 			throw e;
+		}
+	}
+	public void JoinLobbySuccessful(bool succesful) {
+		if (succesful) {
+			LobbyJoinSuccess?.Invoke();
+		} else {
+			LobbyJoinFailure?.Invoke();
 		}
 	}
 
@@ -423,6 +428,20 @@ public class MyLobby : MonoBehaviour {
 			joinedLobby = hostLobby;
 		} catch (LobbyServiceException e) {
 			print(e.Reason);
+			LeaveLobby();
+		}
+	}
+	public async void MakeLobbyPublic() {
+		try {
+			hostLobby = await Lobbies.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions {
+				IsPrivate = false
+			});
+			joinedLobby = hostLobby;
+			LobbyCreationSuccess?.Invoke();
+		} catch (LobbyServiceException e) {
+			print(e.Reason);
+			LeaveLobby();
+			LobbyCreationFailure?.Invoke();
 		}
 	}
 
@@ -480,13 +499,3 @@ public class MyLobby : MonoBehaviour {
 
 
 
-public struct PlayerData {
-	public ulong ClientID;
-	public string LobbyID;
-	public string Name;
-	public PlayerData(ulong clientID, string lobbyID, string name) {
-		this.ClientID = clientID;
-		this.LobbyID = lobbyID;
-		this.Name = name;
-	}
-}

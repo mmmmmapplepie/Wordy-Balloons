@@ -1449,7 +1449,7 @@ CanvasGroup:
   m_Enabled: 1
   m_Alpha: 0
   m_Interactable: 0
-  m_BlocksRaycasts: 1
+  m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
 --- !u!1 &347692723
 GameObject:
@@ -3014,6 +3014,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38655b0471bddde4f8153572f6aee22d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  team1Holder: {fileID: 1120342039}
+  team2Holder: {fileID: 447249985}
+  lobbyPlayerPrefab: {fileID: 5921052582599041628, guid: d207d99b6fd610242b235257685cc23d, type: 3}
+  lobbyScript: {fileID: 913481574}
+  colorOptions:
+  - {r: 1, g: 0, b: 0, a: 0}
+  - {r: 1, g: 0.5528314, b: 0, a: 0}
+  - {r: 1, g: 0.9551071, b: 0, a: 0}
+  - {r: 0.044203043, g: 1, b: 0, a: 0}
+  - {r: 0, g: 1, b: 0.94949126, a: 0}
+  - {r: 0, g: 0.24596381, b: 1, a: 0}
+  - {r: 0.40917587, g: 0, b: 1, a: 0}
+  - {r: 1, g: 0, b: 0.9724145, a: 0}
+  - {r: 1, g: 1, b: 1, a: 0}
+  - {r: 0.21698111, g: 0.21698111, b: 0.21698111, a: 0}
 --- !u!4 &686878202
 Transform:
   m_ObjectHideFlags: 0
@@ -9727,7 +9742,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6960e84d07fb87f47956e7a81d71c4e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ProtocolType: 0
+  m_ProtocolType: 1
   m_MaxPacketQueueSize: 128
   m_MaxPayloadSize: 6144
   m_HeartbeatTimeoutMS: 500
@@ -9778,7 +9793,7 @@ MonoBehaviour:
     EnableNetworkLogs: 1
     OldPrefabList: []
   RunInBackground: 1
-  LogLevel: 0
+  LogLevel: 1
 --- !u!4 &2129996768
 Transform:
   m_ObjectHideFlags: 0

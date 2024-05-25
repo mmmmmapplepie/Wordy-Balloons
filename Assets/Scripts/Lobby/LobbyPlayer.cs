@@ -1,58 +1,91 @@
+using System.Collections;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using Unity.Services.Authentication;
-using Unity.Services.Lobbies.Models;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler {
-	public string lobbyID;
-	public ulong clientID;
 	[SerializeField] TextMeshProUGUI playerNameTxt;
-	[SerializeField] GameObject kickBtn;
+	[SerializeField] GameObject kickBtn, loadingCover, activePlayerCover;
 	[SerializeField] TMP_Dropdown colorPicker;
-	MyLobby lobbyScript;
 
-
-
-	public DragAndDropVisualMode dragAndDropVisualMode => throw new System.NotImplementedException();
 	NetworkVariable<FixedString64Bytes> playerName = new NetworkVariable<FixedString64Bytes>();
-	NetworkVariable<ulong> clientIDNetVar = new NetworkVariable<ulong>();
-	NetworkVariable<Color> playerColor = new NetworkVariable<Color>();
+
+
+	NetworkVariable<ulong> clientIDNetVar = new NetworkVariable<ulong>(ulong.MaxValue);
+
+	NetworkVariable<Color> useColor = new NetworkVariable<Color>(Color.black);
+
+	NetworkVariable<bool> dataCompleteNetVar = new NetworkVariable<bool>(false);
+
+	[HideInInspector] public string lobbyID;
+	[HideInInspector] public NetcodeManager netScript;
+
+	Coroutine timeOutRoutine;
 	public override void OnNetworkSpawn() {
-		if (lobbyScript != null) {
-			playerName.Value = nameTemp;
-			playerColor.Value = colorTemp;
-			clientIDNetVar.Value = clientID;
-		}
-		if (clientIDNetVar.Value == NetworkManager.Singleton.LocalClientId) {
-			colorPicker.gameObject.SetActive(true);
-		}
-		playerNameTxt.text = playerName.Value.ToString();
-		if (NetworkManager.Singleton.IsServer && lobbyID != AuthenticationService.Instance.PlayerId) {
-			kickBtn.SetActive(true);
+		useColor.OnValueChanged += ColorChanged;
+		dataCompleteNetVar.OnValueChanged += LoadStateChanged;
+		clientIDNetVar.OnValueChanged += ClientIDChanged;
+		if (NetworkManager.Singleton.IsServer) timeOutRoutine = StartCoroutine(TimeOutRoutine());
+	}
+	IEnumerator TimeOutRoutine() {
+		float timeoutTime = 5f;
+		yield return new WaitForSecondsRealtime(timeoutTime);
+		KickPlayer();
+	}
+	public override void OnNetworkDespawn() {
+		useColor.OnValueChanged -= ColorChanged;
+		dataCompleteNetVar.OnValueChanged -= LoadStateChanged;
+		clientIDNetVar.OnValueChanged -= ClientIDChanged;
+	}
+
+	void ColorChanged(Color old, Color newC) {
+
+	}
+	void LoadStateChanged(bool old, bool newb) {
+		if (newb) {
+			loadingCover.SetActive(false);
 		}
 	}
-	FixedString64Bytes nameTemp;
-	Color colorTemp;
-	public void SetupPlayer(PlayerData data, MyLobby myLobby) {
-		nameTemp = data.Name;
-		colorTemp = Color.white;
-		lobbyID = data.LobbyID;
-		clientID = data.ClientID;
-		lobbyScript = myLobby;
+	void ClientIDChanged(ulong old, ulong newid) {
+		if (newid == NetworkManager.Singleton.LocalClientId) {
+			activePlayerCover.SetActive(true);
+		}
+	}
 
+
+
+
+	public void SetupPlayer(PlayerData data) {
+		lobbyID = data.LobbyID;
+		playerName.Value = data.Name;
+		clientIDNetVar.Value = data.ClientID;
+		useColor.Value = data.Color;
+
+		if (timeOutRoutine != null) StopCoroutine(timeOutRoutine);
+
+		if (NetworkManager.Singleton.IsServer) {
+			if (lobbyID != AuthenticationService.Instance.PlayerId) {
+				kickBtn.SetActive(true);
+			}
+		}
+
+		dataCompleteNetVar.Value = true;
 	}
 	public void KickPlayer() {
-		lobbyScript.LeaveLobby(lobbyID);
+		MyLobby.Instance.KickFromLobby(lobbyID);
 	}
 
 	public override void OnDestroy() {
 		if (tempObj != null) Destroy(tempObj);
 		base.OnDestroy();
 	}
+
+
+
 	GameObject tempObj;
 	Vector2 difference = Vector2.zero;
 	public void OnBeginDrag(PointerEventData eventData) {
@@ -73,4 +106,25 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 		Destroy(tempObj);
 	}
 
+}
+
+
+
+
+
+
+
+
+
+public struct PlayerData {
+	public ulong ClientID;
+	public string LobbyID;
+	public string Name;
+	public Color Color;
+	public PlayerData(ulong clientID, string lobbyID, string name, Color color) {
+		this.ClientID = clientID;
+		this.LobbyID = lobbyID;
+		this.Name = name;
+		this.Color = color;
+	}
 }

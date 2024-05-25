@@ -199,6 +199,7 @@ public class LobbyUI : MonoBehaviour {
 	}
 	void ToggleLobby(bool interactable) {
 		lobbyPanel.interactable = interactable;
+		lobbyPanel.blocksRaycasts = interactable;
 		lobbyPanel.alpha = interactable ? 1 : 0;
 	}
 
