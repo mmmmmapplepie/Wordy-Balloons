@@ -156,7 +156,7 @@ public class NetcodeManager : NetworkBehaviour {
 
 	#region joining as clinet
 	void JoinAsClient() {
-		// NetworkManager.Singleton.StartClient();
+		NetworkManager.Singleton.StartClient();
 	}
 	void PlayerJoinedLobby(string newJoinedLobbyID) {
 		if (NetworkManager.Singleton.IsServer) {
@@ -168,7 +168,7 @@ public class NetcodeManager : NetworkBehaviour {
 	void ClientConnectedToNGO(ulong clientID) {
 		//non server can't all this
 		if (!NetworkManager.Singleton.IsServer) return;
-		//server shoudln't call for itself
+		//host shoudln't call for itself
 		if (NetworkManager.Singleton.LocalClientId == clientID) return;
 		ClientRpcParams option = new ClientRpcParams {
 			Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { clientID } }

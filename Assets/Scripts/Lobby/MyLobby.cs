@@ -91,7 +91,8 @@ public class MyLobby : MonoBehaviour {
 	public event Action LobbyJoinBegin, LobbyJoinSuccess, LobbyJoinFailure, JoinLobbyNetcode;
 	public event Action<string> LobbyJoined;
 
-	public event Action LeaveLobbyBegin, LeaveLobbySuccess, LeaveLobbyFailure;
+	public event Action LeaveLobbyBegin;
+	// public event Action LeaveLobbySuccess, LeaveLobbyFailure;
 	public event Action<List<Player>> PlayersLeft;
 
 
@@ -152,20 +153,16 @@ public class MyLobby : MonoBehaviour {
 				if (hostLobby != null) {
 					hostLobby = joinedLobby;
 				}
-				if (joinedLobby.Players.Find(x => x.Id == authenticationID) == null) {
-					OutOfLobby(false);
-					return;
-				}
 			} catch (LobbyServiceException e) {
 				print(e);
-				OutOfLobby(true);
+				OutOfLobby(false);
 			}
 		} else {
 			updateElapsed += Time.deltaTime;
 		}
 	}
-	void OutOfLobby(bool lobbyDeleted) {
-		if (!NetworkManager.Singleton.IsConnectedClient && !lobbyDeleted) {
+	void OutOfLobby(bool kicked) {
+		if (!NetworkManager.Singleton.IsConnectedClient && kicked) {
 			LobbyJoinFailure?.Invoke();
 		} else {
 			LobbyJoinSuccess?.Invoke();
@@ -235,6 +232,7 @@ public class MyLobby : MonoBehaviour {
 			if (subscribe) {
 				lobbyCallback = new LobbyEventCallbacks();
 				lobbyCallback.LobbyChanged += LobbyChanged;
+				lobbyCallback.KickedFromLobby += KickedFromLobby;
 				LobbyEvents = await Lobbies.Instance.SubscribeToLobbyEventsAsync(joinedLobby.Id, lobbyCallback);
 			} else {
 				// if (lobbyCallback != null) lobbyCallback.LobbyChanged -= LobbyChanged;
@@ -280,7 +278,9 @@ public class MyLobby : MonoBehaviour {
 		}
 	}
 
-
+	void KickedFromLobby() {
+		OutOfLobby(true);
+	}
 
 
 
@@ -297,7 +297,6 @@ public class MyLobby : MonoBehaviour {
 
 			joinedLobby = await Lobbies.Instance.JoinLobbyByIdAsync(lobbyID, options);
 			await JoinLobby();
-			JoinLobbyNetcode?.Invoke();
 		} catch (Exception e) {
 			print(e);
 			LobbyJoinFailure?.Invoke();
@@ -348,6 +347,7 @@ public class MyLobby : MonoBehaviour {
 			JoinAllocation joinRelayAlloc = await JoinRelay(relayCode);
 			await SubscribeToLobbyEvents(true);
 			NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinRelayAlloc, "dtls"));
+			JoinLobbyNetcode?.Invoke();
 		} catch (Exception e) {
 			LeaveLobby();
 			throw e;
@@ -392,10 +392,10 @@ public class MyLobby : MonoBehaviour {
 				} else {
 					await LobbyService.Instance.RemovePlayerAsync(lobbyID, playerID);
 				}
-				LeaveLobbySuccess?.Invoke();
+				// LeaveLobbySuccess?.Invoke();
 			} catch (Exception e) {
 				print(e);
-				LeaveLobbyFailure?.Invoke();
+				// LeaveLobbyFailure?.Invoke();
 			}
 		}
 	}

@@ -234,7 +234,7 @@ public class LobbyUI : MonoBehaviour {
 	public Transform lobbiesListHolder, lobbyOptionPrefab;
 	void LobbyListFound(List<Lobby> lobbies) {
 		foreach (Transform t in lobbiesListHolder) {
-			Destroy(t);
+			Destroy(t.gameObject);
 		}
 		foreach (Lobby l in lobbies) {
 			Transform newOption = Instantiate(lobbyOptionPrefab, lobbiesListHolder);

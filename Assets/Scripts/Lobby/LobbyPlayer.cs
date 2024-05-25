@@ -30,6 +30,8 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 		dataCompleteNetVar.OnValueChanged += LoadStateChanged;
 		clientIDNetVar.OnValueChanged += ClientIDChanged;
 		if (NetworkManager.Singleton.IsServer) timeOutRoutine = StartCoroutine(TimeOutRoutine());
+
+		loadingCover.SetActive(!dataCompleteNetVar.Value);
 	}
 	IEnumerator TimeOutRoutine() {
 		float timeoutTime = 5f;
