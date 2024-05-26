@@ -354,7 +354,7 @@ public class MyLobby : MonoBehaviour {
 	}
 	public void KickedFromLobby() {
 		Debug.LogWarning("Kicked:" + WaitingForNGO);
-		// if (joinedLobby == null) return;
+		if (joinedLobby == null) return;
 		if (WaitingForNGO) {
 			LobbyJoinFailure?.Invoke();
 		} else {
