@@ -7,20 +7,16 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler {
+public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler, IDropHandler, IPointerEnterHandler, IPointerExitHandler, IPointerUpHandler {
 	[SerializeField] TextMeshProUGUI playerNameTxt;
 	[SerializeField] GameObject kickBtn, loadingCover, activePlayerCover;
 	[SerializeField] TMP_Dropdown colorPicker;
 
 	NetworkVariable<FixedString64Bytes> playerName = new NetworkVariable<FixedString64Bytes>();
-
-
 	NetworkVariable<ulong> clientIDNetVar = new NetworkVariable<ulong>(ulong.MaxValue);
-
-	NetworkVariable<Color> useColor = new NetworkVariable<Color>(Color.black);
-
+	public NetworkVariable<Color> useColor = new NetworkVariable<Color>(Color.black);
+	public NetworkVariable<int> siblingNum = new NetworkVariable<int>();
 	NetworkVariable<bool> dataCompleteNetVar = new NetworkVariable<bool>(false);
-
 	[HideInInspector] public string lobbyID;
 	[HideInInspector] public NetcodeManager netScript;
 
@@ -29,8 +25,11 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 		useColor.OnValueChanged += ColorChanged;
 		dataCompleteNetVar.OnValueChanged += LoadStateChanged;
 		clientIDNetVar.OnValueChanged += ClientIDChanged;
-		if (NetworkManager.Singleton.IsServer) timeOutRoutine = StartCoroutine(TimeOutRoutine());
-
+		siblingNum.OnValueChanged += ChangePos;
+		if (NetworkManager.Singleton.IsServer) {
+			timeOutRoutine = StartCoroutine(TimeOutRoutine());
+			siblingNum.Value = transform.GetSiblingIndex();
+		}
 		loadingCover.SetActive(!dataCompleteNetVar.Value);
 	}
 	IEnumerator TimeOutRoutine() {
@@ -42,6 +41,7 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 		useColor.OnValueChanged -= ColorChanged;
 		dataCompleteNetVar.OnValueChanged -= LoadStateChanged;
 		clientIDNetVar.OnValueChanged -= ClientIDChanged;
+		siblingNum.OnValueChanged -= ChangePos;
 	}
 
 	void ColorChanged(Color old, Color newC) {
@@ -57,9 +57,6 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 			activePlayerCover.SetActive(true);
 		}
 	}
-
-
-
 
 	public void SetupPlayer(PlayerData data) {
 		lobbyID = data.LobbyID;
@@ -87,8 +84,16 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 
 
 
+
+
+
+
+
+
+
+	public GameObject swapIndicator;
 	GameObject tempObj;
-	Vector2 difference = Vector2.zero;
+	public static event System.Action<Transform, LobbyPlayer, LobbyPlayer> TeamChangeEvent;
 	public void OnBeginDrag(PointerEventData eventData) {
 		if (!NetworkManager.Singleton.IsServer) return;
 		tempObj = Instantiate(gameObject, transform.parent.parent.parent);
@@ -100,13 +105,45 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 
 	public void OnDrag(PointerEventData eventData) {
 		if (tempObj != null) {
-			tempObj.GetComponent<RectTransform>().position = difference + (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			Vector2 mousePos = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			mousePos.x = GetComponent<RectTransform>().position.x;
+			tempObj.GetComponent<RectTransform>().position = mousePos;
 		}
 	}
 	public void OnEndDrag(PointerEventData eventData) {
 		Destroy(tempObj);
 	}
 
+	public void OnDrop(PointerEventData eventData) {
+		if (!NetworkManager.Singleton.IsServer) return;
+		GameObject dragObject = eventData.pointerDrag;
+		if (dragObject == null || dragObject.GetComponent<LobbyPlayer>() == null) return;
+		if (dragObject == gameObject) return;
+
+		TeamChangeEvent?.Invoke(transform.parent, dragObject.GetComponent<LobbyPlayer>(), this);
+	}
+
+	void ChangePos(int old, int newPos) {
+		transform.SetSiblingIndex(newPos);
+	}
+
+	public void OnPointerEnter(PointerEventData eventData) {
+		if (!NetworkManager.Singleton.IsServer) return;
+		GameObject dragObject = eventData.pointerDrag;
+		if (dragObject == null || dragObject.GetComponent<LobbyPlayer>() == null) return;
+		if (dragObject == gameObject) return;
+		swapIndicator.SetActive(true);
+	}
+
+	public void OnPointerExit(PointerEventData eventData) {
+		if (!NetworkManager.Singleton.IsServer) return;
+		swapIndicator.SetActive(false);
+	}
+
+	public void OnPointerUp(PointerEventData eventData) {
+		if (!NetworkManager.Singleton.IsServer) return;
+		swapIndicator.SetActive(false);
+	}
 }
 
 

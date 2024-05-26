@@ -26,6 +26,7 @@ public class NetcodeManager : NetworkBehaviour {
 	public override void OnNetworkSpawn() {
 		NetworkManager.Singleton.OnClientConnectedCallback += ClientConnectedToNGO;
 		NetworkManager.Singleton.OnClientDisconnectCallback += ClientDisconnectedFromNGO;
+		NetworkManager.Singleton.OnServerStopped += ServerStopped;
 	}
 
 	void Start() {
@@ -35,6 +36,11 @@ public class NetcodeManager : NetworkBehaviour {
 		MyLobby.Instance.JoinLobbyNetcode += JoinAsClient;
 		MyLobby.Instance.LeaveLobbyBegin += ShutDownNetwork;
 		MyLobby.Instance.PlayersLeft += PlayersLeft;
+
+
+		TeamBox.TeamChangeEvent += ChangeTeam;
+		LobbyPlayer.TeamChangeEvent += ChangeTeam;
+
 	}
 	public override void OnDestroy() {
 		//events from lobby
@@ -45,6 +51,11 @@ public class NetcodeManager : NetworkBehaviour {
 			MyLobby.Instance.LeaveLobbyBegin -= ShutDownNetwork;
 			MyLobby.Instance.PlayersLeft -= PlayersLeft;
 		}
+
+
+		TeamBox.TeamChangeEvent -= ChangeTeam;
+		LobbyPlayer.TeamChangeEvent -= ChangeTeam;
+
 		base.OnDestroy();
 	}
 
@@ -119,6 +130,7 @@ public class NetcodeManager : NetworkBehaviour {
 		Transform newP = Instantiate(lobbyPlayerPrefab, targetHolder);
 		LobbyPlayer script = newP.GetComponent<LobbyPlayer>();
 		script.lobbyID = lobbyID;
+		script.netScript = this;
 		newP.GetComponent<NetworkObject>().Spawn(true);
 		newP.GetComponent<NetworkObject>().TrySetParent(targetHolder);
 		playersObjects.Add(script);
@@ -232,6 +244,10 @@ public class NetcodeManager : NetworkBehaviour {
 		}
 	}
 
+	void ServerStopped(bool stopped) {
+		MyLobby.Instance.LeaveLobby();
+	}
+
 
 
 
@@ -248,8 +264,16 @@ public class NetcodeManager : NetworkBehaviour {
 			LobbyID_KEY_ClientID_VAL.Remove(id);
 			team1.Remove(id);
 			team2.Remove(id);
+
+			if (ClientID_KEY_Color_VAL.ContainsKey(clientID)) {
+				Color c = ClientID_KEY_Color_VAL[clientID];
+				ClientID_KEY_Color_VAL.Remove(clientID);
+				colorsBeingUsed.Remove(c);
+			}
+
 			LobbyPlayer playerObj = playersObjects.Find(x => x.lobbyID == id);
 			if (playerObj != null) {
+				playersObjects.Remove(playerObj);
 				playerObj.GetComponent<NetworkObject>().Despawn(true);
 			}
 			NetworkManager.DisconnectClient(clientID);
@@ -262,29 +286,50 @@ public class NetcodeManager : NetworkBehaviour {
 
 	#region changingTeams
 
-	// void Start() {
-	// 	TeamBox.teamChange += ChangeTeam;
-	// }
-	// void OnDisable() {
-	// 	TeamBox.teamChange -= ChangeTeam;
-	// }
+	void ChangeTeam(Transform targetT, LobbyPlayer dragPlayer, LobbyPlayer swapPlayer) {
+		if (swapPlayer == null) {
+			//can't add more players to the teams
+			if ((targetT == team1Holder && team1Holder.childCount >= team1Max) || (targetT == team2Holder && team2Holder.childCount >= team2Max)) return;
 
-	// void ChangeTeam(int newTeam, LobbyPlayer player) {
-	// 	if (newTeam == 1) {
-	// 		if (team1.Contains(player.lobbyID)) return;
-	// 		team2.Remove(player.lobbyID);
-	// 		team1.Add(player.lobbyID);
-	// 		player.gameObject.GetComponent<NetworkObject>().TrySetParent(team1ListHolder);
-	// 		player.transform.SetAsLastSibling();
-	// 	}
-	// 	if (newTeam == 2) {
-	// 		if (team2.Contains(player.lobbyID)) return;
-	// 		team1.Remove(player.lobbyID);
-	// 		team2.Add(player.lobbyID);
-	// 		player.gameObject.GetComponent<NetworkObject>().TrySetParent(team2ListHolder);
-	// 		player.transform.SetAsLastSibling();
-	// 	}
-	// }
+			if (targetT == team1Holder) {
+				if (team1.Contains(dragPlayer.lobbyID)) return;
+				team2.Remove(dragPlayer.lobbyID);
+				team1.Add(dragPlayer.lobbyID);
+				dragPlayer.gameObject.GetComponent<NetworkObject>().TrySetParent(team1Holder);
+				dragPlayer.transform.SetAsLastSibling();
+			}
+			if (targetT == team2Holder) {
+				if (team2.Contains(dragPlayer.lobbyID)) return;
+				team1.Remove(dragPlayer.lobbyID);
+				team2.Add(dragPlayer.lobbyID);
+				dragPlayer.gameObject.GetComponent<NetworkObject>().TrySetParent(team2Holder);
+				dragPlayer.transform.SetAsLastSibling();
+			}
+			return;
+		}
+
+
+		//swap scenario
+		Transform dragObjHolder = dragPlayer.transform.parent;
+		int dragObjOrder = dragPlayer.transform.GetSiblingIndex();
+		Transform swapObjHolder = swapPlayer.transform.parent;
+		int swapObjOrder = swapPlayer.transform.GetSiblingIndex();
+
+
+		//remove and add to corresponding teams
+		if (dragObjHolder == team1Holder) { team1.Remove(dragPlayer.lobbyID); team1.Add(swapPlayer.lobbyID); }
+		if (dragObjHolder == team2Holder) { team2.Remove(dragPlayer.lobbyID); team2.Add(swapPlayer.lobbyID); };
+		if (swapObjHolder == team1Holder) { team1.Remove(swapPlayer.lobbyID); team1.Add(dragPlayer.lobbyID); };
+		if (swapObjHolder == team2Holder) { team2.Remove(swapPlayer.lobbyID); team2.Add(dragPlayer.lobbyID); };
+
+
+		//then move swap to drag position
+		dragPlayer.gameObject.GetComponent<NetworkObject>().TrySetParent(swapObjHolder);
+		swapPlayer.gameObject.GetComponent<NetworkObject>().TrySetParent(dragObjHolder);
+		//might need to networkvariable that in the lobby player
+		dragPlayer.siblingNum.Value = swapObjOrder;
+		swapPlayer.siblingNum.Value = dragObjOrder;
+	}
 	#endregion
 
 

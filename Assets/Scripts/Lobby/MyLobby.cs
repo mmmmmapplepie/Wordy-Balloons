@@ -155,7 +155,7 @@ public class MyLobby : MonoBehaviour {
 				}
 			} catch (LobbyServiceException e) {
 				print(e);
-				OutOfLobby(false);
+				OutOfLobby(e.Reason != LobbyExceptionReason.LobbyNotFound);
 			}
 		} else {
 			updateElapsed += Time.deltaTime;
@@ -262,10 +262,6 @@ public class MyLobby : MonoBehaviour {
 		if (hostLobby != null) hostLobby = joinedLobby;
 		LobbyChangedEvent?.Invoke(changes);
 
-		if (changes.LobbyDeleted) {
-			LeaveLobby();
-			return;
-		}
 		if (hostLobby != null) {
 			if (changes.PlayerJoined.Value != null) {
 				foreach (LobbyPlayerJoined p in changes.PlayerJoined.Value) {
