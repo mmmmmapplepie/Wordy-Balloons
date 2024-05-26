@@ -26,8 +26,7 @@ public class LobbyUI : MonoBehaviour {
 
 		MyLobby.Instance.LobbyCreationBegin += OpenLoadingPanel;//
 
-		//not done have to chnage so that it only happens when NGO is done
-		MyLobby.Instance.LobbyCreationSuccess += LobbyCreationSuccess;
+		MyLobby.Instance.LobbyCreationSuccess += LobbyCreationSuccess;//
 
 		MyLobby.Instance.LobbyCreationFailure += LobbyCreationFail;//
 
@@ -187,6 +186,7 @@ public class LobbyUI : MonoBehaviour {
 		CloseTransitionPanels();
 	}
 	void ToggleLobby(bool interactable) {
+		print("toggled");
 		lobbyPanel.interactable = interactable;
 		lobbyPanel.blocksRaycasts = interactable;
 		lobbyPanel.alpha = interactable ? 1 : 0;

@@ -162,15 +162,7 @@ public class MyLobby : MonoBehaviour {
 			updateElapsed += Time.deltaTime;
 		}
 	}
-	public void GoOutOfLobby(bool kicked) {
-		if (kicked) {
-			LobbyJoinFailure?.Invoke();
-		} else {
-			//just closes all other panels
-			LobbyJoinSuccess?.Invoke();
-		}
-		LeaveLobby();
-	}
+
 	#endregion
 
 	public async void CreateLobby(string lobbyName, string mode, int lobbyMaxPlayerNumber) {
@@ -262,7 +254,6 @@ public class MyLobby : MonoBehaviour {
 				}
 			}
 			if (changes.PlayerLeft.Value != null) {
-				print("playerLeftbro");
 				PlayersLeft?.Invoke(hostLobby.Players);
 			}
 		}
@@ -310,7 +301,6 @@ public class MyLobby : MonoBehaviour {
 	}
 
 	public async void QuickJoinLobby() {
-		Debug.LogWarning("tryingtojoinlobby situation: " + joinedLobby);
 		if (joinedLobby != null) { LobbyJoinFailure?.Invoke(); return; }
 		LobbyJoinBegin?.Invoke();
 		try {
@@ -355,6 +345,7 @@ public class MyLobby : MonoBehaviour {
 		if (hostLobby == null) return;
 		if (joinedLobby != null) {
 			try {
+				print("kicking player:" + id);
 				await LobbyService.Instance.RemovePlayerAsync(joinedLobby.Id, id);
 			} catch (LobbyServiceException e) {
 				print(e.Reason);
@@ -363,23 +354,29 @@ public class MyLobby : MonoBehaviour {
 	}
 	public void KickedFromLobby() {
 		Debug.LogWarning("Kicked:" + WaitingForNGO);
-		GoOutOfLobby(WaitingForNGO);
+		// if (joinedLobby == null) return;
+		if (WaitingForNGO) {
+			LobbyJoinFailure?.Invoke();
+		} else {
+			//just closes all other panels
+			AuthenticationSuccess?.Invoke();
+		}
+		LeaveLobby();
 	}
 	public void LeaveLobby() {
 		LeaveLobby(authenticationID);
 	}
 	public async void LeaveLobby(string playerID) {
 		if (joinedLobby != null) {
-			Debug.LogWarning("leavingLobby");
 			LeaveLobbyBegin?.Invoke();
 			try {
-				WaitingForNGO = false;
+				string hostID = joinedLobby.HostId;
 				string lobbyID = joinedLobby.Id;
-				string lobbyhostID = joinedLobby.HostId;
+				WaitingForNGO = false;
 				joinedLobby = null;
 				hostLobby = null;
 				await SubscribeToLobbyEvents(false);
-				if (playerID == lobbyhostID) {
+				if (playerID == hostID) {
 					await LobbyService.Instance.DeleteLobbyAsync(lobbyID);
 				} else {
 					await LobbyService.Instance.RemovePlayerAsync(lobbyID, playerID);

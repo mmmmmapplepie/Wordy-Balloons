@@ -33,7 +33,7 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 		loadingCover.SetActive(!dataCompleteNetVar.Value);
 	}
 	IEnumerator TimeOutRoutine() {
-		float timeoutTime = 0.5f;
+		float timeoutTime = 10f;
 		yield return new WaitForSecondsRealtime(timeoutTime);
 		KickPlayer();
 	}

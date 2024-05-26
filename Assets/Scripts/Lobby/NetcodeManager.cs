@@ -8,7 +8,6 @@ using UnityEngine;
 
 public class NetcodeManager : NetworkBehaviour {
 	[SerializeField] Transform team1Holder, team2Holder, lobbyPlayerPrefab;
-	[SerializeField] MyLobby lobbyScript;
 
 
 	public List<Color> colorOptions;
@@ -28,6 +27,7 @@ public class NetcodeManager : NetworkBehaviour {
 
 		//oddly enough only triggers for "other clients other than self" disconnecting
 		NetworkManager.Singleton.OnClientDisconnectCallback += ClientDisconnectedFromNGO;
+		NetworkManager.Singleton.OnClientStopped += ClientStopped;
 	}
 
 	void Start() {
@@ -178,7 +178,7 @@ public class NetcodeManager : NetworkBehaviour {
 	}
 
 	void ClientConnectedToNGO(ulong clientID) {
-		//non server can't all this
+		//non server can't call this
 		if (!NetworkManager.Singleton.IsServer) return;
 		//host shoudln't call for itself
 		if (NetworkManager.Singleton.LocalClientId == clientID) return;
@@ -191,7 +191,6 @@ public class NetcodeManager : NetworkBehaviour {
 	[ClientRpc]
 	void AskForPlayerDataClientRPC(ClientRpcParams option = default) {
 		SendPlayerDataServerRPC(AuthenticationService.Instance.PlayerId, NetworkManager.Singleton.LocalClientId, MyLobby.Instance.playerName);
-		MyLobby.Instance.JoinLobbySuccessful(true);
 	}
 
 	[ServerRpc(RequireOwnership = false)]
@@ -210,18 +209,25 @@ public class NetcodeManager : NetworkBehaviour {
 		data.ClientID = clientID;
 		data.Color = c;
 
-		if (LobbyID_KEY_ClientID_VAL.ContainsKey(lobbyID)) {
-			LobbyID_KEY_ClientID_VAL[lobbyID] = clientID;
-		} else {
-			LobbyID_KEY_ClientID_VAL.Add(lobbyID, clientID);
-		}
-
 		LobbyPlayer playerObj = FindPlayerFromLobbyID(lobbyID);
-		if (playerObj != null) {
+		if (playerObj != null && LobbyID_KEY_ClientID_VAL.ContainsKey(lobbyID)) {
+			LobbyID_KEY_ClientID_VAL[lobbyID] = clientID;
 			playerObj.SetupPlayer(data);
+
+			ClientRpcParams option = new ClientRpcParams {
+				Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { clientID } }
+			};
+			JoinConfirmedClientRpc(option);
 		} else {
+			LobbyID_KEY_ClientID_VAL.Remove(lobbyID);
+			if (playerObj != null) RemovePlayerObject(playerObj);
 			MyLobby.Instance.KickFromLobby(lobbyID);
+			if (clientID != ulong.MaxValue) NetworkManager.DisconnectClient(clientID);
 		}
+	}
+	[ClientRpc]
+	void JoinConfirmedClientRpc(ClientRpcParams option = default) {
+		MyLobby.Instance.JoinLobbySuccessful(true);
 	}
 
 	LobbyPlayer FindPlayerFromLobbyID(string lobbyID) {
@@ -245,7 +251,9 @@ public class NetcodeManager : NetworkBehaviour {
 			}
 		}
 	}
-
+	void ClientStopped(bool wasHost) {
+		if (!wasHost) MyLobby.Instance.KickedFromLobby();
+	}
 
 
 
@@ -271,12 +279,16 @@ public class NetcodeManager : NetworkBehaviour {
 
 			LobbyPlayer playerObj = playersObjects.Find(x => x.lobbyID == id);
 			if (playerObj != null) {
-				playersObjects.Remove(playerObj);
-				playerObj.GetComponent<NetworkObject>().Despawn(true);
+				RemovePlayerObject(playerObj);
 			}
-			print("discconnecting client no" + clientID);
-			NetworkManager.DisconnectClient(clientID);
+
+			if (clientID != ulong.MaxValue) NetworkManager.DisconnectClient(clientID);
 		}
+	}
+
+	void RemovePlayerObject(LobbyPlayer obj) {
+		playersObjects.Remove(obj);
+		obj.GetComponent<NetworkObject>().Despawn(true);
 	}
 
 
