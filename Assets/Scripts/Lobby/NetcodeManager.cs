@@ -25,8 +25,9 @@ public class NetcodeManager : NetworkBehaviour {
 
 	public override void OnNetworkSpawn() {
 		NetworkManager.Singleton.OnClientConnectedCallback += ClientConnectedToNGO;
+
+		//oddly enough only triggers for "other clients other than self" disconnecting
 		NetworkManager.Singleton.OnClientDisconnectCallback += ClientDisconnectedFromNGO;
-		NetworkManager.Singleton.OnServerStopped += ServerStopped;
 	}
 
 	void Start() {
@@ -34,13 +35,12 @@ public class NetcodeManager : NetworkBehaviour {
 		MyLobby.Instance.LobbyCreated += JoinAsHost;
 		MyLobby.Instance.LobbyJoined += PlayerJoinedLobby;
 		MyLobby.Instance.JoinLobbyNetcode += JoinAsClient;
-		MyLobby.Instance.LeaveLobbyBegin += ShutDownNetwork;
+		MyLobby.Instance.LeaveLobbyComplete += ShutDownNetwork;
 		MyLobby.Instance.PlayersLeft += PlayersLeft;
 
 
 		TeamBox.TeamChangeEvent += ChangeTeam;
 		LobbyPlayer.TeamChangeEvent += ChangeTeam;
-
 	}
 	public override void OnDestroy() {
 		//events from lobby
@@ -48,7 +48,7 @@ public class NetcodeManager : NetworkBehaviour {
 			MyLobby.Instance.LobbyCreated -= JoinAsHost;
 			MyLobby.Instance.LobbyJoined -= PlayerJoinedLobby;
 			MyLobby.Instance.JoinLobbyNetcode -= JoinAsClient;
-			MyLobby.Instance.LeaveLobbyBegin -= ShutDownNetwork;
+			MyLobby.Instance.LeaveLobbyComplete -= ShutDownNetwork;
 			MyLobby.Instance.PlayersLeft -= PlayersLeft;
 		}
 
@@ -235,17 +235,15 @@ public class NetcodeManager : NetworkBehaviour {
 
 
 	void ClientDisconnectedFromNGO(ulong clientID) {
-		if (!NetworkManager.Singleton.IsServer) return;
-		foreach (KeyValuePair<string, ulong> pair in LobbyID_KEY_ClientID_VAL) {
-			if (pair.Value == clientID) {
-				MyLobby.Instance.KickFromLobby(pair.Key);
-				return;
+		if (MyLobby.Instance.hostLobby == null) return;
+		if (NetworkManager.Singleton.IsServer) {
+			foreach (KeyValuePair<string, ulong> pair in LobbyID_KEY_ClientID_VAL) {
+				if (pair.Value == clientID) {
+					MyLobby.Instance.KickFromLobby(pair.Key);
+					return;
+				}
 			}
 		}
-	}
-
-	void ServerStopped(bool stopped) {
-		MyLobby.Instance.LeaveLobby();
 	}
 
 
@@ -276,6 +274,7 @@ public class NetcodeManager : NetworkBehaviour {
 				playersObjects.Remove(playerObj);
 				playerObj.GetComponent<NetworkObject>().Despawn(true);
 			}
+			print("discconnecting client no" + clientID);
 			NetworkManager.DisconnectClient(clientID);
 		}
 	}

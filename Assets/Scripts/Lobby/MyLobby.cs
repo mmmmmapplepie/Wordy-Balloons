@@ -91,7 +91,7 @@ public class MyLobby : MonoBehaviour {
 	public event Action LobbyJoinBegin, LobbyJoinSuccess, LobbyJoinFailure, JoinLobbyNetcode;
 	public event Action<string> LobbyJoined;
 
-	public event Action LeaveLobbyBegin;
+	public event Action LeaveLobbyBegin, LeaveLobbyComplete;
 	// public event Action LeaveLobbySuccess, LeaveLobbyFailure;
 	public event Action<List<Player>> PlayersLeft;
 
@@ -109,7 +109,7 @@ public class MyLobby : MonoBehaviour {
 		LobbyHeartbeat();
 
 		//you will probably need polling for edges cases where the events dont work for some reason.
-		LobbyPoll();
+		// LobbyPoll();
 
 		// LobbyListRefresh()
 	}
@@ -153,18 +153,20 @@ public class MyLobby : MonoBehaviour {
 				if (hostLobby != null) {
 					hostLobby = joinedLobby;
 				}
+				// if (joinedLobby.Players.Find(x => x.Id == authenticationID) == null) OutOfLobby(true);
 			} catch (LobbyServiceException e) {
 				print(e);
-				OutOfLobby(e.Reason != LobbyExceptionReason.LobbyNotFound);
+				// OutOfLobby(e.Reason != LobbyExceptionReason.LobbyNotFound);
 			}
 		} else {
 			updateElapsed += Time.deltaTime;
 		}
 	}
-	void OutOfLobby(bool kicked) {
-		if (!NetworkManager.Singleton.IsConnectedClient && kicked) {
+	public void GoOutOfLobby(bool kicked) {
+		if (kicked) {
 			LobbyJoinFailure?.Invoke();
 		} else {
+			//just closes all other panels
 			LobbyJoinSuccess?.Invoke();
 		}
 		LeaveLobby();
@@ -212,13 +214,6 @@ public class MyLobby : MonoBehaviour {
 			LobbyCreationFailure?.Invoke();
 		}
 	}
-	public void LobbyCreationSuccessful(bool succesful) {
-		if (succesful) {
-			LobbyCreationSuccess?.Invoke();
-		} else {
-			LobbyCreationFailure?.Invoke();
-		}
-	}
 	Player GetNewPlayer(string name) {
 		return new Player {
 			Data = new Dictionary<string, PlayerDataObject>{
@@ -235,7 +230,6 @@ public class MyLobby : MonoBehaviour {
 				lobbyCallback.KickedFromLobby += KickedFromLobby;
 				LobbyEvents = await Lobbies.Instance.SubscribeToLobbyEventsAsync(joinedLobby.Id, lobbyCallback);
 			} else {
-				// if (lobbyCallback != null) lobbyCallback.LobbyChanged -= LobbyChanged;
 				if (LobbyEvents == null) return;
 				ILobbyEvents temp = LobbyEvents;
 				lobbyCallback = null;
@@ -251,14 +245,13 @@ public class MyLobby : MonoBehaviour {
 	void LobbyChanged(ILobbyChanges changes) {
 		if (joinedLobby == null) return;
 
-		//in case i fail unsub to the lobby events
+		//in case it fails unsub to the lobby events? idk
 		DateTime now = DateTime.Now;
 		TimeSpan changesTimespan = now - changes.LastUpdated.Value;
 		TimeSpan latestInteractionTimespan = now - latestLobbyInteraction;
 		if (changesTimespan > latestInteractionTimespan) return;
 
 		changes.ApplyToLobby(joinedLobby);
-
 		if (hostLobby != null) hostLobby = joinedLobby;
 		LobbyChangedEvent?.Invoke(changes);
 
@@ -269,19 +262,16 @@ public class MyLobby : MonoBehaviour {
 				}
 			}
 			if (changes.PlayerLeft.Value != null) {
-				PlayersLeft(hostLobby.Players);
+				print("playerLeftbro");
+				PlayersLeft?.Invoke(hostLobby.Players);
 			}
 		}
-	}
-
-	void KickedFromLobby() {
-		OutOfLobby(true);
 	}
 
 
 
 	public async void JoinLobbyByID(string lobbyID) {
-		if (joinedLobby != null) return;
+		if (joinedLobby != null) { LobbyJoinFailure?.Invoke(); return; }
 		LobbyJoinBegin?.Invoke();
 		try {
 			if (NGOConnected()) {
@@ -300,7 +290,7 @@ public class MyLobby : MonoBehaviour {
 	}
 
 	public async void JoinLobbyByCode(string code) {
-		if (joinedLobby != null) return;
+		if (joinedLobby != null) { LobbyJoinFailure?.Invoke(); return; }
 		LobbyJoinBegin?.Invoke();
 		try {
 			if (NGOConnected()) {
@@ -320,7 +310,8 @@ public class MyLobby : MonoBehaviour {
 	}
 
 	public async void QuickJoinLobby() {
-		if (joinedLobby != null) return;
+		Debug.LogWarning("tryingtojoinlobby situation: " + joinedLobby);
+		if (joinedLobby != null) { LobbyJoinFailure?.Invoke(); return; }
 		LobbyJoinBegin?.Invoke();
 		try {
 			if (NGOConnected()) {
@@ -336,7 +327,9 @@ public class MyLobby : MonoBehaviour {
 			LobbyJoinFailure?.Invoke();
 		}
 	}
+	bool WaitingForNGO = false;
 	async Task JoinLobby() {
+		WaitingForNGO = true;
 		latestLobbyInteraction = joinedLobby.LastUpdated;
 		string relayCode = joinedLobby.Data[RelayCode].Value;
 		try {
@@ -355,11 +348,8 @@ public class MyLobby : MonoBehaviour {
 		} else {
 			LobbyJoinFailure?.Invoke();
 		}
+		WaitingForNGO = false;
 	}
-
-
-
-
 
 	public async void KickFromLobby(string id) {
 		if (hostLobby == null) return;
@@ -371,13 +361,19 @@ public class MyLobby : MonoBehaviour {
 			}
 		}
 	}
+	public void KickedFromLobby() {
+		Debug.LogWarning("Kicked:" + WaitingForNGO);
+		GoOutOfLobby(WaitingForNGO);
+	}
 	public void LeaveLobby() {
 		LeaveLobby(authenticationID);
 	}
 	public async void LeaveLobby(string playerID) {
 		if (joinedLobby != null) {
+			Debug.LogWarning("leavingLobby");
 			LeaveLobbyBegin?.Invoke();
 			try {
+				WaitingForNGO = false;
 				string lobbyID = joinedLobby.Id;
 				string lobbyhostID = joinedLobby.HostId;
 				joinedLobby = null;
@@ -388,11 +384,10 @@ public class MyLobby : MonoBehaviour {
 				} else {
 					await LobbyService.Instance.RemovePlayerAsync(lobbyID, playerID);
 				}
-				// LeaveLobbySuccess?.Invoke();
 			} catch (Exception e) {
 				print(e);
-				// LeaveLobbyFailure?.Invoke();
 			}
+			LeaveLobbyComplete?.Invoke();
 		}
 	}
 

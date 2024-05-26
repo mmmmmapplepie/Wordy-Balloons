@@ -3750,7 +3750,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c0ecf5da86621a4a87afda4d0b5391f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  team: 2
+  targetT: {fileID: 447249985}
 --- !u!1 &895202800
 GameObject:
   m_ObjectHideFlags: 0
@@ -7861,7 +7861,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c0ecf5da86621a4a87afda4d0b5391f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  team: 1
+  targetT: {fileID: 1120342039}
 --- !u!1 &1782153894
 GameObject:
   m_ObjectHideFlags: 0
@@ -9793,7 +9793,7 @@ MonoBehaviour:
     EnableNetworkLogs: 1
     OldPrefabList: []
   RunInBackground: 1
-  LogLevel: 0
+  LogLevel: 1
 --- !u!4 &2129996768
 Transform:
   m_ObjectHideFlags: 0
