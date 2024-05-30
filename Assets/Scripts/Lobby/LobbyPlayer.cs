@@ -1,11 +1,15 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using Unity.Services.Authentication;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler, IDropHandler, IPointerEnterHandler, IPointerExitHandler, IPointerUpHandler {
 	[SerializeField] TextMeshProUGUI playerNameTxt;
@@ -13,8 +17,8 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 	[SerializeField] TMP_Dropdown colorPicker;
 
 	NetworkVariable<FixedString64Bytes> playerName = new NetworkVariable<FixedString64Bytes>();
-	NetworkVariable<ulong> clientIDNetVar = new NetworkVariable<ulong>(ulong.MaxValue);
-	public NetworkVariable<Color> useColor = new NetworkVariable<Color>(Color.black);
+	public NetworkVariable<ulong> clientID = new NetworkVariable<ulong>(ulong.MaxValue);
+	public NetworkVariable<int> currColorIndex = new NetworkVariable<int>(0);
 	public NetworkVariable<int> siblingNum = new NetworkVariable<int>();
 	NetworkVariable<bool> dataCompleteNetVar = new NetworkVariable<bool>(false);
 	[HideInInspector] public string lobbyID;
@@ -22,14 +26,17 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 
 	Coroutine timeOutRoutine;
 	public override void OnNetworkSpawn() {
-		useColor.OnValueChanged += ColorChanged;
+		SetDropDown();
+		ColorChanged(-1, currColorIndex.Value);
+		currColorIndex.OnValueChanged += ColorChanged;
 		dataCompleteNetVar.OnValueChanged += LoadStateChanged;
-		clientIDNetVar.OnValueChanged += ClientIDChanged;
+		clientID.OnValueChanged += ClientIDChanged;
 		siblingNum.OnValueChanged += ChangePos;
 		if (NetworkManager.Singleton.IsServer) {
 			timeOutRoutine = StartCoroutine(TimeOutRoutine());
 			siblingNum.Value = transform.GetSiblingIndex();
 		}
+		EnableColorpicker();
 		loadingCover.SetActive(!dataCompleteNetVar.Value);
 	}
 	IEnumerator TimeOutRoutine() {
@@ -38,14 +45,19 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 		KickPlayer();
 	}
 	public override void OnNetworkDespawn() {
-		useColor.OnValueChanged -= ColorChanged;
+		currColorIndex.OnValueChanged -= ColorChanged;
 		dataCompleteNetVar.OnValueChanged -= LoadStateChanged;
-		clientIDNetVar.OnValueChanged -= ClientIDChanged;
+		clientID.OnValueChanged -= ClientIDChanged;
 		siblingNum.OnValueChanged -= ChangePos;
 	}
 
-	void ColorChanged(Color old, Color newC) {
+	public void SetColor(int newIndex) {
+		currColorIndex.Value = newIndex + 1;
+		currColorIndex.Value = newIndex;
+	}
 
+	void ColorChanged(int old, int newC) {
+		colorPicker.Set(newC);
 	}
 	void LoadStateChanged(bool old, bool newb) {
 		if (newb) {
@@ -56,13 +68,14 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 		if (newid == NetworkManager.Singleton.LocalClientId) {
 			activePlayerCover.SetActive(true);
 		}
+		EnableColorpicker();
 	}
 
 	public void SetupPlayer(PlayerData data) {
-		lobbyID = data.LobbyID;
 		playerName.Value = data.Name;
-		clientIDNetVar.Value = data.ClientID;
-		useColor.Value = data.Color;
+		clientID.Value = data.ClientID;
+		currColorIndex.Value = data.ColorIndex;
+		colorPicker.value = currColorIndex.Value;
 
 		if (timeOutRoutine != null) StopCoroutine(timeOutRoutine);
 		if (NetworkManager.Singleton.IsServer) {
@@ -70,9 +83,29 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 				kickBtn.SetActive(true);
 			}
 		}
-
 		dataCompleteNetVar.Value = true;
 	}
+
+	void EnableColorpicker() {
+		colorPicker.interactable = clientID.Value == NetworkManager.Singleton.LocalClientId;
+
+	}
+
+	void SetDropDown() {
+		colorPicker.ClearOptions();
+
+		List<TMP_Dropdown.OptionData> items = new List<TMP_Dropdown.OptionData>();
+		List<Color> options = NetcodeManager.allColorOptions;
+		for (int i = 0; i < options.Count; i++) {
+			Sprite s = NetcodeManager.allColorOptionSprites[i];
+			string index = i.ToString();
+			TMP_Dropdown.OptionData item = new TMP_Dropdown.OptionData(index, s);
+			items.Add(item);
+		}
+		colorPicker.AddOptions(items);
+	}
+
+
 	public void KickPlayer() {
 		MyLobby.Instance.KickFromLobby(lobbyID);
 	}
@@ -81,7 +114,11 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 		if (tempObj != null) Destroy(tempObj);
 		base.OnDestroy();
 	}
-
+	public void RequestColorChange(int value) {
+		int targetIndex = int.Parse(colorPicker.options[value].text);
+		if (currColorIndex.Value == targetIndex) return;
+		if (NetcodeManager.Instance != null) NetcodeManager.Instance.RequestColorChange(targetIndex);
+	}
 
 
 
@@ -158,11 +195,22 @@ public struct PlayerData {
 	public ulong ClientID;
 	public string LobbyID;
 	public string Name;
-	public Color Color;
-	public PlayerData(ulong clientID, string lobbyID, string name, Color color) {
+	public int ColorIndex;
+	public PlayerData(ulong clientID, string lobbyID, string name, int colorIndex) {
 		this.ClientID = clientID;
 		this.LobbyID = lobbyID;
 		this.Name = name;
-		this.Color = color;
+		this.ColorIndex = colorIndex;
 	}
 }
+
+
+
+
+
+
+
+
+
+
+

@@ -18,36 +18,45 @@ public class LobbyUI : MonoBehaviour {
 	// i have to make sure that error cases fire only one event until exited the situation.
 	void Start() {
 		if (MyLobby.Instance == null) return;
-		MyLobby.Instance.AuthenticationBegin += OpenLoadingPanel;//
-		MyLobby.Instance.AuthenticationSuccess += CloseTransitionPanels;//
-		MyLobby.Instance.AuthenticationFailure += AuthenticationFail;//
+		MyLobby.Instance.AuthenticationBegin += OpenLoadingPanel;
+		MyLobby.Instance.AuthenticationSuccess += CloseTransitionPanels;
+		MyLobby.Instance.AuthenticationFailure += AuthenticationFail;
 
+		MyLobby.Instance.LobbyCreationBegin += OpenLoadingPanel;
+		MyLobby.Instance.LobbyCreationSuccess += LobbyCreationSuccess;
+		MyLobby.Instance.LobbyCreationFailure += LobbyCreationFail;
 
+		MyLobby.Instance.HearbeatFailure += HearbeatFail;
 
-		MyLobby.Instance.LobbyCreationBegin += OpenLoadingPanel;//
+		MyLobby.Instance.LobbyJoinBegin += OpenLoadingPanel;
+		MyLobby.Instance.LobbyJoinSuccess += LobbyJoined;
+		MyLobby.Instance.LobbyJoinFailure += LobbyJoinFail;
 
-		MyLobby.Instance.LobbyCreationSuccess += LobbyCreationSuccess;//
+		MyLobby.Instance.LeaveLobbyBegin += LeaveLobbyBegin;
 
-		MyLobby.Instance.LobbyCreationFailure += LobbyCreationFail;//
+		MyLobby.Instance.ListLobbySuccess += LobbyListFound;
+		MyLobby.Instance.ListLobbyFailure += ListLobbiesFail;
+	}
+	void OnDestroy() {
+		if (MyLobby.Instance == null) return;
+		MyLobby.Instance.AuthenticationBegin -= OpenLoadingPanel;
+		MyLobby.Instance.AuthenticationSuccess -= CloseTransitionPanels;
+		MyLobby.Instance.AuthenticationFailure -= AuthenticationFail;
 
+		MyLobby.Instance.LobbyCreationBegin -= OpenLoadingPanel;
+		MyLobby.Instance.LobbyCreationSuccess -= LobbyCreationSuccess;
+		MyLobby.Instance.LobbyCreationFailure -= LobbyCreationFail;
 
+		MyLobby.Instance.HearbeatFailure -= HearbeatFail;
 
-		MyLobby.Instance.HearbeatFailure += HearbeatFail;//
+		MyLobby.Instance.LobbyJoinBegin -= OpenLoadingPanel;
+		MyLobby.Instance.LobbyJoinSuccess -= LobbyJoined;
+		MyLobby.Instance.LobbyJoinFailure -= LobbyJoinFail;
 
+		MyLobby.Instance.LeaveLobbyBegin -= LeaveLobbyBegin;
 
-
-		MyLobby.Instance.LobbyJoinBegin += OpenLoadingPanel;//
-
-		MyLobby.Instance.LobbyJoinSuccess += LobbyJoined;//
-
-		MyLobby.Instance.LobbyJoinFailure += LobbyJoinFail;//
-
-
-
-		MyLobby.Instance.LeaveLobbyBegin += LeaveLobbyBegin;//
-
-		MyLobby.Instance.ListLobbySuccess += LobbyListFound;//
-		MyLobby.Instance.ListLobbyFailure += ListLobbiesFail;//
+		MyLobby.Instance.ListLobbySuccess -= LobbyListFound;
+		MyLobby.Instance.ListLobbyFailure -= ListLobbiesFail;
 	}
 
 
@@ -186,7 +195,6 @@ public class LobbyUI : MonoBehaviour {
 		CloseTransitionPanels();
 	}
 	void ToggleLobby(bool interactable) {
-		print("toggled");
 		lobbyPanel.interactable = interactable;
 		lobbyPanel.blocksRaycasts = interactable;
 		lobbyPanel.alpha = interactable ? 1 : 0;

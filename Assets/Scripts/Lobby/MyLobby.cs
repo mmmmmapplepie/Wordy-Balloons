@@ -89,7 +89,7 @@ public class MyLobby : MonoBehaviour {
 	public event Action HearbeatFailure;
 
 	public event Action LobbyJoinBegin, LobbyJoinSuccess, LobbyJoinFailure, JoinLobbyNetcode;
-	public event Action<string> LobbyJoined;
+	public event Action<string> PlayerJoinedLobby;
 
 	public event Action LeaveLobbyBegin, LeaveLobbyComplete;
 	// public event Action LeaveLobbySuccess, LeaveLobbyFailure;
@@ -250,7 +250,7 @@ public class MyLobby : MonoBehaviour {
 		if (hostLobby != null) {
 			if (changes.PlayerJoined.Value != null) {
 				foreach (LobbyPlayerJoined p in changes.PlayerJoined.Value) {
-					LobbyJoined?.Invoke(p.Player.Id);
+					PlayerJoinedLobby?.Invoke(p.Player.Id);
 				}
 			}
 			if (changes.PlayerLeft.Value != null) {
@@ -345,7 +345,6 @@ public class MyLobby : MonoBehaviour {
 		if (hostLobby == null) return;
 		if (joinedLobby != null) {
 			try {
-				print("kicking player:" + id);
 				await LobbyService.Instance.RemovePlayerAsync(joinedLobby.Id, id);
 			} catch (LobbyServiceException e) {
 				print(e.Reason);
@@ -353,7 +352,6 @@ public class MyLobby : MonoBehaviour {
 		}
 	}
 	public void KickedFromLobby() {
-		Debug.LogWarning("Kicked:" + WaitingForNGO);
 		if (joinedLobby == null) return;
 		if (WaitingForNGO) {
 			LobbyJoinFailure?.Invoke();

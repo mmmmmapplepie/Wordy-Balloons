@@ -1,39 +1,77 @@
-using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.Lobbies.Models;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class NetcodeManager : NetworkBehaviour {
 	[SerializeField] Transform team1Holder, team2Holder, lobbyPlayerPrefab;
 
+	public List<Color> _allColorOptions;
+	public static List<Color> allColorOptions;
+	public static List<Sprite> allColorOptionSprites = new List<Sprite>();
+	Dictionary<ulong, int> ClientID_KEY_ColorIndex_VAL = new Dictionary<ulong, int>();
 
-	public List<Color> colorOptions;
-	NetworkList<Color> colorsBeingUsed;
-	Dictionary<ulong, Color> ClientID_KEY_Color_VAL = new Dictionary<ulong, Color>();
 	Dictionary<string, ulong> LobbyID_KEY_ClientID_VAL = new Dictionary<string, ulong>();
 	HashSet<string> team1 = new HashSet<string>(), team2 = new HashSet<string>();
 	List<LobbyPlayer> playersObjects = new List<LobbyPlayer>();
 	int team1Max = 0; int team2Max = 0;
-
+	public static NetcodeManager Instance;
 	void Awake() {
-		colorsBeingUsed = new NetworkList<Color>();
+		Instance = this;
+		SetupColoredLists();
+		// InvokeRepeating(nameof(PrintStuff), 5f, 2f);
+	}
+	// void PrintStuff() {
+	// 	if (NetworkManager.IsServer) {
+	// 		string info = "";
+	// 		foreach (KeyValuePair<ulong, int> p in ClientID_KEY_ColorIndex_VAL) {
+	// 			info += p.Key + " is paired with index " + p.Value + ";\n";
+	// 		}
+	// 		info += "------------------------------------\n";
+	// 		info += "team1: " + team1.Count + ":::::team2: " + team2.Count;
+	// 		print(info);
+	// 		print(LobbyID_KEY_ClientID_VAL.Count);
+
+	// 	}
+	// }
+
+	void SetupColoredLists() {
+		allColorOptions = _allColorOptions;
+		foreach (Color c in allColorOptions) {
+			allColorOptionSprites.Add(CreateColoredSprite(c));
+		}
+	}
+
+	Sprite CreateColoredSprite(Color c) {
+		Texture2D onePixel = new Texture2D(1, 1);
+		onePixel.filterMode = FilterMode.Point;
+		onePixel.SetPixel(0, 0, c);
+		Sprite s = Sprite.Create(onePixel, new Rect(0f, 0f, onePixel.width, onePixel.height), Vector2.zero);
+		onePixel.Apply();
+		s.name = c.ToString();
+		return s;
 	}
 
 	public override void OnNetworkSpawn() {
 		NetworkManager.Singleton.OnClientConnectedCallback += ClientConnectedToNGO;
 
-		//oddly enough only triggers for "other clients other than self" disconnecting
+		//a client that is disconnecting also gets this callback (as if the still connected are disconnecting...)
 		NetworkManager.Singleton.OnClientDisconnectCallback += ClientDisconnectedFromNGO;
 		NetworkManager.Singleton.OnClientStopped += ClientStopped;
+	}
+	public override void OnNetworkDespawn() {
+		NetworkManager.Singleton.OnClientConnectedCallback -= ClientConnectedToNGO;
+		NetworkManager.Singleton.OnClientDisconnectCallback -= ClientDisconnectedFromNGO;
+		NetworkManager.Singleton.OnClientStopped -= ClientStopped;
+		MyLobby.Instance.KickedFromLobby();
 	}
 
 	void Start() {
 		//events from lobby
 		MyLobby.Instance.LobbyCreated += JoinAsHost;
-		MyLobby.Instance.LobbyJoined += PlayerJoinedLobby;
+		MyLobby.Instance.PlayerJoinedLobby += PlayerJoinedLobby;
 		MyLobby.Instance.JoinLobbyNetcode += JoinAsClient;
 		MyLobby.Instance.LeaveLobbyComplete += ShutDownNetwork;
 		MyLobby.Instance.PlayersLeft += PlayersLeft;
@@ -46,7 +84,7 @@ public class NetcodeManager : NetworkBehaviour {
 		//events from lobby
 		if (MyLobby.Instance != null) {
 			MyLobby.Instance.LobbyCreated -= JoinAsHost;
-			MyLobby.Instance.LobbyJoined -= PlayerJoinedLobby;
+			MyLobby.Instance.PlayerJoinedLobby -= PlayerJoinedLobby;
 			MyLobby.Instance.JoinLobbyNetcode -= JoinAsClient;
 			MyLobby.Instance.LeaveLobbyComplete -= ShutDownNetwork;
 			MyLobby.Instance.PlayersLeft -= PlayersLeft;
@@ -78,20 +116,19 @@ public class NetcodeManager : NetworkBehaviour {
 		LobbyPlayer player = CreatePlayerObject(MyLobby.Instance.authenticationID, team);
 
 		//color
-		Color c = GetFirstAvailableColor();
-		colorsBeingUsed.Add(c);
-		ClientID_KEY_Color_VAL.Add(NetworkManager.Singleton.LocalClientId, c);
+		int colorIndex = GetFirstAvailableColor();
+		// usedColorIndex.Add(colorIndex);
+		ClientID_KEY_ColorIndex_VAL.Add(NetworkManager.Singleton.LocalClientId, colorIndex);
 
 		//playerdata
-		PlayerData data = new PlayerData(NetworkManager.LocalClientId, MyLobby.Instance.authenticationID, MyLobby.Instance.playerName, c);
+		PlayerData data = new PlayerData(NetworkManager.LocalClientId, MyLobby.Instance.authenticationID, MyLobby.Instance.playerName, colorIndex);
 		player.SetupPlayer(data);
 
 		//make lobby public
 		MyLobby.Instance.MakeLobbyPublic();
 	}
 	void ResetVariables() {
-		colorsBeingUsed.Clear();
-		ClientID_KEY_Color_VAL.Clear();
+		ClientID_KEY_ColorIndex_VAL.Clear();
 		team1.Clear();
 		team2.Clear();
 		LobbyID_KEY_ClientID_VAL.Clear();
@@ -137,13 +174,13 @@ public class NetcodeManager : NetworkBehaviour {
 		return script;
 	}
 
-	Color GetFirstAvailableColor() {
-		foreach (Color c in colorOptions) {
-			if (!colorsBeingUsed.Contains(c)) {
-				return c;
+	int GetFirstAvailableColor() {
+		for (int i = 0; i < _allColorOptions.Count; i++) {
+			if (!ClientID_KEY_ColorIndex_VAL.ContainsValue(i)) {
+				return i;
 			}
 		}
-		return default;
+		return -1;
 	}
 	#endregion
 
@@ -195,35 +232,36 @@ public class NetcodeManager : NetworkBehaviour {
 
 	[ServerRpc(RequireOwnership = false)]
 	void SendPlayerDataServerRPC(string lobbyID, ulong clientID, string playerName) {
-		Color c = GetFirstAvailableColor();
-		colorsBeingUsed.Add(c);
-		if (ClientID_KEY_Color_VAL.ContainsKey(clientID)) {
-			ClientID_KEY_Color_VAL[clientID] = c;
+		LobbyPlayer playerObj = FindPlayerFromLobbyID(lobbyID);
+		if (playerObj == null || !LobbyID_KEY_ClientID_VAL.ContainsKey(lobbyID)) {
+			LobbyID_KEY_ClientID_VAL.Remove(lobbyID);
+			if (playerObj != null) RemovePlayerObject(playerObj);
+			MyLobby.Instance.KickFromLobby(lobbyID);
+			if (clientID != ulong.MaxValue) NetworkManager.DisconnectClient(clientID);
+			print("player was already kicked from lobby");
+			return;
+		}
+
+		int colorIndex = GetFirstAvailableColor();
+		if (ClientID_KEY_ColorIndex_VAL.ContainsKey(clientID)) {
+			ClientID_KEY_ColorIndex_VAL[clientID] = colorIndex;
 		} else {
-			ClientID_KEY_Color_VAL.Add(clientID, c);
+			ClientID_KEY_ColorIndex_VAL.Add(clientID, colorIndex);
 		}
 
 		PlayerData data = new PlayerData();
 		data.Name = playerName;
 		data.LobbyID = lobbyID;
 		data.ClientID = clientID;
-		data.Color = c;
+		data.ColorIndex = colorIndex;
 
-		LobbyPlayer playerObj = FindPlayerFromLobbyID(lobbyID);
-		if (playerObj != null && LobbyID_KEY_ClientID_VAL.ContainsKey(lobbyID)) {
-			LobbyID_KEY_ClientID_VAL[lobbyID] = clientID;
-			playerObj.SetupPlayer(data);
+		LobbyID_KEY_ClientID_VAL[lobbyID] = clientID;
+		playerObj.SetupPlayer(data);
 
-			ClientRpcParams option = new ClientRpcParams {
-				Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { clientID } }
-			};
-			JoinConfirmedClientRpc(option);
-		} else {
-			LobbyID_KEY_ClientID_VAL.Remove(lobbyID);
-			if (playerObj != null) RemovePlayerObject(playerObj);
-			MyLobby.Instance.KickFromLobby(lobbyID);
-			if (clientID != ulong.MaxValue) NetworkManager.DisconnectClient(clientID);
-		}
+		ClientRpcParams option = new ClientRpcParams {
+			Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { clientID } }
+		};
+		JoinConfirmedClientRpc(option);
 	}
 	[ClientRpc]
 	void JoinConfirmedClientRpc(ClientRpcParams option = default) {
@@ -252,7 +290,9 @@ public class NetcodeManager : NetworkBehaviour {
 		}
 	}
 	void ClientStopped(bool wasHost) {
-		if (!wasHost) MyLobby.Instance.KickedFromLobby();
+		if (!wasHost) {
+			MyLobby.Instance.KickedFromLobby();
+		}
 	}
 
 
@@ -266,15 +306,16 @@ public class NetcodeManager : NetworkBehaviour {
 			if (PlayersToRemove.Contains(p.Id)) PlayersToRemove.Remove(p.Id);
 		}
 		foreach (string id in PlayersToRemove) {
+			print("playerLeft");
 			ulong clientID = LobbyID_KEY_ClientID_VAL[id];
 			LobbyID_KEY_ClientID_VAL.Remove(id);
 			team1.Remove(id);
 			team2.Remove(id);
 
-			if (ClientID_KEY_Color_VAL.ContainsKey(clientID)) {
-				Color c = ClientID_KEY_Color_VAL[clientID];
-				ClientID_KEY_Color_VAL.Remove(clientID);
-				colorsBeingUsed.Remove(c);
+			if (ClientID_KEY_ColorIndex_VAL.ContainsKey(clientID)) {
+				int index = ClientID_KEY_ColorIndex_VAL[clientID];
+				print(ClientID_KEY_ColorIndex_VAL.Remove(clientID));
+
 			}
 
 			LobbyPlayer playerObj = playersObjects.Find(x => x.lobbyID == id);
@@ -346,7 +387,27 @@ public class NetcodeManager : NetworkBehaviour {
 
 
 	#region changingColor
+	public void RequestColorChange(int colorIndex) {
+		RequestColorChangeServerRpc(colorIndex);
+	}
 
+	[ServerRpc(RequireOwnership = false)]
+	void RequestColorChangeServerRpc(int targetIndex, ServerRpcParams option = default) {
+		ulong senderID = option.Receive.SenderClientId;
+		//set the color regardless. just set it to the original if new one is not available.
+		int previousIndex = ClientID_KEY_ColorIndex_VAL[senderID];
+		if (previousIndex == targetIndex) return;
+
+		if (ClientID_KEY_ColorIndex_VAL.ContainsValue(targetIndex)) {
+			targetIndex = previousIndex;
+		}
+		LobbyPlayer targetPlayerObj = playersObjects.Find(x => x.clientID.Value == senderID);
+		if (targetPlayerObj == null) return;
+
+		ClientID_KEY_ColorIndex_VAL[senderID] = targetIndex;
+
+		targetPlayerObj.SetColor(targetIndex);
+	}
 
 
 	#endregion
