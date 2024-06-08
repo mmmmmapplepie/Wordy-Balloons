@@ -19,54 +19,52 @@ public class LobbyUI : MonoBehaviour {
 	// having the // comment at the end of the event sub means that i have checked the things are correctly fired (only once) for the situation.
 	// i have to make sure that error cases fire only one event until exited the situation.
 	void Start() {
-		if (MyLobby.Instance == null) return;
-		MyLobby.Instance.AuthenticationBegin += OpenLoadingPanel;
-		MyLobby.Instance.AuthenticationSuccess += CloseTransitionPanels;
-		MyLobby.Instance.AuthenticationFailure += AuthenticationFail;
-
-		MyLobby.Instance.LobbyCreationBegin += OpenLoadingPanel;
-		MyLobby.Instance.LobbyCreationSuccess += LobbyCreationSuccess;
-		MyLobby.Instance.LobbyCreationFailure += LobbyCreationFail;
-
-		MyLobby.Instance.HearbeatFailure += HearbeatFail;
-
-		MyLobby.Instance.LobbyJoinBegin += OpenLoadingPanel;
-		MyLobby.Instance.LobbyJoinSuccess += LobbyJoined;
-		MyLobby.Instance.LobbyJoinFailure += LobbyJoinFail;
-
-		MyLobby.Instance.LeaveLobbyBegin += LeaveLobbyBegin;
-
-		MyLobby.Instance.ListLobbySuccess += LobbyListFound;
-		MyLobby.Instance.ListLobbyFailure += ListLobbiesFail;
 
 		NetcodeManager.LockOnLoading += DisableLeaving;
 		NetcodeManager.StartSceneLoading += LoadingNextScene;
-		NetcodeManager.StopSceneLoading += StopLoadingScene;
+
+		MyLobby.AuthenticationBegin += OpenLoadingPanel;
+		MyLobby.AuthenticationSuccess += CloseTransitionPanels;
+		MyLobby.AuthenticationFailure += AuthenticationFail;
+
+		MyLobby.LobbyCreationBegin += OpenLoadingPanel;
+		MyLobby.LobbyCreationSuccess += LobbyCreationSuccess;
+		MyLobby.LobbyCreationFailure += LobbyCreationFail;
+
+		MyLobby.HearbeatFailure += HearbeatFail;
+
+		MyLobby.LobbyJoinBegin += OpenLoadingPanel;
+		MyLobby.LobbyJoinSuccess += LobbyJoined;
+		MyLobby.LobbyJoinFailure += LobbyJoinFail;
+
+		MyLobby.LeaveLobbyBegin += LeaveLobbyBegin;
+
+		MyLobby.ListLobbySuccess += LobbyListFound;
+		MyLobby.ListLobbyFailure += ListLobbiesFail;
 	}
 	void OnDestroy() {
-		if (MyLobby.Instance == null) return;
-		MyLobby.Instance.AuthenticationBegin -= OpenLoadingPanel;
-		MyLobby.Instance.AuthenticationSuccess -= CloseTransitionPanels;
-		MyLobby.Instance.AuthenticationFailure -= AuthenticationFail;
-
-		MyLobby.Instance.LobbyCreationBegin -= OpenLoadingPanel;
-		MyLobby.Instance.LobbyCreationSuccess -= LobbyCreationSuccess;
-		MyLobby.Instance.LobbyCreationFailure -= LobbyCreationFail;
-
-		MyLobby.Instance.HearbeatFailure -= HearbeatFail;
-
-		MyLobby.Instance.LobbyJoinBegin -= OpenLoadingPanel;
-		MyLobby.Instance.LobbyJoinSuccess -= LobbyJoined;
-		MyLobby.Instance.LobbyJoinFailure -= LobbyJoinFail;
-
-		MyLobby.Instance.LeaveLobbyBegin -= LeaveLobbyBegin;
-
-		MyLobby.Instance.ListLobbySuccess -= LobbyListFound;
-		MyLobby.Instance.ListLobbyFailure -= ListLobbiesFail;
-
 		NetcodeManager.LockOnLoading -= DisableLeaving;
 		NetcodeManager.StartSceneLoading -= LoadingNextScene;
-		NetcodeManager.StopSceneLoading -= StopLoadingScene;
+
+		MyLobby.AuthenticationBegin -= OpenLoadingPanel;
+		MyLobby.AuthenticationSuccess -= CloseTransitionPanels;
+		MyLobby.AuthenticationFailure -= AuthenticationFail;
+
+		MyLobby.LobbyCreationBegin -= OpenLoadingPanel;
+		MyLobby.LobbyCreationSuccess -= LobbyCreationSuccess;
+		MyLobby.LobbyCreationFailure -= LobbyCreationFail;
+
+		MyLobby.HearbeatFailure -= HearbeatFail;
+
+		MyLobby.LobbyJoinBegin -= OpenLoadingPanel;
+		MyLobby.LobbyJoinSuccess -= LobbyJoined;
+		MyLobby.LobbyJoinFailure -= LobbyJoinFail;
+
+		MyLobby.LeaveLobbyBegin -= LeaveLobbyBegin;
+
+		MyLobby.ListLobbySuccess -= LobbyListFound;
+		MyLobby.ListLobbyFailure -= ListLobbiesFail;
+
 	}
 
 
@@ -171,6 +169,7 @@ public class LobbyUI : MonoBehaviour {
 		HidePanelsExceptChosen(LoadingPanel);
 	}
 	public void CloseTransitionPanels() {
+		if (!NetcodeManager.CanStopSceneLoading) return;
 		HidePanelsExceptChosen(null);
 	}
 	void HidePanelsExceptChosen(GameObject panelToOpen = null) {
@@ -200,6 +199,7 @@ public class LobbyUI : MonoBehaviour {
 
 	//shoudl be called when NGO host is connected.
 	void LobbyCreationSuccess() {
+		enterGameBtn.interactable = NetworkManager.Singleton.IsServer;
 		lobbyCreationPanel.SetActive(false);
 		LobbyUpdate(MyLobby.Instance.hostLobby);
 		ToggleLobby(true);
@@ -279,13 +279,13 @@ public class LobbyUI : MonoBehaviour {
 		enterGameBtn.interactable = false;
 	}
 	void DisableLeaving(bool lockOn) {
-		leaveBtn.interactable = !lockOn;
-	}
-	void StopLoadingScene() {
-		leaveBtn.interactable = true;
-		if (NetworkManager.Singleton.IsServer) {
-			enterGameBtn.interactable = true;
+		if (lockOn) {
+			OpenLoadingPanel();
+		} else {
+			HidePanelsExceptChosen();
 		}
+		leaveBtn.interactable = !lockOn;
+		enterGameBtn.interactable = NetworkManager.Singleton.IsServer && !lockOn ? true : false;
 	}
 
 

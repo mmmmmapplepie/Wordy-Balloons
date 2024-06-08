@@ -24,9 +24,12 @@ public class IngameDisconnectManager : NetworkBehaviour {
 		CheckWin();
 	}
 	public override void OnNetworkDespawn() {
+		Debug.LogWarning("despawned");
+		if (NetworkManager.Singleton == null) return;
 		NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnectCallback;
 	}
 	public override void OnDestroy() {
+		OnNetworkDespawn();
 		ShutDownNetwork();
 		base.OnDestroy();
 	}
@@ -61,7 +64,6 @@ public class IngameDisconnectManager : NetworkBehaviour {
 
 	[ClientRpc]
 	void TeamWonClientRpc(int winningTeam) {
-		print("win");
 		GameData.GameFinished = true;
 		GameEnded(winningTeam);
 	}

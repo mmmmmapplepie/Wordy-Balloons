@@ -67,12 +67,12 @@ public class NetcodeManager : NetworkBehaviour {
 
 	void Start() {
 		//events from lobby
-		MyLobby.Instance.LobbyCreated += JoinAsHost;
-		MyLobby.Instance.PlayerJoinedLobby += PlayerJoinedLobby;
-		MyLobby.Instance.JoinLobbyNetcode += JoinAsClient;
-		MyLobby.Instance.LeaveLobbyComplete += LeftLobby;
-		MyLobby.Instance.PlayersLeft += PlayersLeft;
-		MyLobby.Instance.PlayersLeft += StopLoadingLevel;
+		MyLobby.LobbyCreated += JoinAsHost;
+		MyLobby.PlayerJoinedLobby += PlayerJoinedLobby;
+		MyLobby.JoinLobbyNetcode += JoinAsClient;
+		MyLobby.LeaveLobbyComplete += LeftLobby;
+		MyLobby.PlayersLeft += PlayersLeft;
+		MyLobby.PlayersLeft += StopLoadingLevel;
 
 
 		TeamBox.TeamChangeEvent += ChangeTeam;
@@ -82,14 +82,12 @@ public class NetcodeManager : NetworkBehaviour {
 	public override void OnDestroy() {
 		OnNetworkDespawn();
 		//events from lobby
-		if (MyLobby.Instance != null) {
-			MyLobby.Instance.LobbyCreated -= JoinAsHost;
-			MyLobby.Instance.PlayerJoinedLobby -= PlayerJoinedLobby;
-			MyLobby.Instance.JoinLobbyNetcode -= JoinAsClient;
-			MyLobby.Instance.LeaveLobbyComplete -= LeftLobby;
-			MyLobby.Instance.PlayersLeft -= PlayersLeft;
-			MyLobby.Instance.PlayersLeft -= StopLoadingLevel;
-		}
+		MyLobby.LobbyCreated -= JoinAsHost;
+		MyLobby.PlayerJoinedLobby -= PlayerJoinedLobby;
+		MyLobby.JoinLobbyNetcode -= JoinAsClient;
+		MyLobby.LeaveLobbyComplete -= LeftLobby;
+		MyLobby.PlayersLeft -= PlayersLeft;
+		MyLobby.PlayersLeft -= StopLoadingLevel;
 
 
 		TeamBox.TeamChangeEvent -= ChangeTeam;
@@ -124,7 +122,7 @@ public class NetcodeManager : NetworkBehaviour {
 		ClientID_KEY_ColorIndex_VAL.Add(NetworkManager.Singleton.LocalClientId, colorIndex);
 
 		//playerdata
-		PlayerData data = new PlayerData(NetworkManager.LocalClientId, MyLobby.Instance.authenticationID, MyLobby.Instance.playerName, colorIndex);
+		PlayerData data = new PlayerData(NetworkManager.LocalClientId, MyLobby.Instance.authenticationID, MyLobby.playerName, colorIndex);
 		player.SetupPlayer(data);
 
 		//make lobby public
@@ -230,7 +228,7 @@ public class NetcodeManager : NetworkBehaviour {
 
 	[ClientRpc]
 	void AskForPlayerDataClientRPC(ClientRpcParams option = default) {
-		SendPlayerDataServerRPC(AuthenticationService.Instance.PlayerId, NetworkManager.Singleton.LocalClientId, MyLobby.Instance.playerName);
+		SendPlayerDataServerRPC(AuthenticationService.Instance.PlayerId, NetworkManager.Singleton.LocalClientId, MyLobby.playerName);
 	}
 
 	[ServerRpc(RequireOwnership = false)]
@@ -299,7 +297,6 @@ public class NetcodeManager : NetworkBehaviour {
 	}
 
 	void LeftLobby() {
-		print(CanStopSceneLoading);
 		if (!CanStopSceneLoading) return;
 		ShutDownNetwork();
 	}
@@ -427,7 +424,7 @@ public class NetcodeManager : NetworkBehaviour {
 
 
 	#region startNextScene
-	public static event Action StartSceneLoading, StopSceneLoading;
+	public static event Action StartSceneLoading;
 	public static event Action<bool> LockOnLoading;
 	//for start: turn on loading panel, disable leave, disable changing teams/colors
 	//for stop: inverse of all the above.
@@ -439,15 +436,7 @@ public class NetcodeManager : NetworkBehaviour {
 		if (loadNextScene != null) StopCoroutine(loadNextScene);
 		loadNextScene = StartCoroutine(LoadNextScene());
 	}
-	static bool _CanStopSceneLoading = true;
-	public static bool CanStopSceneLoading {
-		get {
-			return _CanStopSceneLoading;
-		}
-		set {
-			_CanStopSceneLoading = value;
-		}
-	}
+	public static bool CanStopSceneLoading = true;
 	IEnumerator LoadNextScene() {
 		StartSceneLoading?.Invoke();
 		int countDown = 5;
@@ -464,7 +453,6 @@ public class NetcodeManager : NetworkBehaviour {
 		//have a check if all have laoded or soemthing idk.
 		SceneEventProgressStatus sceneStatus = NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
 		if (sceneStatus != SceneEventProgressStatus.Started) {
-			StopSceneLoading?.Invoke();
 			LockOnSceneClientRpc(false);
 		} else {
 			//change data
@@ -484,7 +472,6 @@ public class NetcodeManager : NetworkBehaviour {
 		if (loadNextScene != null && CanStopSceneLoading) {
 			StopCoroutine(loadNextScene);
 			LockOnSceneClientRpc(false);
-			StopSceneLoading?.Invoke();
 		}
 	}
 	void StopLoadingLevel(ulong i) {

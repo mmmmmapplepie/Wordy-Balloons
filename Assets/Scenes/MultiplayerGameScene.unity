@@ -684,7 +684,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 522203967}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1618146579}
+        m_TargetAssemblyTypeName: IngameDisconnectManager, Assembly-CSharp
+        m_MethodName: GoToScene
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 102900000, guid: 4bbb7537297a69342ac1de46d0b9a815, type: 3}
+          m_ObjectArgumentAssemblyTypeName: UnityEditor.SceneAsset, UnityEditor.CoreModule
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &522203967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1465,7 +1477,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1032616370}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1618146579}
+        m_TargetAssemblyTypeName: IngameDisconnectManager, Assembly-CSharp
+        m_MethodName: GoToScene
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 102900000, guid: a3f814c5899e9aa42a034d091be8ebea, type: 3}
+          m_ObjectArgumentAssemblyTypeName: UnityEditor.SceneAsset, UnityEditor.CoreModule
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1032616370
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1586,7 +1610,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1104143202}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1618146579}
+        m_TargetAssemblyTypeName: IngameDisconnectManager, Assembly-CSharp
+        m_MethodName: GoToScene
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 102900000, guid: a3f814c5899e9aa42a034d091be8ebea, type: 3}
+          m_ObjectArgumentAssemblyTypeName: UnityEditor.SceneAsset, UnityEditor.CoreModule
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1104143202
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1903,6 +1939,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   connectionStopped: {fileID: 118290890}
   gameEnded: {fileID: 262045052}
+  mainMenuScene: {fileID: 0}
 --- !u!1 &1707484557
 GameObject:
   m_ObjectHideFlags: 0
@@ -2119,7 +2156,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1846669258}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1618146579}
+        m_TargetAssemblyTypeName: IngameDisconnectManager, Assembly-CSharp
+        m_MethodName: GoToScene
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 102900000, guid: 4bbb7537297a69342ac1de46d0b9a815, type: 3}
+          m_ObjectArgumentAssemblyTypeName: UnityEditor.SceneAsset, UnityEditor.CoreModule
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1846669258
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -69,7 +69,7 @@ public class MyLobby : MonoBehaviour {
 
 	public static MyLobby Instance;
 	[HideInInspector] public string authenticationID;
-	[HideInInspector] public string playerName;
+	[HideInInspector] public static string playerName;
 	public Lobby hostLobby, joinedLobby;
 	DateTime latestLobbyInteraction;
 
@@ -77,27 +77,27 @@ public class MyLobby : MonoBehaviour {
 	ILobbyEvents LobbyEvents = null;
 	LobbyEventCallbacks lobbyCallback = null;
 
-	public event Action<ILobbyChanges> LobbyChangedEvent;
+	public static event Action<ILobbyChanges> LobbyChangedEvent;
 
-	public event Action AuthenticationBegin, AuthenticationSuccess, AuthenticationFailure;
-
-
-	public event Action LobbyCreationBegin, LobbyCreated, LobbyCreationSuccess, LobbyCreationFailure;
-
-	public event Action RelayFailure;
-
-	public event Action HearbeatFailure;
-
-	public event Action LobbyJoinBegin, LobbyJoinSuccess, LobbyJoinFailure, JoinLobbyNetcode;
-	public event Action<string> PlayerJoinedLobby;
-
-	public event Action LeaveLobbyBegin, LeaveLobbyComplete;
-	// public event Action LeaveLobbySuccess, LeaveLobbyFailure;
-	public event Action<List<Player>> PlayersLeft;
+	public static event Action AuthenticationBegin, AuthenticationSuccess, AuthenticationFailure;
 
 
-	public event Action<List<Lobby>> ListLobbySuccess;
-	public event Action ListLobbyFailure;
+	public static event Action LobbyCreationBegin, LobbyCreated, LobbyCreationSuccess, LobbyCreationFailure;
+
+	public static event Action RelayFailure;
+
+	public static event Action HearbeatFailure;
+
+	public static event Action LobbyJoinBegin, LobbyJoinSuccess, LobbyJoinFailure, JoinLobbyNetcode;
+	public static event Action<string> PlayerJoinedLobby;
+
+	public static event Action LeaveLobbyBegin, LeaveLobbyComplete;
+	// public static event Action LeaveLobbySuccess, LeaveLobbyFailure;
+	public static event Action<List<Player>> PlayersLeft;
+
+
+	public static event Action<List<Lobby>> ListLobbySuccess;
+	public static event Action ListLobbyFailure;
 	#endregion
 
 	#region lobby heartbeat & poll & listRefresh
@@ -356,7 +356,6 @@ public class MyLobby : MonoBehaviour {
 		if (WaitingForNGO) {
 			LobbyJoinFailure?.Invoke();
 		} else {
-			//just closes all other panels
 			AuthenticationSuccess?.Invoke();
 		}
 		LeaveLobby();
