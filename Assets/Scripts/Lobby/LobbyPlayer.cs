@@ -4,12 +4,8 @@ using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using Unity.Services.Authentication;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
 
 public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler, IDropHandler, IPointerEnterHandler, IPointerExitHandler, IPointerUpHandler {
 	[SerializeField] TextMeshProUGUI playerNameTxt;
@@ -104,9 +100,8 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 		}
 		colorPicker.AddOptions(items);
 	}
-
-
 	public void KickPlayer() {
+		if (!NetcodeManager.CanStopSceneLoading) { print("can't kick now"); return; }
 		MyLobby.Instance.KickFromLobby(lobbyID);
 	}
 

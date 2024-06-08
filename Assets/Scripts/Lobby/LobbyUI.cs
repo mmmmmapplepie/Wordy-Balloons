@@ -247,6 +247,7 @@ public class LobbyUI : MonoBehaviour {
 
 	//dont forget to start shutdown for NGO.
 	void LeaveLobbyBegin() {
+		if (!NetcodeManager.CanStopSceneLoading) return;
 		ToggleLobby(false);
 	}
 

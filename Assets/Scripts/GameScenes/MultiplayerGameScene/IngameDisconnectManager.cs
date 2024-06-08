@@ -61,6 +61,7 @@ public class IngameDisconnectManager : NetworkBehaviour {
 
 	[ClientRpc]
 	void TeamWonClientRpc(int winningTeam) {
+		print("win");
 		GameData.GameFinished = true;
 		GameEnded(winningTeam);
 	}
@@ -75,8 +76,9 @@ public class IngameDisconnectManager : NetworkBehaviour {
 			NetworkManager.Singleton.Shutdown();
 		}
 	}
-
+	[SerializeField] UnityEditor.SceneAsset mainMenuScene;
 	public void GoToScene(UnityEditor.SceneAsset scene) {
+		if (scene == mainMenuScene) ShutDownNetwork();
 		SceneManager.LoadScene(scene.name);
 	}
 

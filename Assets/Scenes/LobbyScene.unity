@@ -1650,7 +1650,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4838deab67591f49b82d6e501b66635, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainMenuScene: {fileID: 0}
+  mainMenuScene: {fileID: 102900000, guid: a3f814c5899e9aa42a034d091be8ebea, type: 3}
   lobbyCreationPanel: {fileID: 2084769675}
   lobbyName: {fileID: 1480678707}
   lobbyCode: {fileID: 1907567682}

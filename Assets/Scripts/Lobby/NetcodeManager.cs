@@ -23,6 +23,8 @@ public class NetcodeManager : NetworkBehaviour {
 	void Awake() {
 		Instance = this;
 		SetupColoredLists();
+
+		CanStopSceneLoading = true;
 	}
 	void SetupColoredLists() {
 		allColorOptions = _allColorOptions;
@@ -94,7 +96,6 @@ public class NetcodeManager : NetworkBehaviour {
 		LobbyUI.GoingToMainMenu -= ShutDownNetwork;
 		LobbyPlayer.TeamChangeEvent -= ChangeTeam;
 
-		CanStopSceneLoading = true;
 
 		base.OnDestroy();
 	}
@@ -240,7 +241,6 @@ public class NetcodeManager : NetworkBehaviour {
 			if (playerObj != null) RemovePlayerObject(playerObj);
 			MyLobby.Instance.KickFromLobby(lobbyID);
 			if (clientID != ulong.MaxValue) NetworkManager.DisconnectClient(clientID);
-			print("player was already kicked from lobby");
 			return;
 		}
 
@@ -299,12 +299,13 @@ public class NetcodeManager : NetworkBehaviour {
 	}
 
 	void LeftLobby() {
-		if (!GameData.GameFinished) return;
+		print(CanStopSceneLoading);
+		if (!CanStopSceneLoading) return;
 		ShutDownNetwork();
 	}
 
 	void PlayersLeft(List<Player> currentPlayersInLobby) {
-		if (!GameData.GameFinished) return;
+		if (!CanStopSceneLoading) return;
 		List<string> PlayersToRemove = new List<string>();
 		foreach (KeyValuePair<string, ulong> pair in LobbyID_KEY_ClientID_VAL) {
 			PlayersToRemove.Add(pair.Key);
@@ -319,7 +320,7 @@ public class NetcodeManager : NetworkBehaviour {
 			team2.Remove(id);
 
 			if (ClientID_KEY_ColorIndex_VAL.ContainsKey(clientID)) {
-				int index = ClientID_KEY_ColorIndex_VAL[clientID];
+				ClientID_KEY_ColorIndex_VAL.Remove(clientID);
 			}
 
 			LobbyPlayer playerObj = playersObjects.Find(x => x.lobbyID == id);
@@ -438,7 +439,15 @@ public class NetcodeManager : NetworkBehaviour {
 		if (loadNextScene != null) StopCoroutine(loadNextScene);
 		loadNextScene = StartCoroutine(LoadNextScene());
 	}
-	bool CanStopSceneLoading = true;
+	static bool _CanStopSceneLoading = true;
+	public static bool CanStopSceneLoading {
+		get {
+			return _CanStopSceneLoading;
+		}
+		set {
+			_CanStopSceneLoading = value;
+		}
+	}
 	IEnumerator LoadNextScene() {
 		StartSceneLoading?.Invoke();
 		int countDown = 5;
@@ -507,6 +516,7 @@ public class NetcodeManager : NetworkBehaviour {
 
 	void ShutDownNetwork() {
 		if (!NetworkManager.Singleton.ShutdownInProgress) {
+			CanStopSceneLoading = true;
 			NetworkManager.Singleton.Shutdown();
 		}
 	}
