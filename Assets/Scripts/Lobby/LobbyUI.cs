@@ -9,6 +9,8 @@ using Unity.Services.Relay;
 using UnityEditor.PackageManager.Requests;
 using UnityEngine.SceneManagement;
 using System.Threading.Tasks;
+using UnityEngine.UI;
+using Unity.Netcode;
 
 public class LobbyUI : MonoBehaviour {
 
@@ -36,6 +38,10 @@ public class LobbyUI : MonoBehaviour {
 
 		MyLobby.Instance.ListLobbySuccess += LobbyListFound;
 		MyLobby.Instance.ListLobbyFailure += ListLobbiesFail;
+
+		NetcodeManager.LockOnLoading += DisableLeaving;
+		NetcodeManager.StartSceneLoading += LoadingNextScene;
+		NetcodeManager.StopSceneLoading += StopLoadingScene;
 	}
 	void OnDestroy() {
 		if (MyLobby.Instance == null) return;
@@ -57,6 +63,10 @@ public class LobbyUI : MonoBehaviour {
 
 		MyLobby.Instance.ListLobbySuccess -= LobbyListFound;
 		MyLobby.Instance.ListLobbyFailure -= ListLobbiesFail;
+
+		NetcodeManager.LockOnLoading -= DisableLeaving;
+		NetcodeManager.StartSceneLoading -= LoadingNextScene;
+		NetcodeManager.StopSceneLoading -= StopLoadingScene;
 	}
 
 
@@ -65,9 +75,12 @@ public class LobbyUI : MonoBehaviour {
 	#endregion
 
 	#region Interaction functions
-	public void GoToMainMenu() {
-		//have to stop NGO and lobby
-		SceneManager.LoadScene("MainMenu");
+	public UnityEditor.SceneAsset mainMenuScene;
+	public static event System.Action GoingToMainMenu;
+	public void GoToScene(UnityEditor.SceneAsset scene) {
+		if (scene == mainMenuScene) GoingToMainMenu?.Invoke();
+		//have to stop NGO and lobby if main menu
+		SceneManager.LoadScene(scene.name);
 	}
 	public void RetryAuthentication() {
 		MyLobby.Instance.Authentication();
@@ -153,7 +166,7 @@ public class LobbyUI : MonoBehaviour {
 
 	#region Event Functions
 	[SerializeField] GameObject LoadingPanel, ErrorPanel;
-	[SerializeField] GameObject MainMenuBtn, RetryAuthenticationBtn, CloseErrorPanelBtn;
+	[SerializeField] GameObject RetryAuthenticationBtn, CloseErrorPanelBtn;
 	void OpenLoadingPanel() {
 		HidePanelsExceptChosen(LoadingPanel);
 	}
@@ -167,7 +180,6 @@ public class LobbyUI : MonoBehaviour {
 
 
 		RetryAuthenticationBtn.SetActive(false);
-		MainMenuBtn.SetActive(false);
 		CloseErrorPanelBtn.SetActive(true);
 
 		//only open the one you want.
@@ -182,7 +194,6 @@ public class LobbyUI : MonoBehaviour {
 		HidePanelsExceptChosen(ErrorPanel);
 		RetryAuthenticationBtn.SetActive(true);
 		CloseErrorPanelBtn.SetActive(false);
-		MainMenuBtn.SetActive(true);
 	}
 
 	[SerializeField] CanvasGroup lobbyPanel;
@@ -209,9 +220,9 @@ public class LobbyUI : MonoBehaviour {
 
 
 
-
 	void LobbyJoined() {
 		HidePanelsExceptChosen();
+		enterGameBtn.interactable = NetworkManager.Singleton.IsServer;
 		LobbyUpdate(MyLobby.Instance.joinedLobby);
 		ToggleLobby(true);
 	}
@@ -262,8 +273,19 @@ public class LobbyUI : MonoBehaviour {
 
 
 
-
-
+	public Button leaveBtn, enterGameBtn;
+	void LoadingNextScene() {
+		enterGameBtn.interactable = false;
+	}
+	void DisableLeaving(bool lockOn) {
+		leaveBtn.interactable = !lockOn;
+	}
+	void StopLoadingScene() {
+		leaveBtn.interactable = true;
+		if (NetworkManager.Singleton.IsServer) {
+			enterGameBtn.interactable = true;
+		}
+	}
 
 
 }

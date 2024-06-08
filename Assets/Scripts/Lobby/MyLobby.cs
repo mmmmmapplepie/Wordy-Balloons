@@ -13,7 +13,6 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
 
-[DefaultExecutionOrder(-100)]
 public class MyLobby : MonoBehaviour {
 	//use for lobby data keys
 	public const string RelayCode = "RelayCode";
@@ -77,6 +76,7 @@ public class MyLobby : MonoBehaviour {
 	#region Events
 	ILobbyEvents LobbyEvents = null;
 	LobbyEventCallbacks lobbyCallback = null;
+
 	public event Action<ILobbyChanges> LobbyChangedEvent;
 
 	public event Action AuthenticationBegin, AuthenticationSuccess, AuthenticationFailure;

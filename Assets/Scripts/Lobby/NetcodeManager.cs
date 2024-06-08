@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
@@ -21,22 +23,7 @@ public class NetcodeManager : NetworkBehaviour {
 	void Awake() {
 		Instance = this;
 		SetupColoredLists();
-		// InvokeRepeating(nameof(PrintStuff), 5f, 2f);
 	}
-	// void PrintStuff() {
-	// 	if (NetworkManager.IsServer) {
-	// 		string info = "";
-	// 		foreach (KeyValuePair<ulong, int> p in ClientID_KEY_ColorIndex_VAL) {
-	// 			info += p.Key + " is paired with index " + p.Value + ";\n";
-	// 		}
-	// 		info += "------------------------------------\n";
-	// 		info += "team1: " + team1.Count + ":::::team2: " + team2.Count;
-	// 		print(info);
-	// 		print(LobbyID_KEY_ClientID_VAL.Count);
-
-	// 	}
-	// }
-
 	void SetupColoredLists() {
 		allColorOptions = _allColorOptions;
 		foreach (Color c in allColorOptions) {
@@ -59,13 +46,21 @@ public class NetcodeManager : NetworkBehaviour {
 
 		//a client that is disconnecting also gets this callback (as if the still connected are disconnecting...)
 		NetworkManager.Singleton.OnClientDisconnectCallback += ClientDisconnectedFromNGO;
+		NetworkManager.Singleton.OnClientDisconnectCallback += StopLoadingLevel;
 		NetworkManager.Singleton.OnClientStopped += ClientStopped;
+
+
+		// NetworkManager.Singleton.SceneManager.OnLoad += Scene
+
 	}
 	public override void OnNetworkDespawn() {
-		NetworkManager.Singleton.OnClientConnectedCallback -= ClientConnectedToNGO;
-		NetworkManager.Singleton.OnClientDisconnectCallback -= ClientDisconnectedFromNGO;
-		NetworkManager.Singleton.OnClientStopped -= ClientStopped;
-		MyLobby.Instance.KickedFromLobby();
+		if (NetworkManager.Singleton != null) {
+			NetworkManager.Singleton.OnClientConnectedCallback -= ClientConnectedToNGO;
+			NetworkManager.Singleton.OnClientDisconnectCallback -= ClientDisconnectedFromNGO;
+			NetworkManager.Singleton.OnClientDisconnectCallback -= StopLoadingLevel;
+			NetworkManager.Singleton.OnClientStopped -= ClientStopped;
+		}
+		if (MyLobby.Instance != null) MyLobby.Instance.KickedFromLobby();
 	}
 
 	void Start() {
@@ -73,26 +68,33 @@ public class NetcodeManager : NetworkBehaviour {
 		MyLobby.Instance.LobbyCreated += JoinAsHost;
 		MyLobby.Instance.PlayerJoinedLobby += PlayerJoinedLobby;
 		MyLobby.Instance.JoinLobbyNetcode += JoinAsClient;
-		MyLobby.Instance.LeaveLobbyComplete += ShutDownNetwork;
+		MyLobby.Instance.LeaveLobbyComplete += LeftLobby;
 		MyLobby.Instance.PlayersLeft += PlayersLeft;
+		MyLobby.Instance.PlayersLeft += StopLoadingLevel;
 
 
 		TeamBox.TeamChangeEvent += ChangeTeam;
+		LobbyUI.GoingToMainMenu += ShutDownNetwork;
 		LobbyPlayer.TeamChangeEvent += ChangeTeam;
 	}
 	public override void OnDestroy() {
+		OnNetworkDespawn();
 		//events from lobby
 		if (MyLobby.Instance != null) {
 			MyLobby.Instance.LobbyCreated -= JoinAsHost;
 			MyLobby.Instance.PlayerJoinedLobby -= PlayerJoinedLobby;
 			MyLobby.Instance.JoinLobbyNetcode -= JoinAsClient;
-			MyLobby.Instance.LeaveLobbyComplete -= ShutDownNetwork;
+			MyLobby.Instance.LeaveLobbyComplete -= LeftLobby;
 			MyLobby.Instance.PlayersLeft -= PlayersLeft;
+			MyLobby.Instance.PlayersLeft -= StopLoadingLevel;
 		}
 
 
 		TeamBox.TeamChangeEvent -= ChangeTeam;
+		LobbyUI.GoingToMainMenu -= ShutDownNetwork;
 		LobbyPlayer.TeamChangeEvent -= ChangeTeam;
+
+		CanStopSceneLoading = true;
 
 		base.OnDestroy();
 	}
@@ -290,14 +292,19 @@ public class NetcodeManager : NetworkBehaviour {
 		}
 	}
 	void ClientStopped(bool wasHost) {
+		print("stopped");
 		if (!wasHost) {
 			MyLobby.Instance.KickedFromLobby();
 		}
 	}
 
-
+	void LeftLobby() {
+		if (!GameData.GameFinished) return;
+		ShutDownNetwork();
+	}
 
 	void PlayersLeft(List<Player> currentPlayersInLobby) {
+		if (!GameData.GameFinished) return;
 		List<string> PlayersToRemove = new List<string>();
 		foreach (KeyValuePair<string, ulong> pair in LobbyID_KEY_ClientID_VAL) {
 			PlayersToRemove.Add(pair.Key);
@@ -306,7 +313,6 @@ public class NetcodeManager : NetworkBehaviour {
 			if (PlayersToRemove.Contains(p.Id)) PlayersToRemove.Remove(p.Id);
 		}
 		foreach (string id in PlayersToRemove) {
-			print("playerLeft");
 			ulong clientID = LobbyID_KEY_ClientID_VAL[id];
 			LobbyID_KEY_ClientID_VAL.Remove(id);
 			team1.Remove(id);
@@ -314,8 +320,6 @@ public class NetcodeManager : NetworkBehaviour {
 
 			if (ClientID_KEY_ColorIndex_VAL.ContainsKey(clientID)) {
 				int index = ClientID_KEY_ColorIndex_VAL[clientID];
-				print(ClientID_KEY_ColorIndex_VAL.Remove(clientID));
-
 			}
 
 			LobbyPlayer playerObj = playersObjects.Find(x => x.lobbyID == id);
@@ -339,6 +343,7 @@ public class NetcodeManager : NetworkBehaviour {
 	#region changingTeams
 
 	void ChangeTeam(Transform targetT, LobbyPlayer dragPlayer, LobbyPlayer swapPlayer) {
+		if (!CanStopSceneLoading) return;
 		if (swapPlayer == null) {
 			//can't add more players to the teams
 			if ((targetT == team1Holder && team1Holder.childCount >= team1Max) || (targetT == team2Holder && team2Holder.childCount >= team2Max)) return;
@@ -398,7 +403,7 @@ public class NetcodeManager : NetworkBehaviour {
 		int previousIndex = ClientID_KEY_ColorIndex_VAL[senderID];
 		if (previousIndex == targetIndex) return;
 
-		if (ClientID_KEY_ColorIndex_VAL.ContainsValue(targetIndex)) {
+		if (ClientID_KEY_ColorIndex_VAL.ContainsValue(targetIndex) || !CanStopSceneLoading) {
 			targetIndex = previousIndex;
 		}
 		LobbyPlayer targetPlayerObj = playersObjects.Find(x => x.clientID.Value == senderID);
@@ -420,7 +425,75 @@ public class NetcodeManager : NetworkBehaviour {
 
 
 
+	#region startNextScene
+	public static event Action StartSceneLoading, StopSceneLoading;
+	public static event Action<bool> LockOnLoading;
+	//for start: turn on loading panel, disable leave, disable changing teams/colors
+	//for stop: inverse of all the above.
+	bool CheckIfPlayersFilled() {
+		return team1Max + team2Max == LobbyID_KEY_ClientID_VAL.Count;
+	}
+	Coroutine loadNextScene = null;
+	public void EnterGame() {
+		if (loadNextScene != null) StopCoroutine(loadNextScene);
+		loadNextScene = StartCoroutine(LoadNextScene());
+	}
+	bool CanStopSceneLoading = true;
+	IEnumerator LoadNextScene() {
+		StartSceneLoading?.Invoke();
+		int countDown = 5;
+		while (countDown > 0) {
+			countDown--;
+			yield return new WaitForSeconds(1f);
+		}
+		LockOnSceneClientRpc(true);
+		countDown = 3;
+		while (countDown > 0) {
+			countDown--;
+			yield return new WaitForSeconds(1f);
+		}
+		//have a check if all have laoded or soemthing idk.
+		SceneEventProgressStatus sceneStatus = NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
+		if (sceneStatus != SceneEventProgressStatus.Started) {
+			StopSceneLoading?.Invoke();
+			LockOnSceneClientRpc(false);
+		} else {
+			//change data
+			GameData.GameFinished = false;
+			GameData.allColorOptions = allColorOptions;
+			GameData.ClientID_KEY_ColorIndex_VAL = ClientID_KEY_ColorIndex_VAL;
+			GameData.LobbyID_KEY_ClientID_VAL = LobbyID_KEY_ClientID_VAL;
+			GameData.team1 = team1; GameData.team2 = team2;
+		}
+	}
+	[ClientRpc]
+	void LockOnSceneClientRpc(bool lockOn) {
+		CanStopSceneLoading = !lockOn;
+		LockOnLoading?.Invoke(lockOn);
+	}
+	void StopLoadingLevel() {
+		if (loadNextScene != null && CanStopSceneLoading) {
+			StopCoroutine(loadNextScene);
+			LockOnSceneClientRpc(false);
+			StopSceneLoading?.Invoke();
+		}
+	}
+	void StopLoadingLevel(ulong i) {
+		StopLoadingLevel();
+	}
+	void StopLoadingLevel(List<Player> p) {
+		StopLoadingLevel();
+	}
 
+
+
+
+
+
+
+
+
+	#endregion
 
 
 
