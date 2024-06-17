@@ -4,9 +4,10 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class IngameDisconnectManager : NetworkBehaviour {
+public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	public override void OnNetworkSpawn() {
-		GameData.GameFinished = false;
+		GameData.GameRunning = false;
+
 		NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
 		if (NetworkManager.IsServer) {
 			CheckAllPlayersPresent();
@@ -21,21 +22,21 @@ public class IngameDisconnectManager : NetworkBehaviour {
 			GameData.team2.Remove(pair.Key);
 			LCID.Remove(pair.Key);
 		}
-		CheckWin();
+		CheckTeamEmpty();
 	}
 	public override void OnNetworkDespawn() {
-		Debug.LogWarning("despawned");
+
 		if (NetworkManager.Singleton == null) return;
 		NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnectCallback;
 	}
 	public override void OnDestroy() {
 		OnNetworkDespawn();
-		ShutDownNetwork();
 		base.OnDestroy();
 	}
 	[SerializeField] GameObject connectionStopped, gameEnded;
 	void ConnectionStopped() {
-		if (GameData.GameFinished) return;
+		ShutDownNetwork();
+		if (GameData.GameRunning) return;
 		connectionStopped.SetActive(true);
 	}
 	void OnClientDisconnectCallback(ulong clientID) {
@@ -51,37 +52,38 @@ public class IngameDisconnectManager : NetworkBehaviour {
 				break;
 			}
 		}
-		CheckWin();
+		CheckTeamEmpty();
 	}
-	void CheckWin() {
-		int teamWon = 0;
-		if (GameData.team1.Count == 0) teamWon = 2;
-		if (GameData.team2.Count == 0) teamWon = 1;
-		if (teamWon != 0) {
-			TeamWonClientRpc(teamWon);
+	void CheckTeamEmpty() {
+		int teamRemaining = 0;
+		if (GameData.team1.Count == 0) teamRemaining = 2;
+		if (GameData.team2.Count == 0) teamRemaining = 1;
+		if (teamRemaining != 0) {
+			TeamEmptyClientRpc();
 		}
 	}
 
 	[ClientRpc]
-	void TeamWonClientRpc(int winningTeam) {
-		GameData.GameFinished = true;
-		GameEnded(winningTeam);
-	}
-
-	void GameEnded(int winningTeam) {
-		gameEnded.SetActive(true);
+	void TeamEmptyClientRpc() {
+		ConnectionStopped();
 	}
 
 	void ShutDownNetwork() {
-		if (NetworkManager.Singleton == null) return;
 		if (!NetworkManager.Singleton.ShutdownInProgress) {
 			NetworkManager.Singleton.Shutdown();
 		}
 	}
 	[SerializeField] UnityEditor.SceneAsset mainMenuScene;
 	public void GoToScene(UnityEditor.SceneAsset scene) {
-		if (scene == mainMenuScene) ShutDownNetwork();
+		ShutDownNetwork();
 		SceneManager.LoadScene(scene.name);
 	}
+
+
+
+
+
+
+
 
 }

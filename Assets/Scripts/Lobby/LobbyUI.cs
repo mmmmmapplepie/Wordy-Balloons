@@ -22,6 +22,7 @@ public class LobbyUI : MonoBehaviour {
 
 		NetcodeManager.LockOnLoading += DisableLeaving;
 		NetcodeManager.StartSceneLoading += LoadingNextScene;
+		NetcodeManager.LobbyFull += LobbyFull;
 
 		MyLobby.AuthenticationBegin += OpenLoadingPanel;
 		MyLobby.AuthenticationSuccess += CloseTransitionPanels;
@@ -41,10 +42,13 @@ public class LobbyUI : MonoBehaviour {
 
 		MyLobby.ListLobbySuccess += LobbyListFound;
 		MyLobby.ListLobbyFailure += ListLobbiesFail;
+
+		MyLobby.PlayersLeft += PlayersLeft;
 	}
 	void OnDestroy() {
 		NetcodeManager.LockOnLoading -= DisableLeaving;
 		NetcodeManager.StartSceneLoading -= LoadingNextScene;
+		NetcodeManager.LobbyFull -= LobbyFull;
 
 		MyLobby.AuthenticationBegin -= OpenLoadingPanel;
 		MyLobby.AuthenticationSuccess -= CloseTransitionPanels;
@@ -65,6 +69,7 @@ public class LobbyUI : MonoBehaviour {
 		MyLobby.ListLobbySuccess -= LobbyListFound;
 		MyLobby.ListLobbyFailure -= ListLobbiesFail;
 
+		MyLobby.PlayersLeft -= PlayersLeft;
 	}
 
 
@@ -199,7 +204,7 @@ public class LobbyUI : MonoBehaviour {
 
 	//shoudl be called when NGO host is connected.
 	void LobbyCreationSuccess() {
-		enterGameBtn.interactable = NetworkManager.Singleton.IsServer;
+		startGameBtn.interactable = false;
 		lobbyCreationPanel.SetActive(false);
 		LobbyUpdate(MyLobby.Instance.hostLobby);
 		ToggleLobby(true);
@@ -222,7 +227,7 @@ public class LobbyUI : MonoBehaviour {
 
 	void LobbyJoined() {
 		HidePanelsExceptChosen();
-		enterGameBtn.interactable = NetworkManager.Singleton.IsServer;
+		startGameBtn.interactable = false;
 		LobbyUpdate(MyLobby.Instance.joinedLobby);
 		ToggleLobby(true);
 	}
@@ -274,9 +279,9 @@ public class LobbyUI : MonoBehaviour {
 
 
 
-	public Button leaveBtn, enterGameBtn;
+	public Button leaveBtn, startGameBtn;
 	void LoadingNextScene() {
-		enterGameBtn.interactable = false;
+		startGameBtn.interactable = false;
 	}
 	void DisableLeaving(bool lockOn) {
 		if (lockOn) {
@@ -285,7 +290,13 @@ public class LobbyUI : MonoBehaviour {
 			HidePanelsExceptChosen();
 		}
 		leaveBtn.interactable = !lockOn;
-		enterGameBtn.interactable = NetworkManager.Singleton.IsServer && !lockOn ? true : false;
+		startGameBtn.interactable = false;
+	}
+	void PlayersLeft(List<Player> currentPlayersInLobby) {
+		startGameBtn.interactable = false;
+	}
+	void LobbyFull() {
+		startGameBtn.interactable = true;
 	}
 
 

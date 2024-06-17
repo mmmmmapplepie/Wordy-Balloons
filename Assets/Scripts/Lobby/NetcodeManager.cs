@@ -6,6 +6,7 @@ using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class NetcodeManager : NetworkBehaviour {
 	[SerializeField] Transform team1Holder, team2Holder, lobbyPlayerPrefab;
@@ -51,10 +52,10 @@ public class NetcodeManager : NetworkBehaviour {
 		NetworkManager.Singleton.OnClientDisconnectCallback += StopLoadingLevel;
 		NetworkManager.Singleton.OnClientStopped += ClientStopped;
 
-
-		// NetworkManager.Singleton.SceneManager.OnLoad += Scene
-
 	}
+
+
+
 	public override void OnNetworkDespawn() {
 		if (NetworkManager.Singleton != null) {
 			NetworkManager.Singleton.OnClientConnectedCallback -= ClientConnectedToNGO;
@@ -262,10 +263,15 @@ public class NetcodeManager : NetworkBehaviour {
 			Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { clientID } }
 		};
 		JoinConfirmedClientRpc(option);
+		CheckLobbyFull();
 	}
 	[ClientRpc]
 	void JoinConfirmedClientRpc(ClientRpcParams option = default) {
 		MyLobby.Instance.JoinLobbySuccessful(true);
+	}
+	public static event Action LobbyFull;
+	void CheckLobbyFull() {
+		if (ClientID_KEY_ColorIndex_VAL.Count == MyLobby.Instance.hostLobby.MaxPlayers) LobbyFull?.Invoke();
 	}
 
 	LobbyPlayer FindPlayerFromLobbyID(string lobbyID) {
@@ -456,7 +462,6 @@ public class NetcodeManager : NetworkBehaviour {
 			LockOnSceneClientRpc(false);
 		} else {
 			//change data
-			GameData.GameFinished = false;
 			GameData.allColorOptions = allColorOptions;
 			GameData.ClientID_KEY_ColorIndex_VAL = ClientID_KEY_ColorIndex_VAL;
 			GameData.LobbyID_KEY_ClientID_VAL = LobbyID_KEY_ClientID_VAL;
