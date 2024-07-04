@@ -303,7 +303,6 @@ public class NetcodeManager : NetworkBehaviour {
 	}
 
 	void LeftLobby() {
-		if (!CanStopSceneLoading) return;
 		ShutDownNetwork();
 	}
 
@@ -474,10 +473,10 @@ public class NetcodeManager : NetworkBehaviour {
 		LockOnLoading?.Invoke(lockOn);
 	}
 	void StopLoadingLevel() {
-		if (loadNextScene != null && CanStopSceneLoading) {
-			StopCoroutine(loadNextScene);
-			LockOnSceneClientRpc(false);
-		}
+		if (loadNextScene != null) StopCoroutine(loadNextScene);
+		loadNextScene = null;
+		CanStopSceneLoading = true;
+		if (NetworkManager.Singleton.IsServer) LockOnSceneClientRpc(false);
 	}
 	void StopLoadingLevel(ulong i) {
 		StopLoadingLevel();
