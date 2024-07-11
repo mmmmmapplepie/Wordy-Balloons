@@ -554,6 +554,7 @@ GameObject:
   - component: {fileID: 493678113}
   - component: {fileID: 493678112}
   - component: {fileID: 493678117}
+  - component: {fileID: 493678118}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -660,6 +661,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   countdownTxt: {fileID: 516848448}
+--- !u!114 &493678118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 493678111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17c92f8b18468d4408b2de5fc9b60b60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &513255742
 GameObject:
   m_ObjectHideFlags: 0
@@ -690,8 +703,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dictionaryJSON: {fileID: 0}
-  entries:
-    words: []
+  DictionaryList: []
 --- !u!4 &513255744
 Transform:
   m_ObjectHideFlags: 0
@@ -2566,9 +2578,9 @@ MonoBehaviour:
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_PressedColor: {r: 1, g: 1, b: 1, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 1, g: 1, b: 1, a: 0.5882353}
+    m_DisabledColor: {r: 0.745283, g: 0.745283, b: 0.745283, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
