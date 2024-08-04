@@ -5,97 +5,133 @@ using System;
 
 public class InputManager : MonoBehaviour {
 	public TextMeshProUGUI targetText;
-	public TMP_InputField input;
-	public bool textSet = false;
+	bool canTakeInput = false;
+	public static InputManager Instance;
+	void Awake() {
+		Instance = this;
+
+		//for testing
+		CheckGameStart(0);
+	}
 	void OnEnable() {
-		GameStateManager.countDownChanged += CheckStart;
-		SetInputAvailabilityEvent += ChangeInputAvailability;
+		GameStateManager.countDownChanged += CheckGameStart;
 	}
 	void OnDisable() {
-		GameStateManager.countDownChanged -= CheckStart;
-		SetInputAvailabilityEvent = ChangeInputAvailability;
+		GameStateManager.countDownChanged -= CheckGameStart;
 	}
-
-	void Update() {
-	}
-	static event Action<bool> SetInputAvailabilityEvent;
-	public static void SetInputAvailability(bool enable) {
-		print(enable);
-		SetInputAvailabilityEvent?.Invoke(enable);
-	}
-	void ChangeInputAvailability(bool enable) {
-		input.interactable = enable;
-	}
-
-
-	//takes in a string and return true if it is allowed.
-	public static event System.Func<System.Func<string, bool>> LookForTextFilterMethodEvent;
-	public static event System.Func<Func<string>> newTextPreset;
-
-	void CheckStart(int count) {
+	void CheckGameStart(int count) {
 		if (count != 0) return;
-		ProduceText();
+		SetNewTargetText();
+		canTakeInput = true;
 	}
-
-	void ProduceText() {
-		Func<string> inputTxtInitial = newTextPreset?.Invoke();
-		if (inputTxtInitial == null) inputTxtInitial = () => "";
-		input.text = inputTxtInitial();
-
-		System.Func<string, bool> filter = LookForTextFilterMethodEvent?.Invoke();
-		if (filter == null) filter = (string input) => true;
-
-
-		//loop random stuff from dictionary until filter approves.
-		textSet = true;
+	void Update() {
+		ProcessInput();
+		AnimateText();
 	}
 
 
-
-
-	public static event Func<Action<string>> InputChangedEvent;
-	public static event Func<Func<string, List<string>>> InputSubmitEvent;
-	public static event Action<string> ballonCreated;
-	string prevInput = "";
-	int prevstringPos = 0;
-	public void InputChanged(string s) {
-		if (s == prevInput) return;
-
-		if (input.textComponent.GetTextInfo(s).lineCount > 2 || input.textComponent.isTextOverflowing) {
-			input.text = prevInput;
-			input.stringPosition = prevstringPos;
+	public string targetString { get; set; } = "";
+	public string typedString { get; set; } = "";
+	public static event Action TypedTextChanged;
+	void ProcessInput() {
+		if (!canTakeInput) return;
+		string input = Input.inputString;
+		if (input == null || input.Length == 0) return;
+		if (input.Contains("\r")) {
+			InputSubmitted();
+		} else if (input.Contains("\b")) {
+			Backspace();
+		} else {
+			IncrementInput(input);
 		}
-		prevInput = input.text;
-		prevstringPos = input.stringPosition;
-
-		Action<string> changedCheck = InputChangedEvent?.Invoke();
-		if (changedCheck == null) return;
-		changedCheck(s);
+		TypedTextChanged?.Invoke();
 	}
 
-	public void InputSubmitted(string s) {
-		if (!textSet) return;
-
-		//check for skip part.
-		if (s == "///") {
-			bool canSkip = CheckSkip();
-			if (canSkip) {
-				Skip();
-				return;
-			}
+	#region InputSubmit
+	public void InputSubmitted() {
+		if (typedString == targetString) {
+			ProcessCorrectInput();
+		} else {
+			ProcessWrongInput();
 		}
+	}
 
-		Func<string, List<string>> balloonCreator = InputSubmitEvent?.Invoke();
+	public static event Func<Func<List<string>>> FindBalloonCreator;
+	public static event Action<string> BalloonCreated;
+	public static event Action CorrectInputFinished;
+	void ProcessCorrectInput() {
+		Func<List<string>> balloonCreator = FindBalloonCreator?.Invoke();
 		if (balloonCreator == null) { balloonCreator = NormalCreate; }
-		List<string> newBalloons = balloonCreator(s);
+		List<string> newBalloons = balloonCreator();
 		foreach (string balloonTxt in newBalloons) {
-			ballonCreated.Invoke(balloonTxt);
+			BalloonCreated.Invoke(balloonTxt);
 		}
+		CorrectInputFinished?.Invoke();
+	}
+	List<string> NormalCreate() {
+		return new List<string> { typedString };
+	}
 
-		if (s == targetText.text) {
-			textSet = false;
-			ProduceText();
+
+
+
+	public static event Action WrongInputProcess, WrongInputFinished;
+	void ProcessWrongInput() {
+		WrongInputProcess?.Invoke();
+		WrongInputFinished?.Invoke();
+	}
+	#endregion
+
+
+	#region TypedInputUpdate
+	public static event Func<Action> FindBackspaceProcess, BackspaceFinished;
+	public void Backspace() {
+		Action backSpaceFtn = FindBackspaceProcess?.Invoke();
+		if (backSpaceFtn == null) backSpaceFtn = BasicBackspace;
+		backSpaceFtn();
+		BackspaceFinished?.Invoke();
+	}
+	void BasicBackspace() {
+		if (typedString.Length <= 0) return;
+		typedString = typedString.Substring(0, typedString.Length - 1);
+	}
+
+
+	public static event Func<Action<string>> FindIncrementInputProcess;
+	public static event Action IncrementInputFinished;
+	void IncrementInput(string input) {
+		bool skip = IncrementSkip(input);
+		if (skip) return;
+
+		Action<string> incrementAction = FindIncrementInputProcess?.Invoke();
+		if (incrementAction == null) incrementAction = BaseIncrement;
+		incrementAction(input);
+		IncrementInputFinished?.Invoke();
+	}
+	int _skipTick = 0;
+	int skipTick {
+		get {
+			return _skipTick;
 		}
+		set {
+			_skipTick = value < 0 ? 0 : value;
+			skipTickChanged.Invoke(_skipTick);
+		}
+	}
+	public static event Action<int> skipTickChanged;
+	// essentially typing "////" will try to skip - typing "/" four times in a row
+	bool IncrementSkip(string input) {
+		if (input != "/") {
+			skipTick = 0;
+			return false;
+		}
+		skipTick++;
+
+		if (skipTick == 4) {
+			skipTick = 0;
+			return TrySkip();
+		}
+		return false;
 	}
 	int _skipCharges = 3;
 	public int skipCharges {
@@ -103,26 +139,117 @@ public class InputManager : MonoBehaviour {
 			return _skipCharges;
 		}
 		set {
-			skipCharges = value < 0 ? 0 : value;
+			_skipCharges = value < 0 ? 0 : value;
 		}
 	}
+	public static event Func<Func<bool>> FindCheckSkipFunction;
+	public static event Func<Action> FindSkipFunction;
+	public static event Action<bool> SkipAttemptResult;
+	bool TrySkip() {
+		Func<bool> canSkip = FindCheckSkipFunction?.Invoke();
+		if (canSkip == null) canSkip = NormalSkipCheck;
+		if (!canSkip()) { SkipAttemptResult?.Invoke(false); return false; }
 
-	bool CheckSkip() {
+		Action skipFtn = FindSkipFunction?.Invoke();
+		if (skipFtn == null) skipFtn = NormalSkip;
+		skipFtn.Invoke();
+
+		SkipAttemptResult?.Invoke(true);
+		return true;
+	}
+	bool NormalSkipCheck() {
 		if (skipCharges == 0) return false;
 		return true;
 	}
-	void Skip() {
+	void NormalSkip() {
 		skipCharges--;
-		textSet = false;
-		ProduceText();
+		SetNewTargetText();
 	}
-	List<string> NormalCreate(string s) {
-		if (s == targetText.text) {
-			return new List<string> { s };
-		} else {
-			return new List<string>();
+
+	void BaseIncrement(string input) {
+		typedString = String.Concat(typedString, input);
+		if (typedString.Length > 3 && typedString.Length > targetString.Length) {
+			typedString = typedString.Substring(0, targetString.Length);
 		}
 	}
+	#endregion
+
+
+	#region General Functions
+	public void ToggleInputEnabledState() {
+		canTakeInput = !canTakeInput;
+	}
+	public static event Action ResetEvent;
+	public void ResetTypedText() {
+		skipTick = 0;
+		typedString = "";
+		ResetEvent?.Invoke();
+	}
+	#endregion
+
+
+
+	#region Producing new target text
+	//takes in a string and return true if it is allowed.
+	public static event Func<Func<string>> FindTextTargetMethod;
+	public static event Func<Func<string, bool>> FindTextApprovalMethod;
+	public static event Action NewTextSet;
+
+
+
+	void SetNewTargetText() {
+		Func<string> RandomizerMethod = FindTextTargetMethod?.Invoke();
+		if (RandomizerMethod == null) RandomizerMethod = PickRandomText;
+
+		System.Func<string, bool> filter = FindTextApprovalMethod?.Invoke();
+		if (filter == null) filter = (string input) => true;
+
+		bool txtPassed = false;
+		string ranTxt = "";
+		while (!txtPassed) {
+			ranTxt = RandomizerMethod();
+			if (filter(ranTxt)) txtPassed = true;
+		}
+
+		targetString = ranTxt;
+		targetText.text = ranTxt;
+		ResetTypedText();
+		NewTextSet?.Invoke();
+	}
+
+	string PickRandomText() {
+		return "Random bruh";
+	}
+
+	#endregion
+
+
+	#region text animation
+	public static event Func<Action> FindTextAnimationFunction;
+	void AnimateText() {
+		Action animFtn = FindTextAnimationFunction?.Invoke();
+		if (animFtn == null) animFtn = NoAnimation;
+		NoAnimation();
+	}
+
+	void NoAnimation() {
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+	#endregion
+
+
+
 
 
 }
