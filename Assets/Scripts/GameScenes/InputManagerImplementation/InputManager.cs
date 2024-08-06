@@ -4,7 +4,6 @@ using UnityEngine;
 using System;
 
 public class InputManager : MonoBehaviour {
-	public TextMeshProUGUI targetText;
 	bool canTakeInput = false;
 	public static InputManager Instance;
 	void Awake() {
@@ -24,9 +23,10 @@ public class InputManager : MonoBehaviour {
 		SetNewTargetText();
 		canTakeInput = true;
 	}
+	public static event Action InputProcessFinished;
 	void Update() {
 		ProcessInput();
-		AnimateText();
+		InputProcessFinished?.Invoke();
 	}
 
 
@@ -115,7 +115,7 @@ public class InputManager : MonoBehaviour {
 		}
 		set {
 			_skipTick = value < 0 ? 0 : value;
-			skipTickChanged.Invoke(_skipTick);
+			skipTickChanged?.Invoke(_skipTick);
 		}
 	}
 	public static event Action<int> skipTickChanged;
@@ -212,41 +212,17 @@ public class InputManager : MonoBehaviour {
 		}
 
 		targetString = ranTxt;
-		targetText.text = ranTxt;
 		ResetTypedText();
 		NewTextSet?.Invoke();
 	}
 
 	string PickRandomText() {
-		return "Random bruh";
+		return "Random text has been set bruh!";
 	}
 
 	#endregion
 
 
-	#region text animation
-	public static event Func<Action> FindTextAnimationFunction;
-	void AnimateText() {
-		Action animFtn = FindTextAnimationFunction?.Invoke();
-		if (animFtn == null) animFtn = NoAnimation;
-		NoAnimation();
-	}
-
-	void NoAnimation() {
-
-	}
-
-
-
-
-
-
-
-
-
-
-
-	#endregion
 
 
 
