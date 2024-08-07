@@ -381,11 +381,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   correctColor: {r: 0, g: 1, b: 0.040338516, a: 1}
   wrongColor: {r: 1, g: 0, b: 0, a: 1}
-  correctScale: 2
+  correctScale: 1.5
   wrongScale: 1.5
-  wrongJiggleScale: 0.2
-  correctPeriod: 0.5
-  wrongPeriod: 0.2
+  wrongJiggleScale: 0.5
+  correctPeriod: 0.2
+  wrongPeriod: 0.5
   correctFont: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
   wrongFont: {fileID: 11400000, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
 --- !u!1 &1336554658

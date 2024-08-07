@@ -25,8 +25,8 @@ public class BasicTextAnimation : MonoBehaviour, ITextAnimator {
 
 		int charCount = txtInfo.characterCount;
 
+
 		if (charCount == 0) return;
-		int index = 0;
 		for (int i = 0; i < charCount; i++) {
 			TMP_CharacterInfo charInfo = txtInfo.characterInfo[i];
 			if (!charInfo.isVisible || i >= animationProgressList.Count) continue;
@@ -34,15 +34,12 @@ public class BasicTextAnimation : MonoBehaviour, ITextAnimator {
 			int vertStartIndex = charInfo.vertexIndex;
 			Color32[] vertCols = txtInfo.meshInfo[charMatIndex].colors32;
 			Vector3[] verts = txtInfo.meshInfo[charMatIndex].vertices;
-
-			FontAnimation<float> anim = animationProgressList[index];
+			FontAnimation<float> anim = animationProgressList[i];
 			anim.animation(anim.progress, verts, vertCols, vertStartIndex);
-			index++;
 			anim.progress += Time.deltaTime;
 		}
-		// text.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices);
-		// text.UpdateVertexData(TMP_VertexDataUpdateFlags.Colors32);
-		text.UpdateVertexData(TMP_VertexDataUpdateFlags.All);
+		text.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices);
+		text.UpdateVertexData(TMP_VertexDataUpdateFlags.Colors32);
 	}
 
 	void ManageAnimatingText() {
