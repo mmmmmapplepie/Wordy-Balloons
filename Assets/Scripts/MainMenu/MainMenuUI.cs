@@ -3,8 +3,13 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class MainMenuUI : MonoBehaviour {
-
+#if UNITY_EDITOR
 	public void GoToScene(UnityEditor.SceneAsset scene) {
 		SceneManager.LoadScene(scene.name);
+	}
+#endif
+	public void GoToScene(string name) {
+		if (SceneManager.GetSceneByName(name) == null) return;
+		SceneManager.LoadScene(name);
 	}
 }

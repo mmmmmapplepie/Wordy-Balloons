@@ -21,7 +21,7 @@ public class TextAnimatorTesting : MonoBehaviour {
 	void Animate() {
 		ManageAnimatingText();
 
-
+		
 		tmp.ForceMeshUpdate();
 
 		TMP_TextInfo txtInfo = tmp.textInfo;

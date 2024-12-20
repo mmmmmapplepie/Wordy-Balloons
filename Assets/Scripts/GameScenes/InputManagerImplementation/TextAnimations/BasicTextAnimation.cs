@@ -29,6 +29,10 @@ public class BasicTextAnimation : MonoBehaviour, ITextAnimator {
 		if (charCount == 0) return;
 		for (int i = 0; i < charCount; i++) {
 			TMP_CharacterInfo charInfo = txtInfo.characterInfo[i];
+
+			charInfo.character = "_".ToCharArray()[0];
+
+
 			if (!charInfo.isVisible || i >= animationProgressList.Count) continue;
 			int charMatIndex = charInfo.materialReferenceIndex;
 			int vertStartIndex = charInfo.vertexIndex;
@@ -83,12 +87,13 @@ public class BasicTextAnimation : MonoBehaviour, ITextAnimator {
 		string typed = input.typedString;
 		string target = input.targetString;
 		string output = "";
+
+		TMP_TextInfo txtInfo = text.textInfo;
 		text.text = target;
 		// return;
 
 		bool? correct = null;
 		if (System.String.IsNullOrEmpty(typed)) {
-			text.text = target;
 			return;
 		}
 		for (int i = 0; i < typed.Length; i++) {
@@ -100,10 +105,11 @@ public class BasicTextAnimation : MonoBehaviour, ITextAnimator {
 					correct = true;
 				}
 			} else {
+				string charToAdd = txtInfo.characterInfo[i].isVisible ? target[i].ToString() : "_";
 				if (correct == false) {
-					output += target[i];
+					output += charToAdd;
 				} else {
-					output += "<font=\"" + wrongFont.name + "\">" + target[i];
+					output += "<font=\"" + wrongFont.name + "\">" + charToAdd;
 					correct = false;
 				}
 			}
