@@ -443,6 +443,7 @@ public class NetcodeManager : NetworkBehaviour {
 	}
 	public static bool CanStopSceneLoading = true;
 	IEnumerator LoadNextScene() {
+		SendTeamLists();
 		StartSceneLoading?.Invoke();
 		int countDown = 5;
 		while (countDown > 0) {
@@ -455,6 +456,14 @@ public class NetcodeManager : NetworkBehaviour {
 			countDown--;
 			yield return new WaitForSeconds(1f);
 		}
+
+		if (teamDataRpcSent > 0) {
+			LockOnSceneClientRpc(false);
+			//show warning that connection was too slow or smthing (team data couldn't be passed around)
+			yield break;
+		}
+		//set up team references accessible for clients as well.
+
 		//have a check if all have laoded or soemthing idk.
 		SceneEventProgressStatus sceneStatus = NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
 		if (sceneStatus != SceneEventProgressStatus.Started) {
@@ -467,6 +476,46 @@ public class NetcodeManager : NetworkBehaviour {
 			GameData.team1 = team1; GameData.team2 = team2;
 		}
 	}
+	const string splitter = "/";
+	int teamDataRpcSent = 0;
+	void SendTeamLists() {
+		teamDataRpcSent = (team1.Count + team2.Count) * 2;
+		string team1List = "", team2List = "";
+		foreach (string lobbyID in team1) {
+			team1List += LobbyID_KEY_ClientID_VAL[lobbyID] + splitter;
+		}
+		foreach (string lobbyID in team2) {
+			team2List += LobbyID_KEY_ClientID_VAL[lobbyID] + splitter;
+		}
+		team1List.Remove(team1List.Length - 1);
+		team2List.Remove(team2List.Length - 1);
+		SendTeamListClientRpc(team1List, 1);
+		SendTeamListClientRpc(team2List, 2);
+	}
+	[ClientRpc]
+	void SendTeamListClientRpc(string teamIDs, int associatedTeam) {
+		string[] idList = teamIDs.Split(splitter);
+		List<ulong> targetList = associatedTeam == 1 ? GameData.team1IDList : GameData.team2IDList;
+		targetList.Clear();
+		foreach (string id in idList) {
+			if (ulong.TryParse(id, out ulong idNum)) {
+				targetList.Add(idNum);
+			}
+		}
+		TeamUpdatedServerRpc(NetworkManager.Singleton.LocalClientId);
+	}
+	[ServerRpc(RequireOwnership = false)]
+	void TeamUpdatedServerRpc(ulong id) {
+		teamDataRpcSent--;
+	}
+
+
+
+
+
+
+
+
 	[ClientRpc]
 	void LockOnSceneClientRpc(bool lockOn) {
 		CanStopSceneLoading = !lockOn;

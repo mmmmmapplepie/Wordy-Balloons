@@ -8,11 +8,11 @@ using UnityEngine.SceneManagement;
 public class GameStateManager : NetworkBehaviour {
 	public override void OnNetworkSpawn() {
 		NetworkManager.SceneManager.OnLoadEventCompleted += SceneLoadedForAll;
-		countDown.OnValueChanged += CountDownChanged;
+		countDown_NV.OnValueChanged += CountDownChanged;
 
 	}
 	public override void OnNetworkDespawn() {
-		countDown.OnValueChanged -= CountDownChanged;
+		countDown_NV.OnValueChanged -= CountDownChanged;
 		if (NetworkManager.SceneManager != null) NetworkManager.SceneManager.OnLoadEventCompleted -= SceneLoadedForAll;
 	}
 
@@ -21,21 +21,26 @@ public class GameStateManager : NetworkBehaviour {
 		if (NetworkManager.Singleton.IsServer) StartCoroutine(StartCountDown());
 	}
 
-	NetworkVariable<int> countDown = new NetworkVariable<int>(0);
+	NetworkVariable<int> countDown_NV = new NetworkVariable<int>(0);
 	IEnumerator StartCountDown() {
 		float t = countDownTime;
-		countDown.Value = Mathf.CeilToInt(t);
+		countDown_NV.Value = Mathf.CeilToInt(t);
 		while (t > 0f) {
 			t -= Time.deltaTime;
-			countDown.Value = Mathf.CeilToInt(t);
+			countDown_NV.Value = Mathf.CeilToInt(t);
 			yield return null;
 		}
-		countDown.Value = 0;
+		countDown_NV.Value = 0;
 	}
 	public static event System.Action<int> countDownChanged;
+	public static event System.Action GameStartEvent, GameFinishEvent;
+	public static bool GameRunning;
 	void CountDownChanged(int prev, int newVal) {
-		if (newVal == 0) GameData.GameRunning = true;
 		countDownChanged?.Invoke(newVal);
+		if (newVal == 0) {
+			GameRunning = true;
+			GameStartEvent?.Invoke();
+		}
 	}
 
 }

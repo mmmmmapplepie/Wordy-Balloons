@@ -8,9 +8,6 @@ public class InputManager : MonoBehaviour {
 	public static InputManager Instance;
 	void Awake() {
 		Instance = this;
-
-		//for testing
-		CheckGameStart(0);
 	}
 	void OnEnable() {
 		GameStateManager.countDownChanged += CheckGameStart;
@@ -57,14 +54,14 @@ public class InputManager : MonoBehaviour {
 	}
 
 	public static event Func<Func<List<string>>> FindBalloonCreator;
-	public static event Action<string> BalloonCreated;
+	public static event Action<string> CreateBalloon;
 	public static event Action CorrectInputFinished;
 	void ProcessCorrectInput() {
 		Func<List<string>> balloonCreator = FindBalloonCreator?.Invoke();
 		if (balloonCreator == null) { balloonCreator = NormalCreate; }
 		List<string> newBalloons = balloonCreator();
 		foreach (string balloonTxt in newBalloons) {
-			BalloonCreated.Invoke(balloonTxt);
+			CreateBalloon.Invoke(balloonTxt);
 		}
 		CorrectInputFinished?.Invoke();
 	}

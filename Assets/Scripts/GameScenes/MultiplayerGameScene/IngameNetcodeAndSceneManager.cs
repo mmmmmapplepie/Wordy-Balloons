@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	public override void OnNetworkSpawn() {
-		GameData.GameRunning = false;
+		GameStateManager.GameRunning = false;
 
 		NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
 		if (NetworkManager.IsServer) {
@@ -36,7 +36,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	[SerializeField] GameObject connectionStopped, gameEnded;
 	void ConnectionStopped() {
 		ShutDownNetwork();
-		if (GameData.GameRunning) return;
+		if (GameStateManager.GameRunning) return;
 		connectionStopped.SetActive(true);
 	}
 	void OnClientDisconnectCallback(ulong clientID) {
