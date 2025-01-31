@@ -8,6 +8,11 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	public override void OnNetworkSpawn() {
 		GameStateManager.GameRunning = false;
 
+		if (GameData.SinglePlayerMode) {
+			GameStateManager.GameRunning = true;
+			return;
+		}
+
 		NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
 		if (NetworkManager.IsServer) {
 			CheckAllPlayersPresent();

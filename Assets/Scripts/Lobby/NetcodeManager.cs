@@ -67,7 +67,6 @@ public class NetcodeManager : NetworkBehaviour {
 	}
 
 	void Start() {
-		//events from lobby
 		MyLobby.LobbyCreated += JoinAsHost;
 		MyLobby.PlayerJoinedLobby += PlayerJoinedLobby;
 		MyLobby.JoinLobbyNetcode += JoinAsClient;
@@ -82,7 +81,6 @@ public class NetcodeManager : NetworkBehaviour {
 	}
 	public override void OnDestroy() {
 		OnNetworkDespawn();
-		//events from lobby
 		MyLobby.LobbyCreated -= JoinAsHost;
 		MyLobby.PlayerJoinedLobby -= PlayerJoinedLobby;
 		MyLobby.JoinLobbyNetcode -= JoinAsClient;

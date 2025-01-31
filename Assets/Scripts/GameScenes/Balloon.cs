@@ -10,8 +10,10 @@ public class Balloon : NetworkBehaviour {
 	[HideInInspector] public NetworkVariable<ulong> balloonTeamID;
 	[HideInInspector] public NetworkVariable<Color> balloonColor;
 
+	float flightWidth = 10f;
+	float flightHeight = 4f;
 	void Start() {
-		startPos = Vector3.right * -5f;
+		startPos = Vector3.right * -flightWidth / 2f;
 		endPos = -startPos;
 	}
 
@@ -36,16 +38,32 @@ public class Balloon : NetworkBehaviour {
 
 	void UpdateFlyProgress() {
 		if (NetworkManager.Singleton.IsServer) {
-			flyProgress.Value += Time.deltaTime / flyTime;
+			float newVal = flyProgress.Value + Time.deltaTime / flyTime;
+			if (newVal >= 1) newVal = 1f;
+			flyProgress.Value = newVal;
 		}
 	}
 	Vector3 startPos, endPos;
 	void progressChanged(float previous, float current) {
 		float realProgress = current;
 		if (!BalloonManager.teamIDs.Contains(balloonTeamID.Value)) realProgress = 1 - current;
+		float p = ProgressBehaviour(realProgress);
+		transform.position = GetProgressPosition(startPos, endPos, p);
+	}
 
+	float ProgressBehaviour(float progress) {
+		if (progress <= 0.5) {
+			return Mathf.Sin(progress * Mathf.PI) / 2f;
+		} else {
+			return (2f - Mathf.Sin(progress * Mathf.PI)) / 2f;
+		}
+	}
 
-		transform.position = Vector3.Lerp(startPos, endPos, realProgress);
+	Vector3 GetProgressPosition(Vector3 start, Vector3 end, float progress) {
+		Vector3 p = start;
+		p.x = Mathf.Lerp(start.x, end.x, progress);
+		p.y = start.y + flightHeight * (Mathf.Sin(progress * Mathf.PI));
+		return p;
 	}
 
 
