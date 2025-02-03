@@ -3,7 +3,8 @@ using Unity.Netcode;
 using UnityEngine;
 
 public class GameData : NetworkBehaviour {
-	public static bool SinglePlayerMode = false;
+	public static bool InSinglePlayerMode = false;
+	public static GameMode gameMode;
 	public static List<Color> allColorOptions;
 	public static Dictionary<ulong, int> ClientID_KEY_ColorIndex_VAL = new Dictionary<ulong, int>();
 	public static Dictionary<string, ulong> LobbyID_KEY_ClientID_VAL = new Dictionary<string, ulong>();
@@ -11,3 +12,5 @@ public class GameData : NetworkBehaviour {
 	public static List<ulong> team1IDList = new List<ulong>(), team2IDList = new List<ulong>();
 
 }
+
+public enum GameMode { Normal, Eraser, OwnEnemy }

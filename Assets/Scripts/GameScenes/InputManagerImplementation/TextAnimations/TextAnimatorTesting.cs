@@ -2,15 +2,25 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class TextAnimatorTesting : MonoBehaviour {
-	public TMP_Text tmp;
-	public TMP_InputField input;
-	public TMP_FontAsset font1, font2;
+public class TextAnimatorTesting : MonoBehaviour, ITextAnimator {
+	public TMP_Text displayText;
+	public InputManager inputManager;
+	// public TMP_FontAsset font1, font2;
+
+	void Start() {
+		InputManager.NewTextSet += NewTextSet;
+	}
+	void OnDestroy() {
+		InputManager.NewTextSet += NewTextSet;
+	}
+
+	string targetText;
+	void NewTextSet(string s) {
+		targetText = s;
+	}
 
 	void Update() {
 		Animate();
-		// MyUpdate();
-		// TheirUpdate();
 	}
 
 	List<FontAnimation<float>> animatingText = new List<FontAnimation<float>>();
@@ -18,10 +28,9 @@ public class TextAnimatorTesting : MonoBehaviour {
 	void Animate() {
 		ManageAnimatingText();
 
+		displayText.ForceMeshUpdate();
 
-		tmp.ForceMeshUpdate();
-
-		TMP_TextInfo txtInfo = tmp.textInfo;
+		TMP_TextInfo txtInfo = displayText.textInfo;
 		int charCount = txtInfo.characterCount;
 
 		// print(tmp.text.Length);
@@ -39,21 +48,23 @@ public class TextAnimatorTesting : MonoBehaviour {
 			FontAnimation<float> anim = animatingText[i];
 			anim.animation(anim, verts, vertCols, vertStartIndex);
 		}
-		tmp.UpdateVertexData(TMP_VertexDataUpdateFlags.All);
+		displayText.UpdateVertexData(TMP_VertexDataUpdateFlags.All);
 	}
 	void ManageAnimatingText() {
-		int targetTextLength = tmp.textInfo.characterCount;
+		string typed = inputManager.typedString;
+		string displayString = targetText;
 
-		string typed = input.text;
+		int targetTextLength = targetText.Length;
+
+		displayText.text = displayString;
 		if (typed.Length > targetTextLength) {
 			typed = typed.Substring(0, targetTextLength);
-			input.text = typed;
 		}
 
 		for (int i = animatingText.Count; i < typed.Length; i++) {
 			FontAnimation<float> newAnim = new FontAnimation<float>();
 			newAnim.progress = 0;
-			newAnim.animation = typed[i] == tmp.text[i] ? CorrectCharacter : WrongCharacter;
+			newAnim.animation = typed[i] == displayText.text[i] ? CorrectCharacter : WrongCharacter;
 			animatingText.Add(newAnim);
 		}
 
@@ -124,9 +135,9 @@ public class TextAnimatorTesting : MonoBehaviour {
 
 	#region otherstuff
 	void MyUpdate() {
-		tmp.ForceMeshUpdate();
-		TMP_TextInfo txtInfo = tmp.textInfo;
-		Vector3[] verts = tmp.mesh.vertices;
+		displayText.ForceMeshUpdate();
+		TMP_TextInfo txtInfo = displayText.textInfo;
+		Vector3[] verts = displayText.mesh.vertices;
 		Debug.LogWarning("loop");
 		for (int i = 0; i < txtInfo.characterCount; i++) {
 
@@ -153,8 +164,8 @@ public class TextAnimatorTesting : MonoBehaviour {
 
 
 	void TheirUpdate() {
-		tmp.ForceMeshUpdate();
-		TMP_TextInfo txtInfo = tmp.textInfo;
+		displayText.ForceMeshUpdate();
+		TMP_TextInfo txtInfo = displayText.textInfo;
 		for (int i = 0; i < txtInfo.characterCount; i++) {
 			TMP_CharacterInfo charInfo = txtInfo.characterInfo[i];
 			if (!charInfo.isVisible) continue;
@@ -168,11 +179,15 @@ public class TextAnimatorTesting : MonoBehaviour {
 		for (int i = 0; i < txtInfo.meshInfo.Length; ++i) {
 			TMP_MeshInfo meshInfo = txtInfo.meshInfo[i];
 			meshInfo.mesh.vertices = meshInfo.vertices;
-			Mesh mesh = tmp.mesh;
-			tmp.canvasRenderer.SetMesh(mesh);
+			Mesh mesh = displayText.mesh;
+			displayText.canvasRenderer.SetMesh(mesh);
 			// txtComp.UpdateGeometry(meshInfo.mesh, i);
 
 		}
+	}
+
+	public void AnimationFunction(InputManager input, TMP_Text text) {
+		throw new System.NotImplementedException();
 	}
 	#endregion
 }

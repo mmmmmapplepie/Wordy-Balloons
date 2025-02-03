@@ -8,7 +8,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	public override void OnNetworkSpawn() {
 		GameStateManager.GameRunning = false;
 
-		if (GameData.SinglePlayerMode) {
+		if (GameData.InSinglePlayerMode) {
 			GameStateManager.GameRunning = true;
 			return;
 		}

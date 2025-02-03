@@ -7,7 +7,7 @@ public class BasicTextAnimation : MonoBehaviour, ITextAnimator {
 	public float correctScale, wrongScale, wrongJiggleScale;
 	public float correctPeriod, wrongPeriod;
 	public TMP_FontAsset correctFont, wrongFont;
-	List<FontAnimation<float>> animationProgressList = new List<FontAnimation<float>>();
+	List<FontAnimation<float>> animatingText = new List<FontAnimation<float>>();
 
 	InputManager input;
 	TMP_Text text;
@@ -16,7 +16,7 @@ public class BasicTextAnimation : MonoBehaviour, ITextAnimator {
 		input = inputManager;
 		text = tmpText;
 
-		UpdateFontAndText();
+		// UpdateFontAndText();
 		ManageAnimatingText();
 
 		text.ForceMeshUpdate();
@@ -33,12 +33,12 @@ public class BasicTextAnimation : MonoBehaviour, ITextAnimator {
 			charInfo.character = "_".ToCharArray()[0];
 
 
-			if (!charInfo.isVisible || i >= animationProgressList.Count) continue;
+			if (!charInfo.isVisible || i >= animatingText.Count) continue;
 			int charMatIndex = charInfo.materialReferenceIndex;
 			int vertStartIndex = charInfo.vertexIndex;
 			Color32[] vertCols = txtInfo.meshInfo[charMatIndex].colors32;
 			Vector3[] verts = txtInfo.meshInfo[charMatIndex].vertices;
-			FontAnimation<float> anim = animationProgressList[i];
+			FontAnimation<float> anim = animatingText[i];
 			anim.animation(anim.progress, verts, vertCols, vertStartIndex);
 			anim.progress += Time.deltaTime;
 		}
@@ -51,10 +51,9 @@ public class BasicTextAnimation : MonoBehaviour, ITextAnimator {
 		string target = input.targetString;
 		int targetTextLength = target.Length;
 
+		/*
 		// TMP_TextInfo txtInfo = text.textInfo;
-
 		// int charCount = txtInfo.characterCount;
-
 		// if (charCount == 0) return;
 		// int index = 0;
 		// for (int i = 0; i < charCount; i++) {
@@ -70,16 +69,17 @@ public class BasicTextAnimation : MonoBehaviour, ITextAnimator {
 		// 	index++;
 		// 	anim.progress += Time.deltaTime;
 		// }
+		*/
 
-		for (int i = animationProgressList.Count; i < typed.Length; i++) {
+		for (int i = animatingText.Count; i < typed.Length; i++) {
 			FontAnimation<float> newAnim = new FontAnimation<float>();
 			newAnim.progress = 0;
 			newAnim.animation = typed[i] == target[i] ? CorrectCharacter : WrongCharacter;
-			animationProgressList.Add(newAnim);
+			animatingText.Add(newAnim);
 		}
 
-		while (animationProgressList.Count > typed.Length) {
-			animationProgressList.RemoveAt(typed.Length);
+		while (animatingText.Count > typed.Length) {
+			animatingText.RemoveAt(typed.Length);
 		}
 	}
 
@@ -89,7 +89,6 @@ public class BasicTextAnimation : MonoBehaviour, ITextAnimator {
 		string output = "";
 
 		TMP_TextInfo txtInfo = text.textInfo;
-		text.text = target;
 		// return;
 
 		bool? correct = null;

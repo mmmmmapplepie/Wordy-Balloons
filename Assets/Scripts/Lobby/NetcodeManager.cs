@@ -468,6 +468,7 @@ public class NetcodeManager : NetworkBehaviour {
 			LockOnSceneClientRpc(false);
 		} else {
 			//change data
+			GameData.InSinglePlayerMode = false;
 			GameData.allColorOptions = allColorOptions;
 			GameData.ClientID_KEY_ColorIndex_VAL = ClientID_KEY_ColorIndex_VAL;
 			GameData.LobbyID_KEY_ClientID_VAL = LobbyID_KEY_ClientID_VAL;

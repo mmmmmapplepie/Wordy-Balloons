@@ -6,14 +6,16 @@ public class BalloonManager : NetworkBehaviour {
 
 
 	void Start() {
-		InputManager.CreateBalloon += SpawnBalloon;
+		InputManager.CorrectInputProcess += SpawnBalloon;
 		//subscribe to successfull fire 
 	}
 
+	public static int teamNumber = 1;
 	public static List<ulong> teamIDs = new List<ulong>();
 	public override void OnNetworkSpawn() {
 		base.OnNetworkSpawn();
-		List<ulong> associatedTeamID = GameData.team1IDList.Contains(NetworkManager.Singleton.LocalClientId) ? GameData.team1IDList : GameData.team2IDList;
+		teamNumber = GameData.team1IDList.Contains(NetworkManager.Singleton.LocalClientId) ? 1 : 2;
+		List<ulong> associatedTeamID = teamNumber == 1 ? GameData.team1IDList : GameData.team2IDList;
 		foreach (ulong id in associatedTeamID) {
 			teamIDs.Add(id);
 		}
@@ -21,7 +23,7 @@ public class BalloonManager : NetworkBehaviour {
 
 	public override void OnDestroy() {
 		base.OnDestroy();
-		InputManager.CreateBalloon += SpawnBalloon;
+		InputManager.CorrectInputProcess += SpawnBalloon;
 		//subscribe to successfull fire 
 
 
@@ -29,9 +31,7 @@ public class BalloonManager : NetworkBehaviour {
 
 
 
-	public void SpawnBalloon(string word) {
-		ulong teamID = NetworkManager.Singleton.LocalClientId;
-		print(NetworkManager.Singleton.IsServer);
+	public void SpawnBalloon(string word, ulong teamID) {
 		SpawnBalloonServerRpc(teamID, word.Length);
 	}
 
@@ -40,7 +40,6 @@ public class BalloonManager : NetworkBehaviour {
 	public Transform BalloonHolder;
 	[ServerRpc(RequireOwnership = false)]
 	void SpawnBalloonServerRpc(ulong teamID, int count) {
-		print("rpc Called");
 		GameObject newBalloon = NetworkBehaviour.Instantiate(balloonPrefab, BalloonHolder);
 		Balloon script = newBalloon.GetComponent<Balloon>();
 		script.flyProgress.Value = 0f;

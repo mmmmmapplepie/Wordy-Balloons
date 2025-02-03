@@ -5,7 +5,7 @@ using UnityEngine;
 public class TextAnimator : MonoBehaviour {
 
 	public TMP_Text text;
-	[HideInInspector] public InputManager inputManager;
+	InputManager inputManager;
 	void Start() {
 		inputManager = InputManager.Instance;
 		InputManager.NewTextSet += SetNewText;
@@ -16,8 +16,7 @@ public class TextAnimator : MonoBehaviour {
 		InputManager.NewTextSet -= SetNewText;
 		InputManager.InputProcessFinished -= AnimateText;
 	}
-	void SetNewText() {
-		text.text = inputManager.targetString;
+	void SetNewText(string newTxt) {
 	}
 
 	void RemoveAnimator() {
@@ -29,6 +28,7 @@ public class TextAnimator : MonoBehaviour {
 
 	public static event Func<Action<InputManager, TMP_Text>> FindTextAnimationFunction;
 	void AnimateText() {
+		text.text = inputManager.displayString;
 		if (inputManager == null) return;
 		Action<InputManager, TMP_Text> animFtn = NoAnimation;
 		if (TryGetComponent<ITextAnimator>(out ITextAnimator animScript)) {

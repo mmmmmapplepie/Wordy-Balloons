@@ -16,8 +16,6 @@ public class SinglePlayerSetup : NetworkBehaviour {
 
 		NetworkManager.Singleton.StartHost();
 
-		Debug.LogWarning(NetworkManager.Singleton.IsServer);
-
 		ulong selfID = NetworkManager.Singleton.LocalClientId;
 		ulong computerID = selfID + 1;
 
@@ -40,6 +38,7 @@ public class SinglePlayerSetup : NetworkBehaviour {
 		GameData.team2.Clear();
 		GameData.team2.Add(computerID.ToString());
 
+		GameData.InSinglePlayerMode = true;
 
 		NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
 		//maybe not required.

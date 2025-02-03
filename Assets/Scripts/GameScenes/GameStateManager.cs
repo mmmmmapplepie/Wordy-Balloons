@@ -16,7 +16,8 @@ public class GameStateManager : NetworkBehaviour {
 		if (NetworkManager.SceneManager != null) NetworkManager.SceneManager.OnLoadEventCompleted -= SceneLoadedForAll;
 	}
 
-	float countDownTime = 3;
+	// float countDownTime = 3;
+	float countDownTime = 0.1f;
 	private void SceneLoadedForAll(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut) {
 		if (NetworkManager.Singleton.IsServer) StartCoroutine(StartCountDown());
 	}

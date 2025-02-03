@@ -1,13 +1,16 @@
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using System;
+using Unity.Netcode;
 
 public class InputManager : MonoBehaviour {
-	bool canTakeInput = false;
+	[HideInInspector] public bool canTakeInput = false;
 	public static InputManager Instance;
 	void Awake() {
 		Instance = this;
+	}
+	void OnDestroy() {
+		Instance = null;
 	}
 	void OnEnable() {
 		GameStateManager.countDownChanged += CheckGameStart;
@@ -29,6 +32,7 @@ public class InputManager : MonoBehaviour {
 
 	public string targetString { get; set; } = "";
 	public string typedString { get; set; } = "";
+	public string displayString { get; set; } = "";
 	public static event Action TypedTextChanged;
 	void ProcessInput() {
 		if (!canTakeInput) return;
@@ -54,16 +58,18 @@ public class InputManager : MonoBehaviour {
 	}
 
 	public static event Func<Func<List<string>>> FindBalloonCreator;
-	public static event Action<string> CreateBalloon;
+	public static event Action<string, ulong> CorrectInputProcess;
 	public static event Action CorrectInputFinished;
 	void ProcessCorrectInput() {
 		Func<List<string>> balloonCreator = FindBalloonCreator?.Invoke();
 		if (balloonCreator == null) { balloonCreator = NormalCreate; }
 		List<string> newBalloons = balloonCreator();
 		foreach (string balloonTxt in newBalloons) {
-			CreateBalloon.Invoke(balloonTxt);
+			CorrectInputProcess.Invoke(balloonTxt, NetworkManager.Singleton.LocalClientId);
 		}
 		CorrectInputFinished?.Invoke();
+		skipCharges++;
+		SetNewTargetText();
 	}
 	List<string> NormalCreate() {
 		return new List<string> { typedString };
@@ -91,6 +97,7 @@ public class InputManager : MonoBehaviour {
 	void BasicBackspace() {
 		if (typedString.Length <= 0) return;
 		typedString = typedString.Substring(0, typedString.Length - 1);
+		ProcessDisplayString();
 	}
 
 
@@ -115,17 +122,17 @@ public class InputManager : MonoBehaviour {
 			skipTickChanged?.Invoke(_skipTick);
 		}
 	}
+	int skipRequirement = 3;
 	public static event Action<int> skipTickChanged;
-	// essentially typing "////" will try to skip - typing "/" four times in a row
+	// essentially typing "///" will try to skip - typing "/" four times in a row
 	bool IncrementSkip(string input) {
-		if (input != "/") {
+		if (input != "/" || skipCharges == 0) {
 			skipTick = 0;
 			return false;
 		}
 		skipTick++;
 
-		if (skipTick == 4) {
-			skipTick = 0;
+		if (skipTick >= skipRequirement) {
 			return TrySkip();
 		}
 		return false;
@@ -142,7 +149,11 @@ public class InputManager : MonoBehaviour {
 	public static event Func<Func<bool>> FindCheckSkipFunction;
 	public static event Func<Action> FindSkipFunction;
 	public static event Action<bool> SkipAttemptResult;
+	public void TrySkipBtn() {
+		TrySkip();
+	}
 	bool TrySkip() {
+		skipTick = 0;
 		Func<bool> canSkip = FindCheckSkipFunction?.Invoke();
 		if (canSkip == null) canSkip = NormalSkipCheck;
 		if (!canSkip()) { SkipAttemptResult?.Invoke(false); return false; }
@@ -165,9 +176,22 @@ public class InputManager : MonoBehaviour {
 
 	void BaseIncrement(string input) {
 		typedString = String.Concat(typedString, input);
-		if (typedString.Length > 3 && typedString.Length > targetString.Length) {
+		if (typedString.Length > skipRequirement && typedString.Length > targetString.Length) {
 			typedString = typedString.Substring(0, targetString.Length);
 		}
+		ProcessDisplayString();
+	}
+
+	void ProcessDisplayString() {
+		displayString = "";
+		for (int i = 0; i < typedString.Length; i++) {
+			if (char.IsWhiteSpace(targetString[i]) && targetString[i] != typedString[i]) {
+				displayString += "_";
+			} else {
+				displayString += targetString[i];
+			}
+		}
+		displayString += targetString.Substring(typedString.Length);
 	}
 	#endregion
 
@@ -180,6 +204,7 @@ public class InputManager : MonoBehaviour {
 	public void ResetTypedText() {
 		skipTick = 0;
 		typedString = "";
+		displayString = targetString;
 		ResetEvent?.Invoke();
 	}
 	#endregion
@@ -190,7 +215,7 @@ public class InputManager : MonoBehaviour {
 	//takes in a string and return true if it is allowed.
 	public static event Func<Func<string>> FindTextTargetMethod;
 	public static event Func<Func<string, bool>> FindTextApprovalMethod;
-	public static event Action NewTextSet;
+	public static event Action<string> NewTextSet;
 
 
 
@@ -210,11 +235,16 @@ public class InputManager : MonoBehaviour {
 
 		targetString = ranTxt;
 		ResetTypedText();
-		NewTextSet?.Invoke();
+		NewTextSet?.Invoke(ranTxt);
 	}
-
+	List<DictionaryEntry> DictionaryList = null;
+	public static event Action<DictionaryEntry> NewWordChosen;
 	string PickRandomText() {
-		return "Random text has been set bruh!";
+		if (DictionaryList == null) DictionaryList = EnglishDictionary.Instance.GetDictionaryList();
+		if (DictionaryList == null) return "Random text has been set bruh!";
+		int ranWord = UnityEngine.Random.Range(0, DictionaryList.Count);
+		NewWordChosen?.Invoke(DictionaryList[ranWord]);
+		return DictionaryList[ranWord].word;
 	}
 
 	#endregion

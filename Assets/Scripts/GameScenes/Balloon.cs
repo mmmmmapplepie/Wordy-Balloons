@@ -12,7 +12,7 @@ public class Balloon : NetworkBehaviour {
 
 	float flightWidth = 10f;
 	float flightHeight = 4f;
-	void Start() {
+	void Awake() {
 		startPos = Vector3.right * -flightWidth / 2f;
 		endPos = -startPos;
 	}
@@ -26,6 +26,7 @@ public class Balloon : NetworkBehaviour {
 
 
 		transform.GetChild(0).gameObject.GetComponent<TextMeshPro>().text = power.Value.ToString();
+		UpdateFlyProgress();
 	}
 	public override void OnNetworkDespawn() {
 		base.OnNetworkDespawn();
