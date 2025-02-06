@@ -4,8 +4,11 @@ using TMPro;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameplayDataUI : NetworkBehaviour {
+
+
 
 	void Start() {
 		startTime = Time.time;
@@ -15,11 +18,15 @@ public class GameplayDataUI : NetworkBehaviour {
 		InputManager.skipTickChanged += SkipTickChanged;
 		InputManager.TypedTextChanged += UpdateAccuracy;
 		InputManager.CorrectInputProcess += InputFired;
+
+		BaseManager.BaseTakenDamage += BaseTakesDamage;
 	}
 	public override void OnDestroy() {
 		InputManager.TypedTextChanged -= UpdateAccuracy;
 		InputManager.skipTickChanged -= SkipTickChanged;
 		InputManager.CorrectInputProcess -= InputFired;
+
+		BaseManager.BaseTakenDamage += BaseTakesDamage;
 
 		base.OnDestroy();
 	}
@@ -36,11 +43,18 @@ public class GameplayDataUI : NetworkBehaviour {
 
 	#region PlayerCount
 	public TextMeshProUGUI playerCountTxt;
+	NetworkVariable<int> playerCount = new NetworkVariable<int>();
 	void UpdatePlayerCount() {
-		if (!NetworkManager.Singleton.IsConnectedClient || GameData.InSinglePlayerMode) {
+		if (GameData.InSinglePlayerMode) {
 			playerCountTxt.text = "";
 		} else {
-			playerCountTxt.text = "Players: " + NetworkManager.Singleton.ConnectedClients.Count.ToString();
+			if (NetworkManager.Singleton.IsServer) {
+				playerCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
+			}
+			if (NetworkManager.Singleton.IsClient) {
+				playerCountTxt.text = "Players: " + playerCount.ToString();
+			}
+
 		}
 	}
 	#endregion
@@ -84,7 +98,7 @@ public class GameplayDataUI : NetworkBehaviour {
 
 	void UpdatePointAndPointContribution() {
 		totalPointsTxt.text = pointsContributedByMe.ToString();
-		int teamPoints = BalloonManager.teamNumber == 1 ? team1Points.Value : team2Points.Value;
+		int teamPoints = BalloonManager.team == Team.t1 ? team1Points.Value : team2Points.Value;
 		if (teamPoints == 0) return;
 		pointContributionTxt.text = ((pointsContributedByMe / teamPoints) * 100).ToString("f0") + "%";
 	}
@@ -103,7 +117,8 @@ public class GameplayDataUI : NetworkBehaviour {
 
 		int latestTotalPoints = pointsForCurrSpeed.Sum(x => x.points);
 		float oldestTime = pointsForCurrSpeed[0].timestamp;
-		currSpeedTxt.text = (sampleRatio * latestTotalPoints / (Time.time - oldestTime)).ToString("f0"); ;
+		float calculationPeriod = Time.time - oldestTime < 1 ? 1 : Time.time - oldestTime;
+		currSpeedTxt.text = (sampleRatio * latestTotalPoints / calculationPeriod).ToString("f0"); ;
 	}
 	#endregion
 
@@ -139,7 +154,27 @@ public class GameplayDataUI : NetworkBehaviour {
 	#endregion
 
 
+	#region  BaseDamage
 
+
+	public Slider homeHPSlider, oppHPSlider;
+	void BaseTakesDamage(Team damagedTeam, float hpRatio) {
+		Slider main;
+		if (damagedTeam == BalloonManager.team) {
+			main = homeHPSlider;
+		} else {
+			main = oppHPSlider;
+		}
+		main.value = hpRatio;
+	}
+
+
+
+
+
+
+
+	#endregion
 
 
 

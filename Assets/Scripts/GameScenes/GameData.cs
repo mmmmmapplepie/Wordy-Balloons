@@ -11,6 +11,11 @@ public class GameData : NetworkBehaviour {
 	public static HashSet<string> team1 = new HashSet<string>(), team2 = new HashSet<string>();
 	public static List<ulong> team1IDList = new List<ulong>(), team2IDList = new List<ulong>();
 
-}
+	public static Team GetTeamNumber(ulong ID) {
+		if (team1IDList.Contains(ID)) return Team.t1;
+		return Team.t2;
+	}
 
+}
+public enum Team { t1, t2 };
 public enum GameMode { Normal, Eraser, OwnEnemy }
