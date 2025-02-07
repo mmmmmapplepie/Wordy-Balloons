@@ -13,11 +13,8 @@ public class TeamBox : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoint
 		if (!NetworkManager.Singleton.IsServer) return;
 		GameObject dragObject = eventData.pointerDrag;
 		if (dragObject == null || dragObject.GetComponent<LobbyPlayer>() == null) return;
-		
-
 
 		TeamChangeEvent?.Invoke(targetT, dragObject.GetComponent<LobbyPlayer>(), null);
-
 		// GetComponent<Image>().color = normal;
 	}
 

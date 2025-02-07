@@ -1,495 +1,473 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Unity.Netcode;
 using Unity.Services.Authentication;
-using Unity.Services.Core;
-using Unity.Services.Relay;
-using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
-using Unity.Services.Relay.Models;
-using System;
-using System.Threading;
-using Unity.Netcode;
-using Unity.Netcode.Transports.UTP;
-using Unity.Networking.Transport.Relay;
 
-public class MyLobby : MonoBehaviour {
-	//use for lobby data keys
-	public const string RelayCode = "RelayCode";
-	public const string LobbyID = "LobbyID";
-	public const string GameMode = "GameMode";
-	public const string PlayerName = "PlayerName";
+public class MyLobby : NetworkBehaviour {
+	public static MyLobby Instance;
 
-	CancellationTokenSource ExitScene;
-	CancellationToken ExitToken;
+	#region Events
+	public static event Action LobbyCreatedEvent, LobbyLeft, LobbyDeleted, LobbyJoined, LobbyJoinFail;
+
+	#endregion
 
 	void Awake() {
 		Instance = this;
-		ExitScene = new CancellationTokenSource();
-		ExitToken = ExitScene.Token;
+		SetupColoredLists();
 	}
+
 	void Start() {
-		Authentication();
-	}
-	public async void Authentication(string name = null) {
-		AuthenticationBegin?.Invoke();
-		try {
-			if (UnityServices.State == ServicesInitializationState.Uninitialized) {
-				InitializationOptions options = new InitializationOptions();
-				playerName = (name == null) ? "Player" + UnityEngine.Random.Range(0, 10000) : name;
-				options.SetProfile(playerName);
-				await UnityServices.InitializeAsync(options);
-			}
-			if (!AuthenticationService.Instance.IsSignedIn) {
-				await AuthenticationService.Instance.SignInAnonymouslyAsync();
-				if (AuthenticationService.Instance != null) authenticationID = AuthenticationService.Instance.PlayerId;
-				print(playerName);
-			}
-			AuthenticationSuccess?.Invoke();
-		} catch (Exception e) {
-			print(e);
-			AuthenticationFailure?.Invoke();
-		}
-	}
+		//creating lobby
+		LobbyManager.CreatedLobby += LobbyCreated;
+		LobbyNetcodeManager.ServerStartSuccess += ServerStartedSuccess;
+		LobbyNetcodeManager.ServerStartFail += ServerStartedFail;
 
-	Queue<string> createdLobbyIds = new Queue<string>();
-	void OnDestroy() {
-		while (createdLobbyIds.TryDequeue(out string lobbyId)) {
-			try {
-				LobbyService.Instance.DeleteLobbyAsync(lobbyId);
-			} catch (LobbyServiceException e) {
-				print(e);
-			}
-		}
-		AuthenticationService.Instance.SignOut();
-		ExitScene.Cancel();
-		ExitScene.Dispose();
-		if (Instance == this) Instance = null;
+		//joining lobby
+		LobbyManager.JoinedLobby += JoinedLobby;
+		LobbyManager.PlayerJoinedLobby += JoinedLobbyTemp;
+		LobbyNetcodeManager.ClientStartSuccess += ClientStartedSuccess;
+		LobbyNetcodeManager.ClientConnected += ClientConnected;
+
+		//leaving lobby
+		LobbyManager.LeaveLobbyComplete += LeaveLobby;
+		LobbyManager.KickedFromLobbyEvent += LeaveLobby;
+		LobbyNetcodeManager.ServerStoppedEvent += ServerStopped;
+		LobbyNetcodeManager.ClientDisconnected += ClientDisconnected;
+		LobbyNetcodeManager.ClientStoppedEvent += ClientStopped;
+
+		LobbyPlayer.TeamChangeEvent += ChangeTeam;
+		TeamBox.TeamChangeEvent += ChangeTeam;
 	}
 
-	public static MyLobby Instance;
-	[HideInInspector] public string authenticationID;
-	[HideInInspector] public static string playerName;
-	public Lobby hostLobby, joinedLobby;
-	DateTime latestLobbyInteraction;
+	public override void OnDestroy() {
+		OnNetworkDespawn();
+		//creating lobby
+		LobbyManager.CreatedLobby -= LobbyCreated;
+		LobbyNetcodeManager.ServerStartSuccess -= ServerStartedSuccess;
 
-	#region Events
-	ILobbyEvents LobbyEvents = null;
-	LobbyEventCallbacks lobbyCallback = null;
+		//joining lobby
+		LobbyManager.JoinedLobby -= JoinedLobby;
+		LobbyNetcodeManager.ClientStartSuccess -= ClientStartedSuccess;
+		LobbyNetcodeManager.ClientConnected -= ClientConnected;
 
-	public static event Action<ILobbyChanges> LobbyChangedEvent;
+		//leaving lobby
+		LobbyManager.LeaveLobbyComplete -= LeaveLobby;
+		LobbyManager.KickedFromLobbyEvent -= LeaveLobby;
+		LobbyNetcodeManager.ServerStoppedEvent -= ServerStopped;
+		LobbyNetcodeManager.ClientDisconnected -= ClientDisconnected;
+		LobbyNetcodeManager.ClientStoppedEvent -= ClientStopped;
 
-	public static event Action AuthenticationBegin, AuthenticationSuccess, AuthenticationFailure;
-
-
-	public static event Action LobbyCreationBegin, LobbyCreated, LobbyCreationSuccess, LobbyCreationFailure;
-
-	public static event Action RelayFailure;
-
-	public static event Action HearbeatFailure;
-
-	public static event Action LobbyJoinBegin, LobbyJoinSuccess, LobbyJoinFailure, JoinLobbyNetcode;
-	public static event Action<string> PlayerJoinedLobby;
-
-	public static event Action LeaveLobbyBegin, LeaveLobbyComplete;
-	// public static event Action LeaveLobbySuccess, LeaveLobbyFailure;
-	public static event Action<List<Player>> PlayersLeft;
-
-
-	public static event Action<List<Lobby>> ListLobbySuccess;
-	public static event Action ListLobbyFailure;
-	#endregion
-
-	#region lobby heartbeat & poll & listRefresh
-
-	float heartBeatElapsed = 0, heartBeatPeriod = 15f;
-	float lobbyListRefreshElapsed = 0, lobbyListRefreshPeriod = 5f;
-	float updateElapsed = 0, updatePeriod = 3f;
-	void Update() {
-		LobbyHeartbeat();
-
-		//you will probably need polling for edges cases where the events dont work for some reason.
-		// LobbyPoll();
-
-		// LobbyListRefresh()
-	}
-	async void LobbyHeartbeat() {
-		if (hostLobby == null) { heartBeatElapsed = 0; return; }
-		if (heartBeatElapsed > heartBeatPeriod) {
-			heartBeatElapsed = 0f;
-			try {
-				await LobbyService.Instance.SendHeartbeatPingAsync(hostLobby.Id);
-			} catch (Exception e) {
-				print(e);
-				LeaveLobby();
-				HearbeatFailure?.Invoke();
-			}
-		} else {
-			heartBeatElapsed += Time.deltaTime;
-		}
-	}
-	async void LobbyListRefresh() {
-		if (joinedLobby != null) { lobbyListRefreshElapsed = 0; return; }
-		if (lobbyListRefreshElapsed > lobbyListRefreshPeriod) {
-			lobbyListRefreshElapsed = 0f;
-			try {
-				await ListLobbies();
-			} catch (Exception e) {
-				print(e);
-				LeaveLobby();
-				HearbeatFailure?.Invoke();
-			}
-		} else {
-			lobbyListRefreshElapsed += Time.deltaTime;
-		}
+		LobbyPlayer.TeamChangeEvent -= ChangeTeam;
+		TeamBox.TeamChangeEvent -= ChangeTeam;
+		base.OnDestroy();
 	}
 
-	async void LobbyPoll() {
-		if (joinedLobby == null) { updateElapsed = 0; return; }
-		if (updateElapsed > updatePeriod) {
-			updateElapsed = 0f;
-			try {
-				joinedLobby = await LobbyService.Instance.GetLobbyAsync(joinedLobby.Id);
-				if (hostLobby != null) {
-					hostLobby = joinedLobby;
-				}
-				// if (joinedLobby.Players.Find(x => x.Id == authenticationID) == null) OutOfLobby(true);
-			} catch (LobbyServiceException e) {
-				print(e);
-				// OutOfLobby(e.Reason != LobbyExceptionReason.LobbyNotFound);
-			}
-		} else {
-			updateElapsed += Time.deltaTime;
-		}
-	}
+	#region LobbyVariables
+
+	Dictionary<ulong, int> ClientID_KEY_ColorIndex_VAL = new Dictionary<ulong, int>();
+	Dictionary<ulong, string> ClientID_KEY_LobbyID_VAL = new Dictionary<ulong, string>();
+	HashSet<ulong> team1 = new HashSet<ulong>(), team2 = new HashSet<ulong>();
+	List<LobbyPlayer> playersObjects = new List<LobbyPlayer>();
+	int team1Max = 0; int team2Max = 0;
 
 	#endregion
 
-	public async void CreateLobby(string lobbyName, string mode, int lobbyMaxPlayerNumber) {
-		if (hostLobby != null) return;
-		LobbyCreationBegin?.Invoke();
-		if (NGOConnected()) {
-			LobbyCreationFailure?.Invoke();
-			return;
-		}
-		try {
-			//create lobby
-			CreateLobbyOptions lobbyDetails = new CreateLobbyOptions {
-				IsPrivate = true,
-				Player = GetNewPlayer(playerName),
-				Data = new Dictionary<string, DataObject> {
-					{GameMode, new DataObject(DataObject.VisibilityOptions.Public, mode, DataObject.IndexOptions.S1)},
-					{RelayCode, new DataObject(DataObject.VisibilityOptions.Member, "RelayCode")}
-				}
-			};
-			hostLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, lobbyMaxPlayerNumber, lobbyDetails);
-			latestLobbyInteraction = hostLobby.LastUpdated;
-			createdLobbyIds.Enqueue(hostLobby.Id);
-			//assign relay
-			Allocation relayAlloc = await AllocateRelay(lobbyMaxPlayerNumber);
-			NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(relayAlloc, "dtls"));
-			string relayCode = await GetRelayCode(relayAlloc);
-
-			//update lobby with relay
-			hostLobby = await LobbyService.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions {
-				Data = new Dictionary<string, DataObject> {
-					{RelayCode, new DataObject(DataObject.VisibilityOptions.Member, relayCode)}
-				}
-			});
-			joinedLobby = hostLobby;
-			await SubscribeToLobbyEvents(true);
-			//have to make your own player objects (as you won't be getting events for players being added as that "already happened") -- only for the host.
-			LobbyCreated?.Invoke();
-		} catch (Exception e) {
-			print(e);
-			LeaveLobby();
-			LobbyCreationFailure?.Invoke();
-		}
+	#region  LobbyCreation
+	void LobbyCreated() {
+		Debug.LogWarning("Lobby Created");
+		LobbyNetcodeManager.Instance.StartHost();
 	}
-	Player GetNewPlayer(string name) {
-		return new Player {
-			Data = new Dictionary<string, PlayerDataObject>{
-				{PlayerName,  new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, name)},
-			}
-		};
+	void ServerStartedFail() {
+		Debug.LogWarning("Server start fail");
+		LobbyManager.Instance.LeaveLobby();
+	}
+	void ServerStartedSuccess() {
+		Debug.LogWarning("Server started");
+		LobbyCreatedEvent?.Invoke();
+		InitializeNewLobby();
+		LobbyManager.Instance.MakeLobbyPublic();
 	}
 
-	async Task SubscribeToLobbyEvents(bool subscribe) {
-		try {
-			if (subscribe) {
-				lobbyCallback = new LobbyEventCallbacks();
-				lobbyCallback.LobbyChanged += LobbyChanged;
-				lobbyCallback.KickedFromLobby += KickedFromLobby;
-				LobbyEvents = await Lobbies.Instance.SubscribeToLobbyEventsAsync(joinedLobby.Id, lobbyCallback);
-			} else {
-				if (LobbyEvents == null) return;
-				ILobbyEvents temp = LobbyEvents;
-				lobbyCallback = null;
-				LobbyEvents = null;
-				await temp.UnsubscribeAsync();
-			}
-		} catch (Exception e) {
-			print(e);
-			throw e;
-		}
+	void InitializeNewLobby() {
+		ResetLobbyVariables();
+		ulong clientID = NetworkManager.Singleton.LocalClientId;
+		LobbyPlayer p = AddPlayerToLobby(clientID);
+		p.ConfirmJoin(LobbyManager.playerName);
 	}
 
-	void LobbyChanged(ILobbyChanges changes) {
-		if (joinedLobby == null) return;
+	void ResetLobbyVariables() {
+		ClientID_KEY_ColorIndex_VAL.Clear();
+		ClientID_KEY_LobbyID_VAL.Clear();
+		team1.Clear();
+		team2.Clear();
+		playersObjects.Clear();
+		int slots = LobbyManager.Instance.hostLobby.MaxPlayers;
+		team1Max = Mathf.CeilToInt(slots / 2f);
+		team2Max = slots - team1Max;
+		StopAllCoroutines();
+		tempJoinedList.Clear();
+	}
+	#endregion
 
-		//in case it fails unsub to the lobby events? idk
-		DateTime now = DateTime.Now;
-		TimeSpan changesTimespan = now - changes.LastUpdated.Value;
-		TimeSpan latestInteractionTimespan = now - latestLobbyInteraction;
-		if (changesTimespan > latestInteractionTimespan) return;
 
-		changes.ApplyToLobby(joinedLobby);
-		if (hostLobby != null) hostLobby = joinedLobby;
-		LobbyChangedEvent?.Invoke(changes);
 
-		if (hostLobby != null) {
-			if (changes.PlayerJoined.Value != null) {
-				foreach (LobbyPlayerJoined p in changes.PlayerJoined.Value) {
-					PlayerJoinedLobby?.Invoke(p.Player.Id);
-				}
-			}
-			if (changes.PlayerLeft.Value != null) {
-				PlayersLeft?.Invoke(hostLobby.Players);
-			}
+
+	#region  LobbyJoining
+	void JoinedLobby() {
+		Debug.LogWarning("Lobby joined");
+		LobbyJoined?.Invoke();
+		LobbyNetcodeManager.Instance.StartClient();
+	}
+	List<(string id, Coroutine timeout)> tempJoinedList = new List<(string id, Coroutine timeout)>();
+	void JoinedLobbyTemp(string id) {
+		if (!NetworkManager.Singleton.IsServer) return;
+		StopTimeout(id);
+		Coroutine newJoinTimeout = StartCoroutine(nameof(JoinConfirmationTimeout), id);
+		tempJoinedList.Add((id, newJoinTimeout));
+	}
+	void StopTimeout(string id) {
+		int inx = tempJoinedList.FindIndex(x => x.id == id);
+		if (inx != -1) {
+			StopCoroutine(tempJoinedList[inx].timeout);
+			tempJoinedList.RemoveAt(inx);
 		}
 	}
-
-
-
-	public async void JoinLobbyByID(string lobbyID) {
-		if (joinedLobby != null) { LobbyJoinFailure?.Invoke(); return; }
-		LobbyJoinBegin?.Invoke();
-		try {
-			if (NGOConnected()) {
-				throw new Exception("NGO still connected");
-			}
-			JoinLobbyByIdOptions options = new JoinLobbyByIdOptions {
-				Player = GetNewPlayer(playerName)
-			};
-
-			joinedLobby = await Lobbies.Instance.JoinLobbyByIdAsync(lobbyID, options);
-			await JoinLobby();
-		} catch (Exception e) {
-			print(e);
-			LobbyJoinFailure?.Invoke();
+	//need to add part where i cancel if the player already left the lobby or smthing.
+	const float JoinConfirmationTimeoutTime = 10f;
+	IEnumerator JoinConfirmationTimeout(string id) {
+		yield return new WaitForSeconds(JoinConfirmationTimeoutTime);
+		KickDueToTimeout(id);
+	}
+	void KickDueToTimeout(string id) {
+		LobbyManager.Instance.KickFromLobby(id);
+		int inx = tempJoinedList.FindIndex(x => x.id == id);
+		if (inx != -1) {
+			tempJoinedList.RemoveAt(inx);
 		}
 	}
-
-	public async void JoinLobbyByCode(string code) {
-		if (joinedLobby != null) { LobbyJoinFailure?.Invoke(); return; }
-		LobbyJoinBegin?.Invoke();
-		try {
-			if (NGOConnected()) {
-				throw new Exception("NGO still connected");
-			}
-			JoinLobbyByCodeOptions options = new JoinLobbyByCodeOptions {
-				Player = GetNewPlayer(playerName)
-			};
-
-			joinedLobby = await Lobbies.Instance.JoinLobbyByCodeAsync(code, options);
-
-			await JoinLobby();
-		} catch (Exception e) {
-			print(e);
-			LobbyJoinFailure?.Invoke();
-		}
+	void ClientStartedSuccess() {
+		Debug.LogWarning("Client started");
+		//check if in lobby: if not then yeet self out
+		if (LobbyManager.Instance.joinedLobby == null) { LeaveLobby(); return; }
+		SendLobbyJoinConfirmationServerRPC(AuthenticationService.Instance.PlayerId, NetworkManager.Singleton.LocalClientId, LobbyManager.playerName);
 	}
 
-	public async void QuickJoinLobby() {
-		if (joinedLobby != null) { LobbyJoinFailure?.Invoke(); return; }
-		LobbyJoinBegin?.Invoke();
-		try {
-			if (NGOConnected()) {
-				throw new Exception("NGO still connected");
-			}
-			QuickJoinLobbyOptions options = new QuickJoinLobbyOptions {
-				Player = GetNewPlayer(playerName)
-			};
-			joinedLobby = await LobbyService.Instance.QuickJoinLobbyAsync(options);
-			await JoinLobby();
-		} catch (Exception e) {
-			print(e);
-			LobbyJoinFailure?.Invoke();
-		}
-	}
-	bool WaitingForNGO = false;
-	async Task JoinLobby() {
-		WaitingForNGO = true;
-		latestLobbyInteraction = joinedLobby.LastUpdated;
-		string relayCode = joinedLobby.Data[RelayCode].Value;
-		try {
-			JoinAllocation joinRelayAlloc = await JoinRelay(relayCode);
-			await SubscribeToLobbyEvents(true);
-			NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinRelayAlloc, "dtls"));
-			JoinLobbyNetcode?.Invoke();
-		} catch (Exception e) {
-			LeaveLobby();
-			throw e;
-		}
-	}
-	public void JoinLobbySuccessful(bool succesful) {
-		if (succesful) {
-			LobbyJoinSuccess?.Invoke();
-		} else {
-			LobbyJoinFailure?.Invoke();
-		}
-		WaitingForNGO = false;
+	[ServerRpc(RequireOwnership = false)]
+	void SendLobbyJoinConfirmationServerRPC(string lobbyID, ulong clientID, string playerName) {
+		StopTimeout(lobbyID);
+		if (!ClientID_KEY_LobbyID_VAL.ContainsKey(clientID)) ClientID_KEY_LobbyID_VAL.Add(clientID, lobbyID);
+		LobbyPlayer playerObj = FindPlayerFromClientID(clientID);
+		if (playerObj != null) playerObj.ConfirmJoin(playerName);
 	}
 
-	public async void KickFromLobby(string id) {
-		if (hostLobby == null) return;
-		if (joinedLobby != null) {
-			try {
-				await LobbyService.Instance.RemovePlayerAsync(joinedLobby.Id, id);
-			} catch (LobbyServiceException e) {
-				print(e.Reason);
-			}
-		}
+	void ClientConnected(ulong id) {
+		if (!NetworkManager.Singleton.IsServer) return;
+		if (id == NetworkManager.Singleton.LocalClientId) return;
+		AddPlayerToLobby(id);
+		Debug.LogWarning(id.ToString() + " : client started. Total connected: " + NetworkManager.Singleton.ConnectedClients.Count);
 	}
-	public void KickedFromLobby() {
-		if (joinedLobby == null) return;
-		if (WaitingForNGO) {
-			LobbyJoinFailure?.Invoke();
-		} else {
-			AuthenticationSuccess?.Invoke();
-		}
+	#endregion
+
+
+	#region  lobbyLeaving
+	void LeaveLobby() {
+		LobbyNetcodeManager.Instance.ShutDownNetwork();
+		if (LobbyManager.Instance.joinedLobby != null) LobbyManager.Instance.LeaveLobby();
+	}
+	void CheckPlayersInLobby(List<Player> remaninigPlayers) {
+		//dont really matter as clientdisconnected will be called.
+	}
+	void ServerStopped() {
 		LeaveLobby();
 	}
-	public void LeaveLobby() {
-		LeaveLobby(authenticationID);
+	void ClientDisconnected(ulong id) {
+		if (!NetworkManager.Singleton.IsServer) return;
+		string lobbyID = null;
+		if (ClientID_KEY_LobbyID_VAL.ContainsKey(id)) lobbyID = ClientID_KEY_LobbyID_VAL[id];
+		ClientID_KEY_LobbyID_VAL.Remove(id);
+		RemovePlayer(id);
+
+		if (lobbyID != null) LobbyManager.Instance.KickFromLobby(lobbyID);
 	}
-	public async void LeaveLobby(string playerID) {
-		if (joinedLobby != null) {
-			LeaveLobbyBegin?.Invoke();
-			try {
-				string hostID = joinedLobby.HostId;
-				string lobbyID = joinedLobby.Id;
-				WaitingForNGO = false;
-				joinedLobby = null;
-				hostLobby = null;
-				await SubscribeToLobbyEvents(false);
-				if (playerID == hostID) {
-					await LobbyService.Instance.DeleteLobbyAsync(lobbyID);
-				} else {
-					await LobbyService.Instance.RemovePlayerAsync(lobbyID, playerID);
-				}
-			} catch (Exception e) {
-				print(e);
-			}
-			LeaveLobbyComplete?.Invoke();
-		}
+	void ClientStopped(bool b) {
 	}
 
-
-
-
-
-
-
-
-	public async Task ListLobbies() {
-		try {
-			QueryLobbiesOptions filter = new QueryLobbiesOptions {
-				Count = 25,
-				Filters = new List<QueryFilter> {
-					new QueryFilter(QueryFilter.FieldOptions.AvailableSlots, "0", QueryFilter.OpOptions.GT),
-					},
-				Order = new List<QueryOrder> {
-					new QueryOrder(false, QueryOrder.FieldOptions.Created)
-				}
-			};
-
-			QueryResponse response = await Lobbies.Instance.QueryLobbiesAsync(filter);
-			ListLobbySuccess?.Invoke(response.Results);
-		} catch (LobbyServiceException e) {
-			ListLobbyFailure?.Invoke();
-			print(e.Reason);
-		}
-	}
-
-	public async void UpdateLobbyMode(string mode) {
-		try {
-			Dictionary<string, DataObject> data = new Dictionary<string, DataObject>();
-			data[GameMode] = new DataObject(DataObject.VisibilityOptions.Public, mode, DataObject.IndexOptions.S1);
-			hostLobby = await Lobbies.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions {
-				Data = data
-			});
-			joinedLobby = hostLobby;
-		} catch (LobbyServiceException e) {
-			print(e.Reason);
-			LeaveLobby();
-		}
-	}
-	public async void MakeLobbyPublic() {
-		try {
-			hostLobby = await Lobbies.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions {
-				IsPrivate = false
-			});
-			joinedLobby = hostLobby;
-			LobbyCreationSuccess?.Invoke();
-		} catch (LobbyServiceException e) {
-			print(e.Reason);
-			LeaveLobby();
-			LobbyCreationFailure?.Invoke();
-		}
-	}
-
-
-
-
-
-	#region Relay
-	public async Task<Allocation> AllocateRelay(int playerCount, bool hosting = true) {
-		try {
-			//yo
-			//you can set region in this allocation as well if you want (it does happen automatically as well)
-			//set the player count -1 as it does not include hosts.playerCount;
-			Allocation allocation = await RelayService.Instance.CreateAllocationAsync(playerCount - 1);
-			return allocation;
-		} catch (RelayServiceException e) {
-			print(e.Reason);
-			RelayFailure?.Invoke();
-			throw e;
-		}
-	}
-	public async Task<string> GetRelayCode(Allocation allocation) {
-		try {
-			string relayCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
-			return relayCode;
-		} catch (RelayServiceException e) {
-			print(e.Reason);
-			RelayFailure?.Invoke();
-			throw e;
-		}
-	}
-	public async Task<JoinAllocation> JoinRelay(string relayCode) {
-		try {
-			JoinAllocation allocation = await RelayService.Instance.JoinAllocationAsync(relayCode);
-			return allocation;
-		} catch (RelayServiceException e) {
-			print(e.Reason);
-			RelayFailure?.Invoke();
-			throw e;
-		}
-	}
 	#endregion
 
 
+	#region Team and Player object
+	[Header("Team")]
+	[SerializeField] Transform team1Holder, team2Holder, lobbyPlayerPrefab;
 
-
-
-
-
-	bool NGOConnected() {
-		NetworkManager nm = NetworkManager.Singleton;
-		return nm.ShutdownInProgress || nm.IsClient || nm.IsServer;
+	Team AddNewPlayerToTeam(ulong clientID) {
+		Team freeTeam = GetTeamToPlaceIn();
+		if (freeTeam == Team.t1 && !team1.Contains(clientID)) {
+			team1.Add(clientID);
+		} else if (!team2.Contains(clientID)) {
+			team2.Add(clientID);
+		}
+		return freeTeam;
 	}
+
+	Team GetTeamToPlaceIn() {
+		return team1.Count < team1Max ? Team.t1 : Team.t2;
+	}
+
+	LobbyPlayer AddPlayerToLobby(ulong clientID) {
+		Team team = AddNewPlayerToTeam(clientID);
+		LobbyPlayer player = CreatePlayerObject(clientID, team);
+		int colorIndex = GetFirstAvailableColor();
+		ClientID_KEY_ColorIndex_VAL.Add(clientID, colorIndex);
+		player.SetupPlayer(clientID, colorIndex);
+		return player;
+	}
+
+	LobbyPlayer CreatePlayerObject(ulong clientID, Team team) {
+		Transform targetHolder = team == Team.t1 ? team1Holder : team2Holder;
+		Transform newP = Instantiate(lobbyPlayerPrefab, targetHolder);
+		LobbyPlayer script = newP.GetComponent<LobbyPlayer>();
+		// script.clientID.Value = clientID;
+		newP.GetComponent<NetworkObject>().Spawn(true);
+		newP.GetComponent<NetworkObject>().TrySetParent(targetHolder);
+		playersObjects.Add(script);
+		return script;
+	}
+
+	LobbyPlayer FindPlayerFromClientID(ulong clientID) {
+		foreach (LobbyPlayer p in playersObjects) {
+			if (p.clientID.Value == clientID) return p;
+		}
+		return null;
+	}
+
+	void RemovePlayer(ulong id) {
+		LobbyPlayer p = FindPlayerFromClientID(id);
+		RemovePlayerObject(p);
+		team1.Remove(id);
+		team2.Remove(id);
+		ClientID_KEY_ColorIndex_VAL.Remove(id);
+	}
+
+	void RemovePlayerObject(LobbyPlayer obj) {
+		playersObjects.Remove(obj);
+		obj.GetComponent<NetworkObject>().Despawn(true);
+	}
+
+	void ChangeTeam(Transform targetT, LobbyPlayer dragPlayer, LobbyPlayer swapPlayer) {
+		print(swapPlayer);
+		if (!CanStopSceneLoading) return;
+		if (swapPlayer == null) {
+			if (targetT == team1Holder) {
+				print("T1");
+				if (team1.Contains(dragPlayer.clientID.Value) || team1Holder.childCount >= team1Max) return;
+				team2.Remove(dragPlayer.clientID.Value);
+				team1.Add(dragPlayer.clientID.Value);
+				dragPlayer.gameObject.GetComponent<NetworkObject>().TrySetParent(team1Holder);
+				dragPlayer.transform.SetAsLastSibling();
+			}
+			if (targetT == team2Holder) {
+				print("T2");
+				if (team2.Contains(dragPlayer.clientID.Value) || team2Holder.childCount >= team2Max) return;
+				team1.Remove(dragPlayer.clientID.Value);
+				team2.Add(dragPlayer.clientID.Value);
+				dragPlayer.gameObject.GetComponent<NetworkObject>().TrySetParent(team2Holder);
+				dragPlayer.transform.SetAsLastSibling();
+			}
+			return;
+		}
+		//swap scenario
+
+		Transform dragObjHolder = dragPlayer.transform.parent;
+		int dragObjOrder = dragPlayer.transform.GetSiblingIndex();
+		Transform swapObjHolder = swapPlayer.transform.parent;
+		int swapObjOrder = swapPlayer.transform.GetSiblingIndex();
+
+		if (dragObjHolder == team1Holder) { team1.Remove(dragPlayer.clientID.Value); team1.Add(swapPlayer.clientID.Value); }
+		if (dragObjHolder == team2Holder) { team2.Remove(dragPlayer.clientID.Value); team2.Add(swapPlayer.clientID.Value); };
+		if (swapObjHolder == team1Holder) { team1.Remove(swapPlayer.clientID.Value); team1.Add(dragPlayer.clientID.Value); };
+		if (swapObjHolder == team2Holder) { team2.Remove(swapPlayer.clientID.Value); team2.Add(dragPlayer.clientID.Value); };
+
+		dragPlayer.gameObject.GetComponent<NetworkObject>().TrySetParent(swapObjHolder);
+		swapPlayer.gameObject.GetComponent<NetworkObject>().TrySetParent(dragObjHolder);
+		dragPlayer.siblingNum.Value = swapObjOrder;
+		swapPlayer.siblingNum.Value = dragObjOrder;
+	}
+
+	#endregion
+
+
+	#region Color
+	[Header("ColorSettings")]
+	public List<Color> _allColorOptions;
+	public static List<Color> allColorOptions;
+	public static List<Sprite> allColorOptionSprites = new List<Sprite>();
+	void SetupColoredLists() {
+		allColorOptions = _allColorOptions;
+		foreach (Color c in allColorOptions) {
+			allColorOptionSprites.Add(CreateColoredSprite(c));
+		}
+	}
+	Sprite CreateColoredSprite(Color c) {
+		Texture2D onePixel = new Texture2D(1, 1);
+		onePixel.filterMode = FilterMode.Point;
+		onePixel.SetPixel(0, 0, c);
+		Sprite s = Sprite.Create(onePixel, new Rect(0f, 0f, onePixel.width, onePixel.height), Vector2.zero);
+		onePixel.Apply();
+		s.name = c.ToString();
+		return s;
+	}
+	int GetFirstAvailableColor() {
+		for (int i = 0; i < _allColorOptions.Count; i++) {
+			if (!ClientID_KEY_ColorIndex_VAL.ContainsValue(i)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	public void RequestColorChange(int colorIndex) {
+		RequestColorChangeServerRpc(colorIndex);
+	}
+
+	[ServerRpc(RequireOwnership = false)]
+	void RequestColorChangeServerRpc(int targetIndex, ServerRpcParams option = default) {
+		ulong senderID = option.Receive.SenderClientId;
+		//set the color regardless. just set it to the original if new one is not available.
+		int prevColorIndx = ClientID_KEY_ColorIndex_VAL[senderID];
+		if (prevColorIndx == targetIndex) return;
+
+		if (ClientID_KEY_ColorIndex_VAL.ContainsValue(targetIndex) || !CanStopSceneLoading) {
+			targetIndex = prevColorIndx;
+		}
+		LobbyPlayer targetPlayerObj = playersObjects.Find(x => x.clientID.Value == senderID);
+		if (targetPlayerObj == null) return;
+
+		ClientID_KEY_ColorIndex_VAL[senderID] = targetIndex;
+
+		targetPlayerObj.SetColor(targetIndex);
+	}
+
+	#endregion
+
+
+	#region Entering game
+	public static event Action StartSceneLoading;
+	public static event Action<bool> LockOnLoading;
+	//for start: turn on loading panel, disable leave, disable changing teams/colors
+	//for stop: inverse of all the above.
+	bool CheckIfPlayersFilled() {
+		return team1Max + team2Max == team1.Count + team2.Count;
+	}
+	Coroutine loadNextScene = null;
+	public void EnterGame() {
+		if (loadNextScene != null) StopCoroutine(loadNextScene);
+		loadNextScene = StartCoroutine(LoadNextScene());
+	}
+	public static bool CanStopSceneLoading = true;
+	IEnumerator LoadNextScene() {
+		SendTeamLists();
+		StartSceneLoading?.Invoke();
+		int countDown = 5;
+		while (countDown > 0) {
+			countDown--;
+			yield return new WaitForSeconds(1f);
+		}
+		LockOnSceneClientRpc(true);
+		countDown = 3;
+		while (countDown > 0) {
+			countDown--;
+			yield return new WaitForSeconds(1f);
+		}
+
+		if (teamDataRpcSent > 0) {
+			LockOnSceneClientRpc(false);
+			//show warning that connection was too slow or smthing (team data couldn't be passed around)
+			yield break;
+		}
+		//set up team references accessible for clients as well.
+
+		//have a check if all have laoded or soemthing idk.
+		SceneEventProgressStatus sceneStatus = NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
+		if (sceneStatus != SceneEventProgressStatus.Started) {
+			LockOnSceneClientRpc(false);
+		} else {
+			//change data
+			GameData.InSinglePlayerMode = false;
+			GameData.allColorOptions = allColorOptions;
+			GameData.ClientID_KEY_ColorIndex_VAL = ClientID_KEY_ColorIndex_VAL;
+			// GameData.LobbyID_KEY_ClientID_VAL = LobbyID_KEY_ClientID_VAL;
+			// GameData.team1 = team1; GameData.team2 = team2;
+		}
+	}
+	const string splitter = "/";
+	int teamDataRpcSent = 0;
+	void SendTeamLists() {
+		teamDataRpcSent = (team1.Count + team2.Count) * 2;
+		string team1List = "", team2List = "";
+		// foreach (string lobbyID in team1) {
+		// 	team1List += LobbyID_KEY_ClientID_VAL[lobbyID] + splitter;
+		// }
+		// foreach (string lobbyID in team2) {
+		// 	team2List += LobbyID_KEY_ClientID_VAL[lobbyID] + splitter;
+		// }
+		team1List.Remove(team1List.Length - 1);
+		team2List.Remove(team2List.Length - 1);
+		SendTeamListClientRpc(team1List, 1);
+		SendTeamListClientRpc(team2List, 2);
+	}
+	[ClientRpc]
+	void SendTeamListClientRpc(string teamIDs, int associatedTeam) {
+		string[] idList = teamIDs.Split(splitter);
+		List<ulong> targetList = associatedTeam == 1 ? GameData.team1IDList : GameData.team2IDList;
+		targetList.Clear();
+		foreach (string id in idList) {
+			if (ulong.TryParse(id, out ulong idNum)) {
+				targetList.Add(idNum);
+			}
+		}
+		TeamUpdatedServerRpc(NetworkManager.Singleton.LocalClientId);
+	}
+	[ServerRpc(RequireOwnership = false)]
+	void TeamUpdatedServerRpc(ulong id) {
+		teamDataRpcSent--;
+	}
+
+
+
+
+
+
+
+
+	[ClientRpc]
+	void LockOnSceneClientRpc(bool lockOn) {
+		CanStopSceneLoading = !lockOn;
+		LockOnLoading?.Invoke(lockOn);
+	}
+	void StopLoadingLevel() {
+		if (loadNextScene != null) StopCoroutine(loadNextScene);
+		loadNextScene = null;
+		CanStopSceneLoading = true;
+		if (NetworkManager.Singleton.IsServer) LockOnSceneClientRpc(false);
+	}
+	void StopLoadingLevel(ulong i) {
+		StopLoadingLevel();
+	}
+	void StopLoadingLevel(List<Player> p) {
+		StopLoadingLevel();
+	}
+
+
+
+
+
+
+
+
+
+	#endregion
+
+
 }
-
-
-

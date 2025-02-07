@@ -3715,20 +3715,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38655b0471bddde4f8153572f6aee22d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  team1Holder: {fileID: 1120342039}
-  team2Holder: {fileID: 447249985}
-  lobbyPlayerPrefab: {fileID: 5921052582599041628, guid: d207d99b6fd610242b235257685cc23d, type: 3}
-  _allColorOptions:
-  - {r: 1, g: 0.9147296, b: 0, a: 1}
-  - {r: 0.114495516, g: 1, b: 0, a: 1}
-  - {r: 1, g: 0, b: 0.7176819, a: 1}
-  - {r: 0, g: 0.88056564, b: 1, a: 1}
-  - {r: 1, g: 0.28417802, b: 0, a: 1}
-  - {r: 0.43665028, g: 0, b: 1, a: 1}
-  - {r: 1, g: 0, b: 0.068403244, a: 1}
-  - {r: 0, g: 0.07363939, b: 1, a: 1}
-  - {r: 0, g: 0, b: 0, a: 1}
-  - {r: 1, g: 1, b: 1, a: 1}
 --- !u!4 &686878202
 Transform:
   m_ObjectHideFlags: 0
@@ -4929,6 +4915,8 @@ GameObject:
   m_Component:
   - component: {fileID: 913481575}
   - component: {fileID: 913481574}
+  - component: {fileID: 913481577}
+  - component: {fileID: 913481576}
   m_Layer: 0
   m_Name: LobbyManager
   m_TagString: Untagged
@@ -4964,6 +4952,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &913481576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 913481573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3183706435
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+--- !u!114 &913481577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 913481573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cb8f125daa984b438bc78f5176cdb79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  team1Holder: {fileID: 1120342039}
+  team2Holder: {fileID: 447249985}
+  lobbyPlayerPrefab: {fileID: 5921052582599041628, guid: d207d99b6fd610242b235257685cc23d, type: 3}
+  _allColorOptions:
+  - {r: 1, g: 0.9147296, b: 0, a: 1}
+  - {r: 0.114495516, g: 1, b: 0, a: 1}
+  - {r: 1, g: 0, b: 0.7176819, a: 1}
+  - {r: 0, g: 0.88056564, b: 1, a: 1}
+  - {r: 1, g: 0.28417802, b: 0, a: 1}
+  - {r: 0.43665028, g: 0, b: 1, a: 1}
+  - {r: 1, g: 0, b: 0.068403244, a: 1}
+  - {r: 0, g: 0.07363939, b: 1, a: 1}
+  - {r: 0, g: 0, b: 0, a: 1}
+  - {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &932971838
 GameObject:
   m_ObjectHideFlags: 0

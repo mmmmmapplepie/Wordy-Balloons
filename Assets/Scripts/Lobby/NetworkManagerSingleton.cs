@@ -4,7 +4,6 @@ using UnityEngine;
 [RequireComponent(typeof(NetworkManager))]
 public class NetworkManagerSingleton : MonoBehaviour {
 	void Awake() {
-		DontDestroyOnLoad(gameObject);
 		if (NetworkManager.Singleton != null && NetworkManager.Singleton != GetComponent<NetworkManager>()) Destroy(gameObject);
 	}
 }

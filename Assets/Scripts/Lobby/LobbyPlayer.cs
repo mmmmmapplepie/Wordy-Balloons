@@ -16,33 +16,28 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 	public NetworkVariable<ulong> clientID = new NetworkVariable<ulong>(ulong.MaxValue);
 	public NetworkVariable<int> currColorIndex = new NetworkVariable<int>(0);
 	public NetworkVariable<int> siblingNum = new NetworkVariable<int>();
-	NetworkVariable<bool> dataCompleteNetVar = new NetworkVariable<bool>(false);
-	[HideInInspector] public string lobbyID;
-	[HideInInspector] public NetcodeManager netScript;
+	NetworkVariable<bool> joinConfirmed = new NetworkVariable<bool>(false);
 
-	Coroutine timeOutRoutine;
 	public override void OnNetworkSpawn() {
 		SetDropDown();
 		ColorChanged(-1, currColorIndex.Value);
 		currColorIndex.OnValueChanged += ColorChanged;
-		dataCompleteNetVar.OnValueChanged += LoadStateChanged;
+		playerName.OnValueChanged += NameChanged;
+		joinConfirmed.OnValueChanged += LoadStateChanged;
 		clientID.OnValueChanged += ClientIDChanged;
 		siblingNum.OnValueChanged += ChangePos;
 		if (NetworkManager.Singleton.IsServer) {
-			timeOutRoutine = StartCoroutine(TimeOutRoutine());
 			siblingNum.Value = transform.GetSiblingIndex();
 		}
 		EnableColorpicker();
-		loadingCover.SetActive(!dataCompleteNetVar.Value);
+		loadingCover.SetActive(!joinConfirmed.Value);
+		NameChanged(default, playerName.Value);
 	}
-	IEnumerator TimeOutRoutine() {
-		float timeoutTime = 10f;
-		yield return new WaitForSecondsRealtime(timeoutTime);
-		KickPlayer();
-	}
+
 	public override void OnNetworkDespawn() {
 		currColorIndex.OnValueChanged -= ColorChanged;
-		dataCompleteNetVar.OnValueChanged -= LoadStateChanged;
+		playerName.OnValueChanged -= NameChanged;
+		joinConfirmed.OnValueChanged -= LoadStateChanged;
 		clientID.OnValueChanged -= ClientIDChanged;
 		siblingNum.OnValueChanged -= ChangePos;
 	}
@@ -55,6 +50,9 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 	void ColorChanged(int old, int newC) {
 		colorPicker.Set(newC);
 	}
+	void NameChanged(FixedString64Bytes old, FixedString64Bytes newC) {
+		playerNameTxt.text = newC.ToString();
+	}
 	void LoadStateChanged(bool old, bool newb) {
 		if (newb) {
 			loadingCover.SetActive(false);
@@ -66,20 +64,20 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 		}
 		EnableColorpicker();
 	}
+	public void ConfirmJoin(string name) {
+		playerName.Value = name;
+		joinConfirmed.Value = true;
+	}
 
-	public void SetupPlayer(PlayerData data) {
-		playerName.Value = data.Name;
-		clientID.Value = data.ClientID;
-		currColorIndex.Value = data.ColorIndex;
-		colorPicker.value = currColorIndex.Value;
+	public void SetupPlayer(ulong clientID, int colorInd) {
+		this.clientID.Value = clientID;
+		currColorIndex.Value = colorInd;
 
-		if (timeOutRoutine != null) StopCoroutine(timeOutRoutine);
 		if (NetworkManager.Singleton.IsServer) {
-			if (lobbyID != AuthenticationService.Instance.PlayerId) {
+			if (this.clientID.Value != NetworkManager.Singleton.LocalClientId) {
 				kickBtn.SetActive(true);
 			}
 		}
-		dataCompleteNetVar.Value = true;
 	}
 
 	void EnableColorpicker() {
@@ -91,9 +89,9 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 		colorPicker.ClearOptions();
 
 		List<TMP_Dropdown.OptionData> items = new List<TMP_Dropdown.OptionData>();
-		List<Color> options = NetcodeManager.allColorOptions;
+		List<Color> options = MyLobby.allColorOptions;
 		for (int i = 0; i < options.Count; i++) {
-			Sprite s = NetcodeManager.allColorOptionSprites[i];
+			Sprite s = MyLobby.allColorOptionSprites[i];
 			string index = i.ToString();
 			TMP_Dropdown.OptionData item = new TMP_Dropdown.OptionData(index, s);
 			items.Add(item);
@@ -101,8 +99,8 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 		colorPicker.AddOptions(items);
 	}
 	public void KickPlayer() {
-		if (!NetcodeManager.CanStopSceneLoading) { print("can't kick now"); return; }
-		MyLobby.Instance.KickFromLobby(lobbyID);
+		if (!MyLobby.CanStopSceneLoading) { print("can't kick now"); return; }
+		NetworkManager.Singleton.DisconnectClient(clientID.Value);
 	}
 
 	public override void OnDestroy() {
@@ -112,7 +110,7 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 	public void RequestColorChange(int value) {
 		int targetIndex = int.Parse(colorPicker.options[value].text);
 		if (currColorIndex.Value == targetIndex) return;
-		if (NetcodeManager.Instance != null) NetcodeManager.Instance.RequestColorChange(targetIndex);
+		if (MyLobby.Instance != null) MyLobby.Instance.RequestColorChange(targetIndex);
 	}
 
 
@@ -149,9 +147,8 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 	public void OnDrop(PointerEventData eventData) {
 		if (!NetworkManager.Singleton.IsServer) return;
 		GameObject dragObject = eventData.pointerDrag;
-		if (dragObject == null || dragObject.GetComponent<LobbyPlayer>() == null) return;
+		if (dragObject == null) return;
 		if (dragObject == gameObject) return;
-
 		TeamChangeEvent?.Invoke(transform.parent, dragObject.GetComponent<LobbyPlayer>(), this);
 	}
 
@@ -186,18 +183,6 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 
 
 
-public struct PlayerData {
-	public ulong ClientID;
-	public string LobbyID;
-	public string Name;
-	public int ColorIndex;
-	public PlayerData(ulong clientID, string lobbyID, string name, int colorIndex) {
-		this.ClientID = clientID;
-		this.LobbyID = lobbyID;
-		this.Name = name;
-		this.ColorIndex = colorIndex;
-	}
-}
 
 
 

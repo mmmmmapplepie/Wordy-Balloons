@@ -14,56 +14,52 @@ public class LobbyUI : MonoBehaviour {
 	// i have to make sure that error cases fire only one event until exited the situation.
 	void Start() {
 
-		NetcodeManager.LockOnLoading += DisableLeaving;
-		NetcodeManager.StartSceneLoading += LoadingNextScene;
-		NetcodeManager.LobbyFull += LobbyFull;
+		// LobbyNetcodeManager.LockOnLoading += DisableLeaving;
+		// LobbyNetcodeManager.StartSceneLoading += LoadingNextScene;
+		// LobbyNetcodeManager.LobbyFull += LobbyFull;
 
-		MyLobby.AuthenticationBegin += OpenLoadingPanel;
-		MyLobby.AuthenticationSuccess += CloseTransitionPanels;
-		MyLobby.AuthenticationFailure += AuthenticationFail;
+		LobbyManager.AuthenticationBegin += OpenLoadingPanel;
+		LobbyManager.AuthenticationSuccess += CloseTransitionPanels;
+		LobbyManager.AuthenticationFailure += AuthenticationFail;
 
-		MyLobby.LobbyCreationBegin += OpenLoadingPanel;
-		MyLobby.LobbyCreationSuccess += LobbyCreationSuccess;
-		MyLobby.LobbyCreationFailure += LobbyCreationFail;
+		LobbyManager.LobbyCreationBegin += OpenLoadingPanel;
+		MyLobby.LobbyCreatedEvent += LobbyCreationSuccess;
+		LobbyManager.LobbyCreationFailure += LobbyCreationFail;
 
-		MyLobby.HearbeatFailure += HearbeatFail;
+		LobbyManager.HearbeatFailure += HearbeatFail;
 
-		MyLobby.LobbyJoinBegin += OpenLoadingPanel;
-		MyLobby.LobbyJoinSuccess += LobbyJoined;
-		MyLobby.LobbyJoinFailure += LobbyJoinFail;
+		LobbyManager.LobbyJoinBegin += OpenLoadingPanel;
+		LobbyNetcodeManager.ClientStartSuccess += LobbyJoined;
+		LobbyManager.LobbyJoinFailure += LobbyJoinFail;
 
-		MyLobby.LeaveLobbyBegin += LeaveLobbyBegin;
+		LobbyManager.LeaveLobbyBegin += LeaveLobbyBegin;
 
-		MyLobby.ListLobbySuccess += LobbyListFound;
-		MyLobby.ListLobbyFailure += ListLobbiesFail;
-
-		MyLobby.PlayersLeft += PlayersLeft;
+		LobbyManager.ListLobbySuccess += LobbyListFound;
+		LobbyManager.ListLobbyFailure += ListLobbiesFail;
 	}
 	void OnDestroy() {
-		NetcodeManager.LockOnLoading -= DisableLeaving;
-		NetcodeManager.StartSceneLoading -= LoadingNextScene;
-		NetcodeManager.LobbyFull -= LobbyFull;
+		// LobbyNetcodeManager.LockOnLoading -= DisableLeaving;
+		// LobbyNetcodeManager.StartSceneLoading -= LoadingNextScene;
+		// LobbyNetcodeManager.LobbyFull -= LobbyFull;
 
-		MyLobby.AuthenticationBegin -= OpenLoadingPanel;
-		MyLobby.AuthenticationSuccess -= CloseTransitionPanels;
-		MyLobby.AuthenticationFailure -= AuthenticationFail;
+		LobbyManager.AuthenticationBegin -= OpenLoadingPanel;
+		LobbyManager.AuthenticationSuccess -= CloseTransitionPanels;
+		LobbyManager.AuthenticationFailure -= AuthenticationFail;
 
-		MyLobby.LobbyCreationBegin -= OpenLoadingPanel;
-		MyLobby.LobbyCreationSuccess -= LobbyCreationSuccess;
-		MyLobby.LobbyCreationFailure -= LobbyCreationFail;
+		LobbyManager.LobbyCreationBegin -= OpenLoadingPanel;
+		MyLobby.LobbyCreatedEvent += LobbyCreationSuccess;
+		LobbyManager.LobbyCreationFailure -= LobbyCreationFail;
 
-		MyLobby.HearbeatFailure -= HearbeatFail;
+		LobbyManager.HearbeatFailure -= HearbeatFail;
 
-		MyLobby.LobbyJoinBegin -= OpenLoadingPanel;
-		MyLobby.LobbyJoinSuccess -= LobbyJoined;
-		MyLobby.LobbyJoinFailure -= LobbyJoinFail;
+		LobbyManager.LobbyJoinBegin -= OpenLoadingPanel;
+		LobbyNetcodeManager.ClientStartSuccess -= LobbyJoined;
+		LobbyManager.LobbyJoinFailure -= LobbyJoinFail;
 
-		MyLobby.LeaveLobbyBegin -= LeaveLobbyBegin;
+		LobbyManager.LeaveLobbyBegin -= LeaveLobbyBegin;
 
-		MyLobby.ListLobbySuccess -= LobbyListFound;
-		MyLobby.ListLobbyFailure -= ListLobbiesFail;
-
-		MyLobby.PlayersLeft -= PlayersLeft;
+		LobbyManager.ListLobbySuccess -= LobbyListFound;
+		LobbyManager.ListLobbyFailure -= ListLobbiesFail;
 	}
 
 
@@ -80,7 +76,7 @@ public class LobbyUI : MonoBehaviour {
 		SceneManager.LoadScene(scene.name);
 	}
 	public void RetryAuthentication() {
-		MyLobby.Instance.Authentication();
+		LobbyManager.Instance.Authentication();
 	}
 
 
@@ -132,24 +128,24 @@ public class LobbyUI : MonoBehaviour {
 		lobbyModeDropDown.value = index;
 	}
 	public void CreateLobby() {
-		MyLobby.Instance.CreateLobby(lobbyName.text, ConvertDropDownValueToGameMode(lobbyModeDropDown.value), lobbyPlayerNumDropDown.value + 2);
+		LobbyManager.Instance.CreateLobby(lobbyName.text, ConvertDropDownValueToGameMode(lobbyModeDropDown.value), lobbyPlayerNumDropDown.value + 2);
 	}
 	public void QuickJoin() {
-		MyLobby.Instance.QuickJoinLobby();
+		LobbyManager.Instance.QuickJoinLobby();
 	}
 	public void JoinLobbyByCode() {
-		MyLobby.Instance.JoinLobbyByCode(lobbyCode.text);
+		LobbyManager.Instance.JoinLobbyByCode(lobbyCode.text);
 		lobbyCode.text = "";
 	}
 
 	public void LeaveLobby() {
 		//you need to add UI stuff here as leave lobby itself i decided not to add ui stuff (as it is called EVERYWHERE)
-		MyLobby.Instance.LeaveLobby();
+		LobbyManager.Instance.LeaveLobby();
 	}
 
 
 	public void ListLobbyRefresh() {
-		Task list = MyLobby.Instance.ListLobbies();
+		Task list = LobbyManager.Instance.ListLobbies();
 	}
 
 
@@ -168,7 +164,7 @@ public class LobbyUI : MonoBehaviour {
 		HidePanelsExceptChosen(LoadingPanel);
 	}
 	public void CloseTransitionPanels() {
-		if (!NetcodeManager.CanStopSceneLoading) return;
+		// if (!LobbyNetcodeManager.CanStopSceneLoading) return;
 		HidePanelsExceptChosen(null);
 	}
 	void HidePanelsExceptChosen(GameObject panelToOpen = null) {
@@ -200,7 +196,7 @@ public class LobbyUI : MonoBehaviour {
 	void LobbyCreationSuccess() {
 		startGameBtn.interactable = false;
 		lobbyCreationPanel.SetActive(false);
-		LobbyUpdate(MyLobby.Instance.hostLobby);
+		LobbyUpdate(LobbyManager.Instance.hostLobby);
 		ToggleLobby(true);
 		CloseTransitionPanels();
 	}
@@ -222,14 +218,14 @@ public class LobbyUI : MonoBehaviour {
 	void LobbyJoined() {
 		HidePanelsExceptChosen();
 		startGameBtn.interactable = false;
-		LobbyUpdate(MyLobby.Instance.joinedLobby);
+		LobbyUpdate(LobbyManager.Instance.joinedLobby);
 		ToggleLobby(true);
 	}
 	[SerializeField] TextMeshProUGUI lobbyModeTxt, lobbyCodeTxt;
 	void LobbyUpdate(Lobby lobby) {
 		if (lobby == null) return;
-		lobbyModeTxt.text = lobby.Data[MyLobby.GameMode].Value;
-		if (MyLobby.Instance.hostLobby != null) {
+		lobbyModeTxt.text = lobby.Data[LobbyManager.GameMode].Value;
+		if (LobbyManager.Instance.hostLobby != null) {
 			lobbyCodeTxt.text = lobby.LobbyCode;
 		}
 	}
@@ -246,7 +242,7 @@ public class LobbyUI : MonoBehaviour {
 
 	//dont forget to start shutdown for NGO.
 	void LeaveLobbyBegin() {
-		if (!NetcodeManager.CanStopSceneLoading) return;
+		// if (!LobbyNetcodeManager.CanStopSceneLoading) return;
 		ToggleLobby(false);
 	}
 
@@ -263,7 +259,7 @@ public class LobbyUI : MonoBehaviour {
 		}
 	}
 	public GameObject lobbyListingFailNotificationObject;
-	void ListLobbiesFail() {
+	void ListLobbiesFail(List<Lobby> list) {
 		lobbyListingFailNotificationObject.SetActive(true);
 	}
 

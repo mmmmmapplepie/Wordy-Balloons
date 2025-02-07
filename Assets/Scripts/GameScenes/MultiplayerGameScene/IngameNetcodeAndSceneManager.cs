@@ -57,9 +57,11 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 				break;
 			}
 		}
+		Debug.LogError(clientID);
 		CheckTeamEmpty();
 	}
 	void CheckTeamEmpty() {
+		if (NetworkManager.Singleton.IsServer) Debug.LogWarning(NetworkManager.Singleton.ConnectedClients.Count);
 		int teamRemaining = 0;
 		if (GameData.team1.Count == 0) teamRemaining = 2;
 		if (GameData.team2.Count == 0) teamRemaining = 1;
