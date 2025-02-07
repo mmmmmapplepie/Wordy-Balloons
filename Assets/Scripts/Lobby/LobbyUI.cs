@@ -33,6 +33,7 @@ public class LobbyUI : MonoBehaviour {
 		LobbyManager.LobbyJoinFailure += LobbyJoinFail;
 
 		LobbyManager.LeaveLobbyBegin += LeaveLobbyBegin;
+		LobbyManager.LeaveLobbyComplete += LeaveLobbyComplete;
 
 		LobbyManager.ListLobbySuccess += LobbyListFound;
 		LobbyManager.ListLobbyFailure += ListLobbiesFail;
@@ -47,7 +48,7 @@ public class LobbyUI : MonoBehaviour {
 		LobbyManager.AuthenticationFailure -= AuthenticationFail;
 
 		LobbyManager.LobbyCreationBegin -= OpenLoadingPanel;
-		MyLobby.LobbyCreatedEvent += LobbyCreationSuccess;
+		MyLobby.LobbyCreatedEvent -= LobbyCreationSuccess;
 		LobbyManager.LobbyCreationFailure -= LobbyCreationFail;
 
 		LobbyManager.HearbeatFailure -= HearbeatFail;
@@ -57,6 +58,7 @@ public class LobbyUI : MonoBehaviour {
 		LobbyManager.LobbyJoinFailure -= LobbyJoinFail;
 
 		LobbyManager.LeaveLobbyBegin -= LeaveLobbyBegin;
+		LobbyManager.LeaveLobbyComplete -= LeaveLobbyComplete;
 
 		LobbyManager.ListLobbySuccess -= LobbyListFound;
 		LobbyManager.ListLobbyFailure -= ListLobbiesFail;
@@ -244,6 +246,9 @@ public class LobbyUI : MonoBehaviour {
 	void LeaveLobbyBegin() {
 		// if (!LobbyNetcodeManager.CanStopSceneLoading) return;
 		ToggleLobby(false);
+	}
+	void LeaveLobbyComplete() {
+		HidePanelsExceptChosen();
 	}
 
 	public Transform lobbiesListHolder, lobbyOptionPrefab;

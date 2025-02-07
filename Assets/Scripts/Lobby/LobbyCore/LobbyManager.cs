@@ -114,40 +114,6 @@ public class LobbyManager : MonoBehaviour {
 		}
 	}
 
-	// float updateElapsed = 0, updatePeriod = 3f;
-	// async void LobbyPoll() {
-	// 	if (joinedLobby == null) { updateElapsed = 0; return; }
-	// 	if (updateElapsed > updatePeriod) {
-	// 		updateElapsed = 0f;
-	// 		try {
-	// 			joinedLobby = await LobbyService.Instance.GetLobbyAsync(joinedLobby.Id);
-	// 			if (hostLobby != null) {
-	// 				hostLobby = joinedLobby;
-	// 			}
-	// 		} catch (LobbyServiceException e) {
-	// 			print(e);
-	// 		}
-	// 	} else {
-	// 		updateElapsed += Time.deltaTime;
-	// 	}
-	// }
-	// float lobbyListRefreshElapsed = 0, lobbyListRefreshPeriod = 5f;
-	// async void LobbyListRefresh() {
-	// 	if (joinedLobby != null) { lobbyListRefreshElapsed = 0; return; }
-	// 	if (lobbyListRefreshElapsed > lobbyListRefreshPeriod) {
-	// 		lobbyListRefreshElapsed = 0f;
-	// 		try {
-	// 			await ListLobbies();
-	// 		} catch (Exception e) {
-	// 			print(e);
-	// 			LeaveLobby();
-	// 			HearbeatFailure?.Invoke();
-	// 		}
-	// 	} else {
-	// 		lobbyListRefreshElapsed += Time.deltaTime;
-	// 	}
-	// }
-
 	#endregion
 
 
@@ -410,6 +376,7 @@ public class LobbyManager : MonoBehaviour {
 	}
 	public async void LeaveLobby(string authenticationID, bool SendEvents = true) {
 		if (SendEvents) LeaveLobbyBegin?.Invoke();
+
 		try {
 			await UnsubscribeFromLobbyEvents();
 		} catch (Exception e) {
@@ -496,13 +463,7 @@ public class LobbyManager : MonoBehaviour {
 
 
 	void OnDestroy() {
-		while (createdLobbyIds.TryDequeue(out string lobbyId)) {
-			try {
-				LobbyService.Instance.DeleteLobbyAsync(lobbyId);
-			} catch (LobbyServiceException e) {
-				print(e);
-			}
-		}
+		ResetLobbyManager();
 		AuthenticationService.Instance.SignOut();
 		ExitScene.Cancel();
 		ExitScene.Dispose();
@@ -520,7 +481,6 @@ public class LobbyManager : MonoBehaviour {
 			}
 		}
 		LobbyManagerResetEvent?.Invoke();
-		//disconnect NGO
 	}
 
 

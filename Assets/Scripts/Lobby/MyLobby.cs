@@ -139,6 +139,7 @@ public class MyLobby : NetworkBehaviour {
 	const float JoinConfirmationTimeoutTime = 10f;
 	IEnumerator JoinConfirmationTimeout(string id) {
 		yield return new WaitForSeconds(JoinConfirmationTimeoutTime);
+		print("Kicking " + id + " from timeout.");
 		KickDueToTimeout(id);
 	}
 	void KickDueToTimeout(string id) {
@@ -167,7 +168,7 @@ public class MyLobby : NetworkBehaviour {
 		if (!NetworkManager.Singleton.IsServer) return;
 		if (id == NetworkManager.Singleton.LocalClientId) return;
 		AddPlayerToLobby(id);
-		Debug.LogWarning(id.ToString() + " : client started. Total connected: " + NetworkManager.Singleton.ConnectedClients.Count);
+		// Debug.LogWarning(id.ToString() + " : client started. Total connected: " + NetworkManager.Singleton.ConnectedClients.Count);
 	}
 	#endregion
 
