@@ -8,7 +8,6 @@ using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using Unity.Services.Relay.Models;
 using System;
-using System.Threading;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
@@ -19,18 +18,18 @@ public class LobbyManager : MonoBehaviour {
 	public const string GameMode = "GameMode";
 	public const string PlayerName = "PlayerName";
 
-	CancellationTokenSource ExitScene;
-	CancellationToken ExitToken;
+	// CancellationTokenSource ExitScene;
+	// CancellationToken ExitToken;
 	public static LobbyManager Instance;
 	void Awake() {
 		Instance = this;
-		ExitScene = new CancellationTokenSource();
-		ExitToken = ExitScene.Token;
+		// ExitScene = new CancellationTokenSource();
+		// ExitToken = ExitScene.Token;
 	}
 	void Start() {
-		Authentication();
+		Authenticate();
 	}
-	public async void Authentication(string name = null) {
+	public async void Authenticate(string name = null) {
 		AuthenticationBegin?.Invoke();
 		try {
 			if (UnityServices.State == ServicesInitializationState.Uninitialized) {
@@ -51,7 +50,6 @@ public class LobbyManager : MonoBehaviour {
 		}
 	}
 
-	Queue<string> createdLobbyIds = new Queue<string>();
 
 
 	[HideInInspector] public string authenticationID;
@@ -94,7 +92,6 @@ public class LobbyManager : MonoBehaviour {
 	float heartBeatElapsed = 0, heartBeatPeriod = 15f;
 	void Update() {
 		LobbyHeartbeat();
-
 		//you may need polling for edges cases where the events dont work for some reason.
 		// LobbyPoll();
 	}
@@ -136,8 +133,6 @@ public class LobbyManager : MonoBehaviour {
 				}
 			};
 			hostLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, lobbyMaxPlayerNumber, lobbyDetails);
-			// latestLobbyInteraction = hostLobby.LastUpdated;
-			createdLobbyIds.Enqueue(hostLobby.Id);
 			//assign relay
 			Allocation relayAlloc = await AllocateRelay(lobbyMaxPlayerNumber);
 			NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(relayAlloc, "dtls"));
@@ -151,7 +146,6 @@ public class LobbyManager : MonoBehaviour {
 			});
 			joinedLobby = hostLobby;
 			await SubscribeToLobbyEvents();
-			//have to make your own player objects (as you won't be getting events for players being added as that "already happened") -- only for the host.
 			CreatedLobby?.Invoke();
 		} catch (Exception e) {
 			print(e);
@@ -194,11 +188,6 @@ public class LobbyManager : MonoBehaviour {
 
 	void LobbyChanged(ILobbyChanges changes) {
 		if (joinedLobby == null) return;
-		//in case it fails unsub to the lobby events? idk
-		// DateTime now = DateTime.Now;
-		// TimeSpan changesTimespan = now - changes.LastUpdated.Value;
-		// TimeSpan latestInteractionTimespan = now - latestLobbyInteraction;
-		// if (changesTimespan > latestInteractionTimespan) return;
 
 		changes.ApplyToLobby(joinedLobby);
 		if (hostLobby != null) hostLobby = joinedLobby;
@@ -319,10 +308,7 @@ public class LobbyManager : MonoBehaviour {
 			LobbyJoinFailure?.Invoke();
 		}
 	}
-	// bool WaitingForNGO = false;
 	async Task JoinLobby() {
-		// WaitingForNGO = true;
-		// latestLobbyInteraction = joinedLobby.LastUpdated;
 		string relayCode = joinedLobby.Data[RelayCode].Value;
 		try {
 			JoinAllocation joinRelayAlloc = await JoinRelay(relayCode);
@@ -335,14 +321,6 @@ public class LobbyManager : MonoBehaviour {
 			throw e;
 		}
 	}
-	// public void JoinLobbySuccessful(bool succesful) {
-	// 	if (succesful) {
-	// 		LobbyJoinSuccess?.Invoke();
-	// 	} else {
-	// 		LobbyJoinFailure?.Invoke();
-	// 	}
-	// 	// WaitingForNGO = false;
-	// }
 
 	#endregion
 
@@ -362,12 +340,6 @@ public class LobbyManager : MonoBehaviour {
 		}
 	}
 	public void KickedFromLobby() {
-		// if (joinedLobby == null) return;
-		// if (WaitingForNGO) {
-		// 	LobbyJoinFailure?.Invoke();
-		// } else {
-		// 	AuthenticationSuccess?.Invoke();
-		// }
 		KickedFromLobbyEvent?.Invoke();
 		LeaveLobby();
 	}
@@ -384,7 +356,6 @@ public class LobbyManager : MonoBehaviour {
 		}
 		if (joinedLobby != null) {
 			try {
-				// WaitingForNGO = false;
 				if (authenticationID == joinedLobby.HostId) {
 					await LobbyService.Instance.DeleteLobbyAsync(joinedLobby.Id);
 				} else {
@@ -429,20 +400,6 @@ public class LobbyManager : MonoBehaviour {
 			ListLobbyFailure?.Invoke(null);
 		}
 	}
-
-	// public async void UpdateLobbyMode(string mode) {
-	// 	try {
-	// 		Dictionary<string, DataObject> data = new Dictionary<string, DataObject>();
-	// 		data[GameMode] = new DataObject(DataObject.VisibilityOptions.Public, mode, DataObject.IndexOptions.S1);
-	// 		hostLobby = await Lobbies.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions {
-	// 			Data = data
-	// 		});
-	// 		joinedLobby = hostLobby;
-	// 	} catch (LobbyServiceException e) {
-	// 		print(e.Reason);
-	// 		LeaveLobby();
-	// 	}
-	// }
 	public async void MakeLobbyPublic() {
 		try {
 			hostLobby = await Lobbies.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions {
@@ -461,29 +418,20 @@ public class LobbyManager : MonoBehaviour {
 
 
 
-
 	void OnDestroy() {
+		Instance = null;
 		ResetLobbyManager();
 		AuthenticationService.Instance.SignOut();
-		ExitScene.Cancel();
-		ExitScene.Dispose();
-		Instance = null;
+		// ExitScene.Cancel();
+		// ExitScene.Dispose();
 	}
 
 	//if references and such not properly nulled when leaving etc (or stuck)
-	void ResetLobbyManager() {
-		LeaveLobby(true);
-		while (createdLobbyIds.TryDequeue(out string lobbyId)) {
-			try {
-				LobbyService.Instance.DeleteLobbyAsync(lobbyId);
-			} catch (LobbyServiceException e) {
-				print(e);
-			}
-		}
+	void ResetLobbyManager(bool sendEvents = false) {
+		// LeaveLobby(sendEvents);
+		LeaveLobby();
 		LobbyManagerResetEvent?.Invoke();
 	}
-
-
 
 	bool NGOConnected() {
 		NetworkManager nm = NetworkManager.Singleton;

@@ -21,33 +21,35 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 	public override void OnNetworkSpawn() {
 		SetDropDown();
 		ColorChanged(-1, currColorIndex.Value);
+		clientID.OnValueChanged += CheckActivePlayer;
 		currColorIndex.OnValueChanged += ColorChanged;
 		playerName.OnValueChanged += NameChanged;
 		joinConfirmed.OnValueChanged += LoadStateChanged;
-		clientID.OnValueChanged += ClientIDChanged;
 		siblingNum.OnValueChanged += ChangePos;
+
 		if (NetworkManager.Singleton.IsServer) {
 			siblingNum.Value = transform.GetSiblingIndex();
 		}
-		EnableColorpicker();
+
 		loadingCover.SetActive(!joinConfirmed.Value);
 		NameChanged(default, playerName.Value);
 	}
 
 	public override void OnNetworkDespawn() {
+		clientID.OnValueChanged -= CheckActivePlayer;
 		currColorIndex.OnValueChanged -= ColorChanged;
 		playerName.OnValueChanged -= NameChanged;
 		joinConfirmed.OnValueChanged -= LoadStateChanged;
-		clientID.OnValueChanged -= ClientIDChanged;
 		siblingNum.OnValueChanged -= ChangePos;
 	}
 
 	public void SetColor(int newIndex) {
-		currColorIndex.Value = newIndex + 1;
 		currColorIndex.Value = newIndex;
 	}
 
 	void ColorChanged(int old, int newC) {
+		print(old);
+		print(newC);
 		colorPicker.Set(newC);
 	}
 	void NameChanged(FixedString64Bytes old, FixedString64Bytes newC) {
@@ -58,12 +60,7 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 			loadingCover.SetActive(false);
 		}
 	}
-	void ClientIDChanged(ulong old, ulong newid) {
-		if (newid == NetworkManager.Singleton.LocalClientId) {
-			activePlayerCover.SetActive(true);
-		}
-		EnableColorpicker();
-	}
+
 	public void ConfirmJoin(string name) {
 		playerName.Value = name;
 		joinConfirmed.Value = true;
@@ -78,11 +75,18 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 				kickBtn.SetActive(true);
 			}
 		}
+
+		EnableColorpicker();
+	}
+
+	void CheckActivePlayer(ulong id, ulong clientID) {
+		if (clientID == NetworkManager.Singleton.LocalClientId) {
+			activePlayerCover.SetActive(true);
+		}
 	}
 
 	void EnableColorpicker() {
 		colorPicker.interactable = clientID.Value == NetworkManager.Singleton.LocalClientId;
-
 	}
 
 	void SetDropDown() {
@@ -99,7 +103,7 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 		colorPicker.AddOptions(items);
 	}
 	public void KickPlayer() {
-		if (!MyLobby.CanStopSceneLoading) { print("can't kick now"); return; }
+		if (MyLobby.LoadingSceneBool.Value) { print("can't kick now"); return; }
 		NetworkManager.Singleton.DisconnectClient(clientID.Value);
 	}
 
@@ -108,8 +112,9 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 		base.OnDestroy();
 	}
 	public void RequestColorChange(int value) {
-		int targetIndex = int.Parse(colorPicker.options[value].text);
+		int targetIndex = value;
 		if (currColorIndex.Value == targetIndex) return;
+		colorPicker.Set(currColorIndex.Value);
 		if (MyLobby.Instance != null) MyLobby.Instance.RequestColorChange(targetIndex);
 	}
 

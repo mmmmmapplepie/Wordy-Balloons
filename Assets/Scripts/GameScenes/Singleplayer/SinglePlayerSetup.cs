@@ -29,14 +29,10 @@ public class SinglePlayerSetup : NetworkBehaviour {
 
 		// public static List<ulong> team1IDList = new List<ulong>(), team2IDList = new List<ulong>();
 		// public static HashSet<string> team1 = new HashSet<string>(), team2 = new HashSet<string>();
-		GameData.team1IDList.Clear();
-		GameData.team1IDList.Add(selfID);
-		GameData.team2IDList.Clear();
-		GameData.team2IDList.Add(computerID);
 		GameData.team1.Clear();
-		GameData.team1.Add(selfID.ToString());
+		GameData.team1.Add(selfID);
 		GameData.team2.Clear();
-		GameData.team2.Add(computerID.ToString());
+		GameData.team2.Add(computerID);
 
 		GameData.InSinglePlayerMode = true;
 

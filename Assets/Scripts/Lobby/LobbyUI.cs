@@ -5,18 +5,25 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using System.Threading.Tasks;
 using UnityEngine.UI;
-
+using System;
+using Unity.Netcode;
+[DefaultExecutionOrder(-100)]
 public class LobbyUI : MonoBehaviour {
+
+	void Awake() {
+		SetGameModeDropdown();
+	}
+
 
 	#region subscribing/unsubscribing to events;
 
 	// having the // comment at the end of the event sub means that i have checked the things are correctly fired (only once) for the situation.
 	// i have to make sure that error cases fire only one event until exited the situation.
 	void Start() {
-
-		// LobbyNetcodeManager.LockOnLoading += DisableLeaving;
-		// LobbyNetcodeManager.StartSceneLoading += LoadingNextScene;
-		// LobbyNetcodeManager.LobbyFull += LobbyFull;
+		MyLobby.LobbyFull += LobbyFull;
+		MyLobby.SceneLoadingError += LoadingSceneError;
+		MyLobby.LoadingCountdown.OnValueChanged += LoadingCountdown;
+		MyLobby.LoadingSceneBool.OnValueChanged += LoadingSceneStateChange;
 
 		LobbyManager.AuthenticationBegin += OpenLoadingPanel;
 		LobbyManager.AuthenticationSuccess += CloseTransitionPanels;
@@ -39,9 +46,10 @@ public class LobbyUI : MonoBehaviour {
 		LobbyManager.ListLobbyFailure += ListLobbiesFail;
 	}
 	void OnDestroy() {
-		// LobbyNetcodeManager.LockOnLoading -= DisableLeaving;
-		// LobbyNetcodeManager.StartSceneLoading -= LoadingNextScene;
-		// LobbyNetcodeManager.LobbyFull -= LobbyFull;
+		MyLobby.LobbyFull -= LobbyFull;
+		MyLobby.SceneLoadingError -= LoadingSceneError;
+		MyLobby.LoadingCountdown.OnValueChanged -= LoadingCountdown;
+		MyLobby.LoadingSceneBool.OnValueChanged -= LoadingSceneStateChange;
 
 		LobbyManager.AuthenticationBegin -= OpenLoadingPanel;
 		LobbyManager.AuthenticationSuccess -= CloseTransitionPanels;
@@ -70,15 +78,14 @@ public class LobbyUI : MonoBehaviour {
 	#endregion
 
 	#region Interaction functions
-	public UnityEditor.SceneAsset mainMenuScene;
 	public static event System.Action GoingToMainMenu;
-	public void GoToScene(UnityEditor.SceneAsset scene) {
-		if (scene == mainMenuScene) GoingToMainMenu?.Invoke();
+	public void GoToScene(string scene) {
+		if (scene == "MainMenu") GoingToMainMenu?.Invoke();
 		//have to stop NGO and lobby if main menu
-		SceneManager.LoadScene(scene.name);
+		SceneManager.LoadScene(scene);
 	}
 	public void RetryAuthentication() {
-		LobbyManager.Instance.Authentication();
+		LobbyManager.Instance.Authenticate();
 	}
 
 
@@ -96,41 +103,23 @@ public class LobbyUI : MonoBehaviour {
 		lobbyCreationPanel.SetActive(false);
 	}
 
+	List<string> gameModeOptions;
+	void SetGameModeDropdown() {
+		gameModeOptions = new List<string>(Enum.GetNames(typeof(GameMode)));
+		lobbyModeDropDown.SetOptions(gameModeOptions);
+	}
+
 	//imma disable changing lobby mode and name once started.
-	public string ConvertDropDownValueToGameMode(int index) {
-		switch (index) {
-			case 0:
-				return "Normal";
-			case 1:
-				return "Eraser";
-			case 2:
-				return "OwnEnemy";
-			case 3:
-				return "Pacifist";
-			default:
-				return "Normal";
-		}
+	public string ConvertDropDownValueToGameModeString(int index) {
+		return gameModeOptions[index];
 	}
-	public void ConvertGameModeToDropDownValue(string newMode) {
-		int index = 0;
-		switch (newMode) {
-			case "Normal":
-				index = 0;
-				break;
-			case "Eraser":
-				index = 1;
-				break;
-			case "OwnEnemy":
-				index = 2;
-				break;
-			case "Pacifist":
-				index = 3;
-				break;
-		}
-		lobbyModeDropDown.value = index;
+	public GameMode ConvertDropDownValueToGameMode(int index) {
+		Enum.TryParse(gameModeOptions[index], out GameMode mode);
+		return mode;
 	}
+
 	public void CreateLobby() {
-		LobbyManager.Instance.CreateLobby(lobbyName.text, ConvertDropDownValueToGameMode(lobbyModeDropDown.value), lobbyPlayerNumDropDown.value + 2);
+		LobbyManager.Instance.CreateLobby(lobbyName.text, ConvertDropDownValueToGameModeString(lobbyModeDropDown.value), lobbyPlayerNumDropDown.value + 2);
 	}
 	public void QuickJoin() {
 		LobbyManager.Instance.QuickJoinLobby();
@@ -170,6 +159,7 @@ public class LobbyUI : MonoBehaviour {
 		HidePanelsExceptChosen(null);
 	}
 	void HidePanelsExceptChosen(GameObject panelToOpen = null) {
+		if (LobbyManager.Instance == null) return;
 		//disable non basic items
 		LoadingPanel.SetActive(false);
 		ErrorPanel.SetActive(false);
@@ -203,6 +193,7 @@ public class LobbyUI : MonoBehaviour {
 		CloseTransitionPanels();
 	}
 	void ToggleLobby(bool interactable) {
+		if (lobbyPanel == null) return;
 		lobbyPanel.interactable = interactable;
 		lobbyPanel.blocksRaycasts = interactable;
 		lobbyPanel.alpha = interactable ? 1 : 0;
@@ -273,8 +264,27 @@ public class LobbyUI : MonoBehaviour {
 
 
 
-
+	#region sceneLoading
 	public Button leaveBtn, startGameBtn;
+	public GameObject stopGameLoadBtn, loadCountdown;
+
+	void LoadingSceneError() {
+		ChangeToLoadingSceneMode(false);
+	}
+	void LoadingCountdown(int old, int n) {
+		loadCountdown.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = n.ToString();
+	}
+	void LoadingSceneStateChange(bool old, bool loadingScene) {
+		ChangeToLoadingSceneMode(loadingScene);
+	}
+	void ChangeToLoadingSceneMode(bool loadingScene) {
+		if (NetworkManager.Singleton.IsServer) {
+			startGameBtn.interactable = !loadingScene;
+			stopGameLoadBtn.SetActive(loadingScene);
+		}
+		loadCountdown.SetActive(loadingScene);
+		leaveBtn.interactable = !loadingScene;
+	}
 	void LoadingNextScene() {
 		startGameBtn.interactable = false;
 	}
@@ -287,12 +297,13 @@ public class LobbyUI : MonoBehaviour {
 		leaveBtn.interactable = !lockOn;
 		startGameBtn.interactable = false;
 	}
-	void PlayersLeft(List<Player> currentPlayersInLobby) {
-		startGameBtn.interactable = false;
-	}
-	void LobbyFull() {
-		startGameBtn.interactable = true;
+	void LobbyFull(bool full) {
+		startGameBtn.interactable = full;
 	}
 
+
+
+
+	#endregion
 
 }

@@ -4,18 +4,19 @@ using UnityEngine;
 
 public class GameData : NetworkBehaviour {
 	public static bool InSinglePlayerMode = false;
-	public static GameMode gameMode;
+	public static NetworkVariable<GameMode> gameMode = new NetworkVariable<GameMode>();
 	public static List<Color> allColorOptions;
 	public static Dictionary<ulong, int> ClientID_KEY_ColorIndex_VAL = new Dictionary<ulong, int>();
-	public static Dictionary<string, ulong> LobbyID_KEY_ClientID_VAL = new Dictionary<string, ulong>();
-	public static HashSet<string> team1 = new HashSet<string>(), team2 = new HashSet<string>();
-	public static List<ulong> team1IDList = new List<ulong>(), team2IDList = new List<ulong>();
+	public static Dictionary<ulong, string> ClientID_KEY_LobbyID_VAL = new Dictionary<ulong, string>();
+	public static HashSet<ulong> team1 = new HashSet<ulong>(), team2 = new HashSet<ulong>();
+	// public static List<ulong> team1IDList = new List<ulong>(), team2IDList = new List<ulong>();
 
-	public static Team GetTeamNumber(ulong ID) {
-		if (team1IDList.Contains(ID)) return Team.t1;
+	public static Team GetTeamFromClientID(ulong ID) {
+		if (team1.Contains(ID)) return Team.t1;
 		return Team.t2;
 	}
 
 }
 public enum Team { t1, t2 };
+//normal is normal, eraser everything is erased when typing something wrong, own enemy - if you fire with mistake you take damage instead.
 public enum GameMode { Normal, Eraser, OwnEnemy }

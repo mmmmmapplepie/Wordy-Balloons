@@ -19,10 +19,10 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		}
 	}
 	void CheckAllPlayersPresent() {
-		Dictionary<string, ulong> LCID = GameData.LobbyID_KEY_ClientID_VAL;
+		Dictionary<ulong, string> LCID = GameData.ClientID_KEY_LobbyID_VAL;
 		for (int i = 0; i < LCID.Count;) {
-			KeyValuePair<string, ulong> pair = LCID.ElementAt(i);
-			if (NetworkManager.Singleton.ConnectedClientsIds.Contains(pair.Value)) { i++; continue; }
+			KeyValuePair<ulong, string> pair = LCID.ElementAt(i);
+			if (NetworkManager.Singleton.ConnectedClientsIds.Contains(pair.Key)) { i++; continue; }
 			GameData.team1.Remove(pair.Key);
 			GameData.team2.Remove(pair.Key);
 			LCID.Remove(pair.Key);
@@ -49,15 +49,9 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 			ConnectionStopped();
 		}
 		if (!NetworkManager.Singleton.IsServer) return;
-		foreach (KeyValuePair<string, ulong> pair in GameData.LobbyID_KEY_ClientID_VAL) {
-			if (pair.Value == clientID) {
-				GameData.team1.Remove(pair.Key);
-				GameData.team2.Remove(pair.Key);
-				GameData.LobbyID_KEY_ClientID_VAL.Remove(pair.Key);
-				break;
-			}
-		}
-		Debug.LogError(clientID);
+		GameData.team1.Remove(clientID);
+		GameData.team2.Remove(clientID);
+		GameData.ClientID_KEY_LobbyID_VAL.Remove(clientID);
 		CheckTeamEmpty();
 	}
 	void CheckTeamEmpty() {

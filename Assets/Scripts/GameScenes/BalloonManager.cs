@@ -10,11 +10,11 @@ public class BalloonManager : NetworkBehaviour {
 	}
 
 	public static Team team = Team.t1;
-	public static List<ulong> teamIDs = new List<ulong>();
+	public static HashSet<ulong> teamIDs = new HashSet<ulong>();
 	public override void OnNetworkSpawn() {
 		base.OnNetworkSpawn();
-		team = GameData.GetTeamNumber(NetworkManager.Singleton.LocalClientId);
-		List<ulong> associatedTeamID = team == Team.t1 ? GameData.team1IDList : GameData.team2IDList;
+		team = GameData.GetTeamFromClientID(NetworkManager.Singleton.LocalClientId);
+		HashSet<ulong> associatedTeamID = team == Team.t1 ? GameData.team1 : GameData.team2;
 		foreach (ulong id in associatedTeamID) {
 			teamIDs.Add(id);
 		}
@@ -46,7 +46,7 @@ public class BalloonManager : NetworkBehaviour {
 		Balloon script = newBalloon.GetComponent<Balloon>();
 		script.flyProgress.Value = 0f;
 		script.power.Value = count;
-		script.balloonTeam.Value = GameData.GetTeamNumber(teamID);
+		script.balloonTeam.Value = GameData.GetTeamFromClientID(teamID);
 		script.balloonColor.Value = colorList[GameData.ClientID_KEY_ColorIndex_VAL[teamID]];
 		newBalloon.GetComponent<NetworkObject>().Spawn();
 	}

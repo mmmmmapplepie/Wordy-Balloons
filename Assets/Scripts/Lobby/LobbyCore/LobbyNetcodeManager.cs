@@ -37,7 +37,7 @@ public class LobbyNetcodeManager : NetworkBehaviour {
 	public override void OnNetworkDespawn() {
 		if (NetworkManager.Singleton != null) {
 			NetworkManager.Singleton.OnClientConnectedCallback -= ClientConnectedToNGO;
-			NetworkManager.Singleton.OnServerStarted += ServerStarted;
+			NetworkManager.Singleton.OnServerStarted -= ServerStarted;
 			NetworkManager.Singleton.OnServerStopped -= ServerStopped;
 			NetworkManager.Singleton.OnClientDisconnectCallback -= ClientDisconnectedFromNGO;
 			NetworkManager.Singleton.OnClientStopped -= ClientStopped;

@@ -90,7 +90,7 @@ public class GameplayDataUI : NetworkBehaviour {
 	public TextMeshProUGUI currSpeedTxt, avgSpeedTxt, totalPointsTxt, pointContributionTxt;
 	void InputFired(string s, ulong localID) {
 		pointsContributedByMe += s.Length;
-		if (GameData.team1IDList.Contains(localID)) team1Points.Value += s.Length;
+		if (GameData.team1.Contains(localID)) team1Points.Value += s.Length;
 		else team2Points.Value += s.Length;
 
 		pointsForCurrSpeed.Add((Time.time, s.Length));
