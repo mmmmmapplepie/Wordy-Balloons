@@ -52,20 +52,18 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 			TeamEmptyClientRpc();
 		}
 	}
-	public static event Action<GameStateManager.GameResult> GameResultChange;
+	public static event Action<GameStateManager.GameResult> GameResultChangeByConnection;
 	void StopConnection() {
 		ShutDownNetwork();
-		print("ConnectionStopped");
-		GameResultChange?.Invoke(GameStateManager.GameResult.Draw);
+		GameResultChangeByConnection?.Invoke(GameStateManager.GameResult.Draw);
 	}
 	void ServerStopped(bool b) {
-		print("ServerStop");
-		GameResultChange?.Invoke(GameStateManager.GameResult.Draw);
+		print("ServerStopped");
+		GameResultChangeByConnection?.Invoke(GameStateManager.GameResult.Draw);
 	}
 
 	[ClientRpc]
 	void TeamEmptyClientRpc() {
-		print("TeamEmptyClientRPC");
 		StopConnection();
 	}
 

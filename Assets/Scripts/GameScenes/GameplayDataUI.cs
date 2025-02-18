@@ -18,18 +18,18 @@ public class GameplayDataUI : NetworkBehaviour {
 		InputManager.TypedTextChanged += UpdateAccuracy;
 		InputManager.CorrectInputProcess += InputFired;
 
-		IngameNetcodeAndSceneManager.GameResultChange += GameResultChange;
+		BaseManager.BaseTakenDamage += BaseTakesDamageClientRpc;
 
-		BaseManager.BaseTakenDamage += BaseTakesDamage;
+		GameStateManager.GameResultChangedEvent += GameResultChange;
 	}
 	public override void OnDestroy() {
 		InputManager.TypedTextChanged -= UpdateAccuracy;
 		InputManager.skipTickChanged -= SkipTickChanged;
 		InputManager.CorrectInputProcess -= InputFired;
 
-		IngameNetcodeAndSceneManager.GameResultChange -= GameResultChange;
+		BaseManager.BaseTakenDamage -= BaseTakesDamageClientRpc;
 
-		BaseManager.BaseTakenDamage += BaseTakesDamage;
+		GameStateManager.GameResultChangedEvent -= GameResultChange;
 
 		base.OnDestroy();
 	}
@@ -93,10 +93,13 @@ public class GameplayDataUI : NetworkBehaviour {
 	public TextMeshProUGUI currSpeedTxt, avgSpeedTxt, totalPointsTxt, pointContributionTxt;
 	void InputFired(string s, ulong localID) {
 		pointsContributedByMe += s.Length;
-		if (GameData.team1.Contains(localID)) team1Points.Value += s.Length;
-		else team2Points.Value += s.Length;
-
+		UpdateTeamPointsServerRpc(GameData.team1.Contains(localID) ? Team.t1 : Team.t2, s.Length);
 		pointsForCurrSpeed.Add((Time.time, s.Length));
+	}
+	[ServerRpc(RequireOwnership = false)]
+	void UpdateTeamPointsServerRpc(Team team, int addition) {
+		if (team == Team.t1) team1Points.Value += addition;
+		if (team == Team.t2) team2Points.Value += addition;
 	}
 
 	void UpdatePointAndPointContribution() {
@@ -158,7 +161,10 @@ public class GameplayDataUI : NetworkBehaviour {
 
 
 	#region  BaseDamage
-
+	[ClientRpc]
+	void BaseTakesDamageClientRpc(Team damageTeam, float ratio) {
+		BaseTakesDamage(damageTeam, ratio);
+	}
 
 	public Slider homeHPSlider, oppHPSlider;
 	void BaseTakesDamage(Team damagedTeam, float hpRatio) {
@@ -174,15 +180,15 @@ public class GameplayDataUI : NetworkBehaviour {
 
 
 
+
 	#endregion
 
 
 
 	#region gameEnd stats
 	void GameResultChange(GameStateManager.GameResult result) {
-		if (GameStateManager.CurrGameResult != GameStateManager.GameResult.Undecided) return;
 		if (result == GameStateManager.GameResult.Draw) return;
-
+		//show game stats
 	}
 
 

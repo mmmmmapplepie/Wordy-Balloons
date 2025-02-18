@@ -9,17 +9,21 @@ public class GameUI : MonoBehaviour {
 		GameStateManager.countDownChanged += ChangeCountDown;
 		GameStateManager.GameStartEvent += GameStart;
 
-		IngameNetcodeAndSceneManager.GameResultChange += GameResultChange;
-
 		InputManager.NewWordChosen += NewText;
+
+		GameStateManager.GameResultChangedEvent += GameResultChange;
+
 	}
 	void OnDisable() {
 		GameStateManager.countDownChanged -= ChangeCountDown;
 		GameStateManager.GameStartEvent -= GameStart;
 
-		IngameNetcodeAndSceneManager.GameResultChange -= GameResultChange;
-
 		InputManager.NewWordChosen -= NewText;
+
+		GameStateManager.GameResultChangedEvent -= GameResultChange;
+
+		Time.timeScale = 1;
+
 	}
 
 
@@ -80,10 +84,14 @@ public class GameUI : MonoBehaviour {
 	[Header("Game Finish")] public TextMeshProUGUI VictoryDefeatText;
 	public GameObject menuBtn, ConnectionLost;
 
+	void TeamLose(Team t) {
+		GameStateManager.GameResult r = GameStateManager.GameResult.Team1Win;
+		if (t == Team.t1) r = GameStateManager.GameResult.Team2Win;
+		GameResultChange(r);
+	}
 
 
 	void GameResultChange(GameStateManager.GameResult result) {
-		if (GameStateManager.CurrGameResult != GameStateManager.GameResult.Undecided) return;
 		if (result == GameStateManager.GameResult.Draw) {
 			ConnectionLost.SetActive(true);
 		} else {

@@ -13,13 +13,17 @@ public class GameStateManager : NetworkBehaviour {
 		NetworkManager.SceneManager.OnLoadEventCompleted += SceneLoadedForAll;
 		countDown_NV.OnValueChanged += CountDownChanged;
 
-		IngameNetcodeAndSceneManager.GameResultChange += GameResultChange;
+		BaseManager.TeamLose += TeamLoss;
+
+		IngameNetcodeAndSceneManager.GameResultChangeByConnection += ChangeGameResult;
 	}
 	public override void OnNetworkDespawn() {
 		if (NetworkManager.SceneManager != null) NetworkManager.SceneManager.OnLoadEventCompleted -= SceneLoadedForAll;
 		countDown_NV.OnValueChanged -= CountDownChanged;
 
-		IngameNetcodeAndSceneManager.GameResultChange += GameResultChange;
+		BaseManager.TeamLose -= TeamLoss;
+
+		IngameNetcodeAndSceneManager.GameResultChangeByConnection -= ChangeGameResult;
 	}
 
 	float countDownTime = 3;
@@ -41,6 +45,7 @@ public class GameStateManager : NetworkBehaviour {
 	}
 	public static event System.Action<int> countDownChanged;
 	public static event System.Action GameStartEvent, GameFinishEvent;
+	public static event System.Action<GameResult> GameResultChangedEvent;
 	public static bool GameRunning { get; private set; }
 	public static GameResult CurrGameResult;
 	void CountDownChanged(int prev, int newVal) {
@@ -55,10 +60,23 @@ public class GameStateManager : NetworkBehaviour {
 		}
 	}
 
+	void TeamLoss(Team t) {
+		GameResult r = GameResult.Team1Win;
+		if (t == Team.t1) r = GameResult.Team2Win;
+		GameResultChangeClientRpc(r);
+	}
 
-	void GameResultChange(GameResult result) {
+	[ClientRpc]
+	void GameResultChangeClientRpc(GameResult r) {
+		ChangeGameResult(r);
+	}
+	void ChangeGameResult(GameResult r) {
+		if (CurrGameResult != GameResult.Undecided) return;
+		CurrGameResult = r;
+		GameResultChangedEvent?.Invoke(r);
 		GameRunning = false;
 	}
+
 
 	public enum GameResult { Undecided, Team1Win, Team2Win, Draw }
 }

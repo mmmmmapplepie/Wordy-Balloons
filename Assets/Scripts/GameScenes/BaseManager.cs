@@ -14,6 +14,10 @@ public class BaseManager : NetworkBehaviour {
 	(DefaultMaxHP);
 
 	public static event Action BaseHPSet;
+	public override void OnNetworkSpawn() {
+		base.OnNetworkSpawn();
+		if (NetworkManager.Singleton.IsServer) SetBaseHP(DefaultMaxHP, DefaultMaxHP);
+	}
 	public static void SetBaseHP(int team1HP, int team2HP) {
 		team1BaseHP.Value = team1HP;
 		team2BaseHP.Value = team2HP;

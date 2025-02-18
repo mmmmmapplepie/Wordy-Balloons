@@ -15,6 +15,8 @@ public class MyLobby : NetworkBehaviour {
 	#endregion
 
 	void Awake() {
+		LoadingSceneBool.Value = false;
+		LoadingCountdown.Value = sceneLoadTimer;
 		Instance = this;
 		SetupColoredLists();
 	}
@@ -65,6 +67,7 @@ public class MyLobby : NetworkBehaviour {
 		LobbyPlayer.TeamChangeEvent -= ChangeTeam;
 		TeamBox.TeamChangeEvent -= ChangeTeam;
 		base.OnDestroy();
+
 	}
 
 
@@ -389,7 +392,6 @@ public class MyLobby : NetworkBehaviour {
 		}
 		LoadingCountdown.Value = countDown;
 
-		//have a check if all have laoded or soemthing idk.
 		SceneEventProgressStatus sceneStatus = NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
 		if (sceneStatus != SceneEventProgressStatus.Started) {
 			SceneLoadingError?.Invoke();
