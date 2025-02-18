@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
@@ -6,17 +7,30 @@ using UnityEngine.SceneManagement;
 
 public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	public override void OnNetworkSpawn() {
-		GameStateManager.GameRunning = false;
-
-		if (GameData.InSinglePlayerMode) {
-			GameStateManager.GameRunning = true;
-			return;
-		}
-
 		NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
+		NetworkManager.Singleton.OnServerStopped += ServerStopped;
 		if (NetworkManager.IsServer) {
 			CheckAllPlayersPresent();
 		}
+	}
+	public override void OnNetworkDespawn() {
+		if (NetworkManager.Singleton == null) return;
+		NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnectCallback;
+	}
+	public override void OnDestroy() {
+		OnNetworkDespawn();
+		base.OnDestroy();
+	}
+	void OnClientDisconnectCallback(ulong clientID) {
+		if (clientID == NetworkManager.ServerClientId) {
+			StopConnection();
+			return;
+		}
+		if (!NetworkManager.Singleton.IsServer) return;
+		GameData.team1.Remove(clientID);
+		GameData.team2.Remove(clientID);
+		GameData.ClientID_KEY_LobbyID_VAL.Remove(clientID);
+		CheckTeamEmpty();
 	}
 	void CheckAllPlayersPresent() {
 		Dictionary<ulong, string> LCID = GameData.ClientID_KEY_LobbyID_VAL;
@@ -29,31 +43,6 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		}
 		CheckTeamEmpty();
 	}
-	public override void OnNetworkDespawn() {
-
-		if (NetworkManager.Singleton == null) return;
-		NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnectCallback;
-	}
-	public override void OnDestroy() {
-		OnNetworkDespawn();
-		base.OnDestroy();
-	}
-	[SerializeField] GameObject connectionStopped, gameEnded;
-	void ConnectionStopped() {
-		ShutDownNetwork();
-		if (GameStateManager.GameRunning) return;
-		connectionStopped.SetActive(true);
-	}
-	void OnClientDisconnectCallback(ulong clientID) {
-		if (clientID == NetworkManager.ServerClientId) {
-			ConnectionStopped();
-		}
-		if (!NetworkManager.Singleton.IsServer) return;
-		GameData.team1.Remove(clientID);
-		GameData.team2.Remove(clientID);
-		GameData.ClientID_KEY_LobbyID_VAL.Remove(clientID);
-		CheckTeamEmpty();
-	}
 	void CheckTeamEmpty() {
 		if (NetworkManager.Singleton.IsServer) Debug.LogWarning(NetworkManager.Singleton.ConnectedClients.Count);
 		int teamRemaining = 0;
@@ -63,10 +52,21 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 			TeamEmptyClientRpc();
 		}
 	}
+	public static event Action<GameStateManager.GameResult> GameResultChange;
+	void StopConnection() {
+		ShutDownNetwork();
+		print("ConnectionStopped");
+		GameResultChange?.Invoke(GameStateManager.GameResult.Draw);
+	}
+	void ServerStopped(bool b) {
+		print("ServerStop");
+		GameResultChange?.Invoke(GameStateManager.GameResult.Draw);
+	}
 
 	[ClientRpc]
 	void TeamEmptyClientRpc() {
-		ConnectionStopped();
+		print("TeamEmptyClientRPC");
+		StopConnection();
 	}
 
 	void ShutDownNetwork() {
@@ -74,10 +74,9 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 			NetworkManager.Singleton.Shutdown();
 		}
 	}
-	[SerializeField] UnityEditor.SceneAsset mainMenuScene;
-	public void GoToScene(UnityEditor.SceneAsset scene) {
+	public void GoToScene(string scene) {
 		ShutDownNetwork();
-		SceneManager.LoadScene(scene.name);
+		SceneManager.LoadScene(scene);
 	}
 
 

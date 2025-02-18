@@ -138,7 +138,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &14246862
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1634,6 +1634,9 @@ MonoBehaviour:
   menusPanel: {fileID: 1600918678}
   guidePanel: {fileID: 1552293784}
   gameNotPausedTxt: {fileID: 534621251}
+  VictoryDefeatText: {fileID: 556680823}
+  menuBtn: {fileID: 1542971309}
+  ConnectionLost: {fileID: 118290890}
 --- !u!1 &501293503
 GameObject:
   m_ObjectHideFlags: 0
@@ -6870,9 +6873,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63857bc7180225449b5e1163699f69bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  connectionStopped: {fileID: 118290890}
-  gameEnded: {fileID: 262045052}
-  mainMenuScene: {fileID: 102900000, guid: a3f814c5899e9aa42a034d091be8ebea, type: 3}
 --- !u!114 &1618146580
 MonoBehaviour:
   m_ObjectHideFlags: 0

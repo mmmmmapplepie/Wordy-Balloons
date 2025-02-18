@@ -48,8 +48,6 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 	}
 
 	void ColorChanged(int old, int newC) {
-		print(old);
-		print(newC);
 		colorPicker.Set(newC);
 	}
 	void NameChanged(FixedString64Bytes old, FixedString64Bytes newC) {

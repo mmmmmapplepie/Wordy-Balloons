@@ -9,7 +9,6 @@ using UnityEngine.UI;
 public class GameplayDataUI : NetworkBehaviour {
 
 
-
 	void Start() {
 		startTime = Time.time;
 
@@ -19,12 +18,16 @@ public class GameplayDataUI : NetworkBehaviour {
 		InputManager.TypedTextChanged += UpdateAccuracy;
 		InputManager.CorrectInputProcess += InputFired;
 
+		IngameNetcodeAndSceneManager.GameResultChange += GameResultChange;
+
 		BaseManager.BaseTakenDamage += BaseTakesDamage;
 	}
 	public override void OnDestroy() {
 		InputManager.TypedTextChanged -= UpdateAccuracy;
 		InputManager.skipTickChanged -= SkipTickChanged;
 		InputManager.CorrectInputProcess -= InputFired;
+
+		IngameNetcodeAndSceneManager.GameResultChange -= GameResultChange;
 
 		BaseManager.BaseTakenDamage += BaseTakesDamage;
 
@@ -171,6 +174,16 @@ public class GameplayDataUI : NetworkBehaviour {
 
 
 
+	#endregion
+
+
+
+	#region gameEnd stats
+	void GameResultChange(GameStateManager.GameResult result) {
+		if (GameStateManager.CurrGameResult != GameStateManager.GameResult.Undecided) return;
+		if (result == GameStateManager.GameResult.Draw) return;
+
+	}
 
 
 

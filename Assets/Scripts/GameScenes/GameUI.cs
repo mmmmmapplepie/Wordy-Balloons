@@ -2,17 +2,22 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameUI : MonoBehaviour {
 	void OnEnable() {
 		GameStateManager.countDownChanged += ChangeCountDown;
 		GameStateManager.GameStartEvent += GameStart;
 
+		IngameNetcodeAndSceneManager.GameResultChange += GameResultChange;
+
 		InputManager.NewWordChosen += NewText;
 	}
 	void OnDisable() {
 		GameStateManager.countDownChanged -= ChangeCountDown;
 		GameStateManager.GameStartEvent -= GameStart;
+
+		IngameNetcodeAndSceneManager.GameResultChange -= GameResultChange;
 
 		InputManager.NewWordChosen -= NewText;
 	}
@@ -62,10 +67,40 @@ public class GameUI : MonoBehaviour {
 		guidePanel.SetActive(!guidePanel.activeInHierarchy);
 	}
 	public void GoToScene(string s) {
-		NetworkManager.Singleton.SceneManager.LoadScene(s, UnityEngine.SceneManagement.LoadSceneMode.Single);
+		NetworkManager.Singleton.Shutdown();
+		SceneManager.LoadScene(s);
 	}
 
 
 	#endregion
+
+
+
+	#region Game Finish
+	[Header("Game Finish")] public TextMeshProUGUI VictoryDefeatText;
+	public GameObject menuBtn, ConnectionLost;
+
+
+
+	void GameResultChange(GameStateManager.GameResult result) {
+		if (GameStateManager.CurrGameResult != GameStateManager.GameResult.Undecided) return;
+		if (result == GameStateManager.GameResult.Draw) {
+			ConnectionLost.SetActive(true);
+		} else {
+			VictoryDefeatText.text = result.ToString();
+			VictoryDefeatText.transform.parent.gameObject.SetActive(true);
+		}
+		menusPanel.SetActive(true);
+		menuBtn.SetActive(false);
+	}
+
+
+
+
+	#endregion
+
+
+
+
 
 }

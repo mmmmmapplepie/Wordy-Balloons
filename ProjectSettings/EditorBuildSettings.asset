@@ -17,4 +17,5 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MultiplayerGameScene.unity
     guid: 87ef0e67964c6774aa9c2527f13622cb
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.renderstreaming.settings: {fileID: 11400000, guid: eaaad242393318e4f85c45e69c8837f0, type: 2}
