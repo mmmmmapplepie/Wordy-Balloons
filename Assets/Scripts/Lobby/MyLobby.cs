@@ -180,6 +180,7 @@ public class MyLobby : NetworkBehaviour {
 	void LeaveLobby() {
 		if (LobbyNetcodeManager.Instance == null) return;
 		LobbyNetcodeManager.Instance.ShutDownNetwork();
+		if (LobbyManager.Instance == null) return;
 		if (LobbyManager.Instance.joinedLobby != null) LobbyManager.Instance.LeaveLobby();
 	}
 	void ServerStopped() {

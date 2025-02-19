@@ -92,6 +92,7 @@ public class LobbyManager : MonoBehaviour {
 	float heartBeatElapsed = 0, heartBeatPeriod = 15f;
 	void Update() {
 		LobbyHeartbeat();
+		// Debug.LogWarning("LobbyJoined:" + joinedLobby + "\n netconnection" + NetworkManager.Singleton.IsConnectedClient);
 		//you may need polling for edges cases where the events dont work for some reason.
 		// LobbyPoll();
 	}
