@@ -51,26 +51,6 @@ public class BasicTextAnimation : MonoBehaviour, ITextAnimator {
 		string target = input.targetString;
 		int targetTextLength = target.Length;
 
-		/*
-		// TMP_TextInfo txtInfo = text.textInfo;
-		// int charCount = txtInfo.characterCount;
-		// if (charCount == 0) return;
-		// int index = 0;
-		// for (int i = 0; i < charCount; i++) {
-		// 	TMP_CharacterInfo charInfo = txtInfo.characterInfo[i];
-		// 	if (!charInfo.isVisible || i >= animationProgressList.Count) continue;
-		// 	int charMatIndex = charInfo.materialReferenceIndex;
-		// 	int vertStartIndex = charInfo.vertexIndex;
-		// 	Color32[] vertCols = txtInfo.meshInfo[charMatIndex].colors32;
-		// 	Vector3[] verts = txtInfo.meshInfo[charMatIndex].vertices;
-
-		// 	FontAnimation<float> anim = animationProgressList[index];
-		// 	anim.animation(anim.progress, verts, vertCols, vertStartIndex);
-		// 	index++;
-		// 	anim.progress += Time.deltaTime;
-		// }
-		*/
-
 		for (int i = animatingText.Count; i < typed.Length; i++) {
 			FontAnimation<float> newAnim = new FontAnimation<float>();
 			newAnim.progress = 0;

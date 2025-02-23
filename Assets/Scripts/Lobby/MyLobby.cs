@@ -374,6 +374,7 @@ public class MyLobby : NetworkBehaviour {
 	IEnumerator LoadNextScene() {
 		LoadingSceneBool.Value = true;
 		SendTeamListsRPC();
+
 		float timeout = setTimeout;
 		while (dataRpcConfirmationReceived > 0 && timeout > 0) {
 			timeout -= Time.unscaledDeltaTime;
@@ -399,11 +400,8 @@ public class MyLobby : NetworkBehaviour {
 			StopSceneLoading();
 		} else {
 			//change data
-			if (Enum.TryParse(LobbyManager.Instance.hostLobby.Data[LobbyManager.GameMode].Value, out GameMode mode)) {
-				GameData.gameMode.Value = mode;
-			} else {
-				GameData.gameMode.Value = default;
-			}
+
+
 			GameData.InSinglePlayerMode = false;
 			GameData.allColorOptions = allColorOptions;
 			GameData.ClientID_KEY_ColorIndex_VAL = ClientID_KEY_ColorIndex_VAL;
@@ -440,6 +438,10 @@ public class MyLobby : NetworkBehaviour {
 		string[] team2List = teamLists[1].Split(splitter);
 		GameData.team1.Clear();
 		GameData.team2.Clear();
+
+		Enum.TryParse(LobbyManager.Instance.joinedLobby.Data[LobbyManager.GameMode].Value, out GameMode mode);
+		GameData.gameMode = mode;
+
 		foreach (string s in team1List) {
 			if (ulong.TryParse(s, out ulong clientID)) GameData.team1.Add(clientID);
 		}
@@ -453,6 +455,9 @@ public class MyLobby : NetworkBehaviour {
 		if (timeSent != timeTeamRPCSent) return;
 		dataRpcConfirmationReceived--;
 	}
+
+
+
 	#endregion
 
 	public void StopSceneLoading() {

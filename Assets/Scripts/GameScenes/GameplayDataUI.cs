@@ -20,7 +20,7 @@ public class GameplayDataUI : NetworkBehaviour {
 
 		BaseManager.BaseTakenDamage += BaseTakesDamageClientRpc;
 
-		GameStateManager.GameResultChangedEvent += GameResultChange;
+		GameStateManager.GameResultSetEvent += GameResultChange;
 	}
 	public override void OnDestroy() {
 		InputManager.TypedTextChanged -= UpdateAccuracy;
@@ -29,7 +29,7 @@ public class GameplayDataUI : NetworkBehaviour {
 
 		BaseManager.BaseTakenDamage -= BaseTakesDamageClientRpc;
 
-		GameStateManager.GameResultChangedEvent -= GameResultChange;
+		GameStateManager.GameResultSetEvent -= GameResultChange;
 
 		base.OnDestroy();
 	}
@@ -38,6 +38,7 @@ public class GameplayDataUI : NetworkBehaviour {
 		UpdatePlayerCount();
 		UpdatePointAndPointContribution();
 		UpdateSpeeds();
+		UpdateSkipCharges();
 	}
 
 
@@ -74,6 +75,10 @@ public class GameplayDataUI : NetworkBehaviour {
 
 
 	#region Skip
+	public TextMeshProUGUI skipCharges;
+	void UpdateSkipCharges() {
+		skipCharges.text = InputManager.skipCharges.ToString();
+	}
 	public GameObject tick1, tick2;
 	void SkipTickChanged(int ticks) {
 		tick1.SetActive(ticks > 0);

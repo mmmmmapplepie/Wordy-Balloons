@@ -4,12 +4,11 @@ using UnityEngine;
 
 public class GameData : NetworkBehaviour {
 	public static bool InSinglePlayerMode = false;
-	public static NetworkVariable<GameMode> gameMode = new NetworkVariable<GameMode>();
+	public static GameMode gameMode = default;
 	public static List<Color> allColorOptions;
 	public static Dictionary<ulong, int> ClientID_KEY_ColorIndex_VAL = new Dictionary<ulong, int>();
 	public static Dictionary<ulong, string> ClientID_KEY_LobbyID_VAL = new Dictionary<ulong, string>();
 	public static HashSet<ulong> team1 = new HashSet<ulong>(), team2 = new HashSet<ulong>();
-	// public static List<ulong> team1IDList = new List<ulong>(), team2IDList = new List<ulong>();
 
 	public static Team GetTeamFromClientID(ulong ID) {
 		if (team1.Contains(ID)) return Team.t1;

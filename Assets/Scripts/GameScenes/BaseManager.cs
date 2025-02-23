@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class BaseManager : NetworkBehaviour {
 
-	const int DefaultMaxHP = 50;
+	const int DefaultMaxHP = 5;
 	public static NetworkVariable<int> team1BaseHP = new NetworkVariable<int>(DefaultMaxHP);
 	public static NetworkVariable<int> team2BaseHP = new NetworkVariable<int>
 	(DefaultMaxHP);
@@ -27,6 +27,11 @@ public class BaseManager : NetworkBehaviour {
 	}
 	public static event Action<Team> TeamLose;
 	public static event Action<Team, float> BaseTakenDamage;
+
+	[ServerRpc(RequireOwnership = false)]
+	public void DamageBaseServerRpc(Team team, int dmg) {
+		DamageBase(team, dmg);
+	}
 	public static void DamageBase(Team teamBaseToDamage, int dmg) {
 		NetworkVariable<int> target;
 		NetworkVariable<int> max;

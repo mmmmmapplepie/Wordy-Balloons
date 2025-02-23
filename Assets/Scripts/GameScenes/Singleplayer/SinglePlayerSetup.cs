@@ -32,6 +32,7 @@ public class SinglePlayerSetup : NetworkBehaviour {
 		GameData.team2.Add(computerID);
 
 		GameData.InSinglePlayerMode = true;
+		GameData.gameMode = GameMode.OwnEnemy;
 
 		NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
 	}

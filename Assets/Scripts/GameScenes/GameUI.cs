@@ -11,7 +11,7 @@ public class GameUI : MonoBehaviour {
 
 		InputManager.NewWordChosen += NewText;
 
-		GameStateManager.GameResultChangedEvent += GameResultChange;
+		GameStateManager.GameResultSetEvent += GameResultSet;
 
 	}
 	void OnDisable() {
@@ -20,18 +20,11 @@ public class GameUI : MonoBehaviour {
 
 		InputManager.NewWordChosen -= NewText;
 
-		GameStateManager.GameResultChangedEvent -= GameResultChange;
+		GameStateManager.GameResultSetEvent -= GameResultSet;
 
 		Time.timeScale = 1;
 
 	}
-
-
-
-
-
-
-
 
 
 
@@ -84,25 +77,23 @@ public class GameUI : MonoBehaviour {
 	[Header("Game Finish")] public TextMeshProUGUI VictoryDefeatText;
 	public GameObject menuBtn, ConnectionLost;
 
-	void TeamLose(Team t) {
-		GameStateManager.GameResult r = GameStateManager.GameResult.Team1Win;
-		if (t == Team.t1) r = GameStateManager.GameResult.Team2Win;
-		GameResultChange(r);
-	}
 
 
-	void GameResultChange(GameStateManager.GameResult result) {
+	void GameResultSet(GameStateManager.GameResult result) {
 		if (result == GameStateManager.GameResult.Draw) {
 			ConnectionLost.SetActive(true);
 		} else {
-			VictoryDefeatText.text = result.ToString();
-			VictoryDefeatText.transform.parent.gameObject.SetActive(true);
+			DisplayTeamWinning(result == GameStateManager.GameResult.Team1Win ? Team.t1 : Team.t2);
 		}
 		menusPanel.SetActive(true);
 		menuBtn.SetActive(false);
 	}
 
 
+	void DisplayTeamWinning(Team t) {
+		VictoryDefeatText.text = t == BalloonManager.team ? "Victory" : "Defeat";
+		VictoryDefeatText.transform.parent.gameObject.SetActive(true);
+	}
 
 
 	#endregion

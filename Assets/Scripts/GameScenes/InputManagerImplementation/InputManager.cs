@@ -11,6 +11,7 @@ public class InputManager : MonoBehaviour {
 	}
 	void OnDestroy() {
 		Instance = null;
+		_skipCharges = 3;
 	}
 	void OnEnable() {
 		GameStateManager.countDownChanged += CheckGameStart;
@@ -65,7 +66,7 @@ public class InputManager : MonoBehaviour {
 		if (balloonCreator == null) { balloonCreator = NormalCreate; }
 		List<string> newBalloons = balloonCreator();
 		foreach (string balloonTxt in newBalloons) {
-			CorrectInputProcess.Invoke(balloonTxt, NetworkManager.Singleton.LocalClientId);
+			CorrectInputProcess?.Invoke(balloonTxt, NetworkManager.Singleton.LocalClientId);
 		}
 		CorrectInputFinished?.Invoke();
 		skipCharges++;
@@ -137,8 +138,8 @@ public class InputManager : MonoBehaviour {
 		}
 		return false;
 	}
-	int _skipCharges = 3;
-	public int skipCharges {
+	static int _skipCharges = 3;
+	public static int skipCharges {
 		get {
 			return _skipCharges;
 		}
