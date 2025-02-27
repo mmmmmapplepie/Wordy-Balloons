@@ -94,7 +94,7 @@ public class LobbyManager : MonoBehaviour {
 		LobbyHeartbeat();
 		// Debug.LogWarning("LobbyJoined:" + joinedLobby + "\n netconnection" + NetworkManager.Singleton.IsConnectedClient);
 		//you may need polling for edges cases where the events dont work for some reason.
-		// LobbyPoll();
+		LobbyPoll();
 	}
 	async void LobbyHeartbeat() {
 		if (hostLobby == null) { heartBeatElapsed = 0; return; }
@@ -109,6 +109,17 @@ public class LobbyManager : MonoBehaviour {
 			}
 		} else {
 			heartBeatElapsed += Time.deltaTime;
+		}
+	}
+
+	float lobbyPollElapsed = 0, lobbyPollPeriod = 15f;
+	void LobbyPoll() {
+		if (joinedLobby != null || hostLobby != null) { lobbyPollElapsed = lobbyPollPeriod - 1f; return; }
+		if (lobbyPollElapsed > lobbyPollPeriod) {
+			lobbyPollElapsed = 0f;
+			ListLobbies();
+		} else {
+			lobbyPollElapsed += Time.deltaTime;
 		}
 	}
 
@@ -398,6 +409,7 @@ public class LobbyManager : MonoBehaviour {
 			ListLobbySuccess?.Invoke(response.Results);
 		} catch (LobbyServiceException e) {
 			print(e.Reason);
+			if (e.ErrorCode == 16429) return;
 			ListLobbyFailure?.Invoke(null);
 		}
 	}

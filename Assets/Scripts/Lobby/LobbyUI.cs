@@ -27,6 +27,7 @@ public class LobbyUI : MonoBehaviour {
 
 		LobbyManager.AuthenticationBegin += OpenLoadingPanel;
 		LobbyManager.AuthenticationSuccess += CloseTransitionPanels;
+		LobbyManager.AuthenticationSuccess += ListLobbyRefresh;
 		LobbyManager.AuthenticationFailure += AuthenticationFail;
 
 		LobbyManager.LobbyCreationBegin += OpenLoadingPanel;
@@ -53,6 +54,7 @@ public class LobbyUI : MonoBehaviour {
 
 		LobbyManager.AuthenticationBegin -= OpenLoadingPanel;
 		LobbyManager.AuthenticationSuccess -= CloseTransitionPanels;
+		LobbyManager.AuthenticationSuccess -= ListLobbyRefresh;
 		LobbyManager.AuthenticationFailure -= AuthenticationFail;
 
 		LobbyManager.LobbyCreationBegin -= OpenLoadingPanel;
