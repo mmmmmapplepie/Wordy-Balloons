@@ -26,12 +26,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 304515552750334469}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 4207226813325019448}
+  m_Father: {fileID: 1902604898324159788}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &6567466339006300525
 SpriteRenderer:
@@ -224,7 +224,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 1
-  m_Children: []
+  m_Children:
+  - {fileID: 8683285225428298020}
   m_Father: {fileID: 4207226813325019448}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &8783492787122074195
@@ -398,6 +399,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4207226813325019448}
   - component: {fileID: 4933939617185954574}
+  - component: {fileID: 2850887641568975829}
   - component: {fileID: -1977413652812716518}
   - component: {fileID: 8072690949885170815}
   - component: {fileID: 6286592777695610531}
@@ -424,7 +426,6 @@ Transform:
   m_Children:
   - {fileID: 3555437613536495735}
   - {fileID: 5567688325363103960}
-  - {fileID: 8683285225428298020}
   - {fileID: 1902604898324159788}
   - {fileID: 5745156936281139001}
   m_Father: {fileID: 0}
@@ -449,6 +450,25 @@ MonoBehaviour:
     m_InternalValue: 0
   balloonColor:
     m_InternalValue: {r: 0, g: 0, b: 0, a: 0}
+  anim: {fileID: 2850887641568975829}
+--- !u!114 &2850887641568975829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2058238836198209358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 637f113617d252243ae89a6e63ff4992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wiggleMat: {fileID: 2100000, guid: a0b9dd300625c3743a11f1792f710507, type: 2}
+  bodyHolder: {fileID: 1902604898324159788}
+  highlight: {fileID: 5780861756760215632}
+  shadow: {fileID: 5526196940260616635}
+  body: {fileID: 8783492787122074195}
+  outline: {fileID: 6567466339006300525}
 --- !u!114 &-1977413652812716518
 MonoBehaviour:
   m_ObjectHideFlags: 0
