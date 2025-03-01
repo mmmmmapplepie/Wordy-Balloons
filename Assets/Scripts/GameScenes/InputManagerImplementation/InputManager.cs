@@ -99,6 +99,7 @@ public class InputManager : MonoBehaviour {
 		if (typedString.Length <= 0) return;
 		typedString = typedString.Substring(0, typedString.Length - 1);
 		ProcessDisplayString();
+		DecrementSkip();
 	}
 
 
@@ -137,6 +138,11 @@ public class InputManager : MonoBehaviour {
 			return TrySkip();
 		}
 		return false;
+	}
+	void DecrementSkip() {
+		if (skipTick > 0) {
+			skipTick--;
+		}
 	}
 	static int _skipCharges = 3;
 	public static int skipCharges {

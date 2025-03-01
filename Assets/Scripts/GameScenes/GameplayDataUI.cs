@@ -58,7 +58,6 @@ public class GameplayDataUI : NetworkBehaviour {
 			if (NetworkManager.Singleton.IsClient) {
 				playerCountTxt.text = "Players: " + playerCount.ToString();
 			}
-
 		}
 	}
 	#endregion

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MatchCamToScreenSize : MonoBehaviour {
-	void Start() {
+	void Awake() {
 		float w = Screen.width;
 		float h = Screen.height;
 		float aspect = w / h;

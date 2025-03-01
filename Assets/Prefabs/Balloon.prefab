@@ -421,7 +421,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 3555437613536495735}
@@ -469,6 +469,8 @@ MonoBehaviour:
   shadow: {fileID: 5526196940260616635}
   body: {fileID: 8783492787122074195}
   outline: {fileID: 6567466339006300525}
+  collisionEffect: {fileID: 2265361527779004259, guid: 2623ff6ee49189e43a5ddccf0bf1bd8f, type: 3}
+  baseCollisionEffect: {fileID: 5333196219213776793, guid: 5129d6f2a555d1a4f8761d2530f976d8, type: 3}
 --- !u!114 &-1977413652812716518
 MonoBehaviour:
   m_ObjectHideFlags: 0

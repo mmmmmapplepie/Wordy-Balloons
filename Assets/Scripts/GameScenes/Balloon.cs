@@ -92,7 +92,6 @@ public class Balloon : NetworkBehaviour {
 
 
 	void OnTriggerEnter2D(Collider2D other) {
-		// if (!NetworkManager.Singleton.IsServer) return;
 		if (power.Value <= 0) return;
 		if (other.gameObject.TryGetComponent<Balloon>(out Balloon s)) {
 			if (s.power.Value <= 0 || balloonTeam.Value == s.balloonTeam.Value) return;
@@ -111,15 +110,14 @@ public class Balloon : NetworkBehaviour {
 			power.Value = power.Value - dmg <= 0 ? 0 : power.Value - dmg;
 			powerTxt.text = power.Value.ToString();
 		}
-		//take dmaage splash
 		if (power.Value <= 0) DestroyBalloon();
 	}
 	void DestroyBalloon(bool onBase = false) {
 		if (onBase) {
-			//make effects
+			anim.BaseCollisionEffect();
 			if (NetworkManager.Singleton.IsServer) Destroy(gameObject);
 		} else {
-			//some other effects
+			anim.CollisionEffect();
 			if (NetworkManager.Singleton.IsServer) Destroy(gameObject);
 		}
 	}

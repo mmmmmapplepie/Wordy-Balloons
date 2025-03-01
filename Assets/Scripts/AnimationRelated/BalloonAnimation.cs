@@ -49,4 +49,24 @@ public class BalloonAnimation : MonoBehaviour {
 		bodyMat.SetFloat("_MaxDistortion", inputVal);
 	}
 
+
+	public GameObject collisionEffect, baseCollisionEffect;
+
+	public void CollisionEffect() {
+		int ops = collisionEffect.transform.childCount;
+		GameObject newObj = Instantiate(collisionEffect, transform.position, Quaternion.identity);
+		newObj.transform.localScale = transform.localScale;
+		for (int i = 0; i < 5; i++) {
+			int target = Random.Range(0, ops);
+			newObj.transform.GetChild(target).gameObject.SetActive(true);
+		}
+	}
+	public void BaseCollisionEffect() {
+		CollisionEffect();
+		GameObject newObj = Instantiate(baseCollisionEffect, transform.position, Quaternion.identity);
+		newObj.transform.localScale = transform.localScale;
+	}
+
+
+
 }
