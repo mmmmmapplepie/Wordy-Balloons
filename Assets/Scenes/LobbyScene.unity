@@ -717,6 +717,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 765375948}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &180804458
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -932,6 +944,7 @@ GameObject:
   - component: {fileID: 216862976}
   - component: {fileID: 216862975}
   - component: {fileID: 216862974}
+  - component: {fileID: 216862977}
   m_Layer: 5
   m_Name: PlayerCountDropdown
   m_TagString: Untagged
@@ -1024,10 +1037,10 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: MyLobby, Assembly-CSharp
-        m_MethodName: ChangePlayerNumber
-        m_Mode: 0
+      - m_Target: {fileID: 765375948}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -1075,6 +1088,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 216862972}
   m_CullTransparentMesh: 1
+--- !u!114 &216862977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 216862972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 476501c0516611c4a867d45c2fa6bffd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clip: {fileID: 8300000, guid: d880a90fdbc4d624ebaa663265f59fe5, type: 3}
+  volume: 1
 --- !u!1 &268759335
 GameObject:
   m_ObjectHideFlags: 0
@@ -1525,6 +1552,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 765375948}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &280104014
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1886,6 +1925,18 @@ MonoBehaviour:
       - m_Target: {fileID: 431179776}
         m_TargetAssemblyTypeName: LobbyUI, Assembly-CSharp
         m_MethodName: CreateLobby
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 765375948}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2918,6 +2969,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 765375948}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &539580796
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3503,6 +3566,63 @@ MonoBehaviour:
     mipBias: 0
     varianceClampScale: 0.9
     contrastAdaptiveSharpening: 0
+--- !u!1001 &655450111
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6473249056332820758, guid: f2ea1cba2d674f64a8a233edfdaec2fb, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6473249056332820758, guid: f2ea1cba2d674f64a8a233edfdaec2fb, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6473249056332820758, guid: f2ea1cba2d674f64a8a233edfdaec2fb, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6473249056332820758, guid: f2ea1cba2d674f64a8a233edfdaec2fb, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6473249056332820758, guid: f2ea1cba2d674f64a8a233edfdaec2fb, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6473249056332820758, guid: f2ea1cba2d674f64a8a233edfdaec2fb, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6473249056332820758, guid: f2ea1cba2d674f64a8a233edfdaec2fb, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6473249056332820758, guid: f2ea1cba2d674f64a8a233edfdaec2fb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6473249056332820758, guid: f2ea1cba2d674f64a8a233edfdaec2fb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6473249056332820758, guid: f2ea1cba2d674f64a8a233edfdaec2fb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8138496233983192718, guid: f2ea1cba2d674f64a8a233edfdaec2fb, type: 3}
+      propertyPath: m_Name
+      value: AudioManager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f2ea1cba2d674f64a8a233edfdaec2fb, type: 3}
 --- !u!1 &680737259
 GameObject:
   m_ObjectHideFlags: 0
@@ -3942,6 +4062,8 @@ GameObject:
   - component: {fileID: 765375946}
   - component: {fileID: 765375945}
   - component: {fileID: 765375944}
+  - component: {fileID: 765375948}
+  - component: {fileID: 765375949}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -4036,6 +4158,34 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &765375948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 765375943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d4d3f7bf17a2c044a7712dff5cde611, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clip: {fileID: 8300000, guid: d880a90fdbc4d624ebaa663265f59fe5, type: 3}
+  volume: 1
+--- !u!114 &765375949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 765375943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d4d3f7bf17a2c044a7712dff5cde611, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clip: {fileID: 8300000, guid: 77c614b2333530346958a36b4edba9b5, type: 3}
+  volume: 1
 --- !u!1 &770090284
 GameObject:
   m_ObjectHideFlags: 0
@@ -4122,6 +4272,18 @@ MonoBehaviour:
       - m_Target: {fileID: 913481577}
         m_TargetAssemblyTypeName: MyLobby, Assembly-CSharp
         m_MethodName: EnterGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 765375948}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4837,6 +4999,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: MainMenu
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 765375948}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &896368477
@@ -5589,6 +5763,18 @@ MonoBehaviour:
       - m_Target: {fileID: 431179776}
         m_TargetAssemblyTypeName: LobbyUI, Assembly-CSharp
         m_MethodName: ListLobbyRefresh
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 765375948}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7259,6 +7445,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 765375948}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1302952927
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8636,6 +8834,18 @@ MonoBehaviour:
       - m_Target: {fileID: 431179776}
         m_TargetAssemblyTypeName: LobbyUI, Assembly-CSharp
         m_MethodName: GoToCreateLobby
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 765375949}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10112,6 +10322,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 765375948}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1982488710
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10374,6 +10596,7 @@ GameObject:
   - component: {fileID: 2006303937}
   - component: {fileID: 2006303936}
   - component: {fileID: 2006303935}
+  - component: {fileID: 2006303938}
   m_Layer: 5
   m_Name: GameModeDropdown
   m_TagString: Untagged
@@ -10464,10 +10687,10 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: MyLobby, Assembly-CSharp
-        m_MethodName: ChangeGameMode
-        m_Mode: 0
+      - m_Target: {fileID: 765375948}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -10515,6 +10738,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2006303933}
   m_CullTransparentMesh: 1
+--- !u!114 &2006303938
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2006303933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 476501c0516611c4a867d45c2fa6bffd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clip: {fileID: 8300000, guid: d880a90fdbc4d624ebaa663265f59fe5, type: 3}
+  volume: 1
 --- !u!1 &2024221828
 GameObject:
   m_ObjectHideFlags: 0
@@ -11721,3 +11958,4 @@ SceneRoots:
   - {fileID: 431179777}
   - {fileID: 1525206218}
   - {fileID: 1922078638}
+  - {fileID: 655450111}

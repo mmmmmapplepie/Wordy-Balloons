@@ -6,7 +6,7 @@ public class BalloonManager : NetworkBehaviour {
 
 
 	void Start() {
-		InputManager.CorrectInputProcess += SpawnBalloon;
+		InputManager.CorrectEntryProcess += SpawnBalloon;
 	}
 
 	public static Team team = Team.t1;
@@ -23,7 +23,7 @@ public class BalloonManager : NetworkBehaviour {
 
 	public override void OnDestroy() {
 		base.OnDestroy();
-		InputManager.CorrectInputProcess -= SpawnBalloon;
+		InputManager.CorrectEntryProcess -= SpawnBalloon;
 	}
 
 	public void BallonSpawnBtn(int id) {

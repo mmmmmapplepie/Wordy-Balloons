@@ -51,8 +51,9 @@ public class BalloonAnimation : MonoBehaviour {
 
 
 	public GameObject collisionEffect, baseCollisionEffect;
-
+	public AudioClip collisionSound;
 	public void CollisionEffect() {
+		AudioPlayer.PlayOneShot_Static(collisionSound, 1f);
 		int ops = collisionEffect.transform.childCount;
 		GameObject newObj = Instantiate(collisionEffect, transform.position, Quaternion.identity);
 		newObj.transform.localScale = transform.localScale;

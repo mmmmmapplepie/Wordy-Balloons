@@ -5,6 +5,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameUI : MonoBehaviour {
+	void Start() {
+		AudioPlayer.Instance.AddNewSound(victorySound);
+		AudioPlayer.Instance.AddNewSound(defeatSound);
+	}
+
+
 	void OnEnable() {
 		GameStateManager.countDownChanged += ChangeCountDown;
 		GameStateManager.GameStartEvent += GameStart;
@@ -74,25 +80,33 @@ public class GameUI : MonoBehaviour {
 
 
 	#region Game Finish
-	[Header("Game Finish")] public TextMeshProUGUI VictoryDefeatText;
-	public GameObject menuBtn, ConnectionLost;
-
-
-
+	[Header("Game Finish")] public GameObject menuBtn;
+	public GameObject connectionLost, victoryPanel, defeatPanel, endingPanel;
+	public Sound victorySound, defeatSound;
 	void GameResultSet(GameStateManager.GameResult result) {
 		if (result == GameStateManager.GameResult.Draw) {
-			ConnectionLost.SetActive(true);
+			connectionLost.SetActive(true);
 		} else {
 			DisplayTeamWinning(result == GameStateManager.GameResult.Team1Win ? Team.t1 : Team.t2);
 		}
+		//setup the stats
+		//show animation
+
+		endingPanel.SetActive(true);
 		menusPanel.SetActive(true);
 		menuBtn.SetActive(false);
 	}
 
 
 	void DisplayTeamWinning(Team t) {
-		VictoryDefeatText.text = t == BalloonManager.team ? "Victory" : "Defeat";
-		VictoryDefeatText.transform.parent.gameObject.SetActive(true);
+		bool victory = t == BalloonManager.team;
+		if (victory) {
+			victoryPanel.SetActive(true);
+			AudioPlayer.Instance.PlaySound(victorySound.Name);
+		} else {
+			defeatPanel.SetActive(true);
+			AudioPlayer.Instance.PlaySound(defeatSound.Name);
+		}
 	}
 
 

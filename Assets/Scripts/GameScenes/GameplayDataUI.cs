@@ -14,9 +14,9 @@ public class GameplayDataUI : NetworkBehaviour {
 
 		UpdateGameMode();
 
-		InputManager.skipTickChanged += SkipTickChanged;
+		InputManager.SkipTickChanged += SkipTickChanged;
 		InputManager.TypedTextChanged += UpdateAccuracy;
-		InputManager.CorrectInputProcess += InputFired;
+		InputManager.CorrectEntryProcess += InputFired;
 
 		BaseManager.BaseTakenDamage += BaseTakesDamageClientRpc;
 
@@ -24,8 +24,8 @@ public class GameplayDataUI : NetworkBehaviour {
 	}
 	public override void OnDestroy() {
 		InputManager.TypedTextChanged -= UpdateAccuracy;
-		InputManager.skipTickChanged -= SkipTickChanged;
-		InputManager.CorrectInputProcess -= InputFired;
+		InputManager.SkipTickChanged -= SkipTickChanged;
+		InputManager.CorrectEntryProcess -= InputFired;
 
 		BaseManager.BaseTakenDamage -= BaseTakesDamageClientRpc;
 

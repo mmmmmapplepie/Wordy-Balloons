@@ -6,10 +6,10 @@ public class GameModeInputManager : MonoBehaviour {
 
 	void Start() {
 		SetupInputFunctionWRTGameMode();
-		InputManager.WrongInputFinished += WrongInput;
+		InputManager.WrongEntryFinished += WrongInput;
 	}
 	void OnDestroy() {
-		InputManager.WrongInputFinished -= WrongInput;
+		InputManager.WrongEntryFinished -= WrongInput;
 	}
 
 	Action wrongInputAction;

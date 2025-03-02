@@ -40,7 +40,7 @@ public class InputManager : MonoBehaviour {
 		string input = Input.inputString;
 		if (input == null || input.Length == 0) return;
 		if (input.Contains("\r")) {
-			InputSubmitted();
+			EntrySubmitted();
 		} else if (input.Contains("\b")) {
 			Backspace();
 		} else {
@@ -50,25 +50,25 @@ public class InputManager : MonoBehaviour {
 	}
 
 	#region InputSubmit
-	public void InputSubmitted() {
+	public void EntrySubmitted() {
 		if (typedString == targetString) {
-			ProcessCorrectInput();
+			ProcessCorrectEntry();
 		} else {
-			ProcessWrongInput();
+			ProcessWrongEntry();
 		}
 	}
 
 	public static event Func<Func<List<string>>> FindBalloonCreator;
-	public static event Action<string, ulong> CorrectInputProcess;
-	public static event Action CorrectInputFinished;
-	void ProcessCorrectInput() {
+	public static event Action<string, ulong> CorrectEntryProcess;
+	public static event Action CorrectEntryFinished;
+	void ProcessCorrectEntry() {
 		Func<List<string>> balloonCreator = FindBalloonCreator?.Invoke();
 		if (balloonCreator == null) { balloonCreator = NormalCreate; }
 		List<string> newBalloons = balloonCreator();
 		foreach (string balloonTxt in newBalloons) {
-			CorrectInputProcess?.Invoke(balloonTxt, NetworkManager.Singleton.LocalClientId);
+			CorrectEntryProcess?.Invoke(balloonTxt, NetworkManager.Singleton.LocalClientId);
 		}
-		CorrectInputFinished?.Invoke();
+		CorrectEntryFinished?.Invoke();
 		skipCharges++;
 		SetNewTargetText();
 	}
@@ -79,10 +79,10 @@ public class InputManager : MonoBehaviour {
 
 
 
-	public static event Action WrongInputProcess, WrongInputFinished;
-	void ProcessWrongInput() {
-		WrongInputProcess?.Invoke();
-		WrongInputFinished?.Invoke();
+	public static event Action WrongEntryProcess, WrongEntryFinished;
+	void ProcessWrongEntry() {
+		WrongEntryProcess?.Invoke();
+		WrongEntryFinished?.Invoke();
 	}
 	#endregion
 
@@ -104,7 +104,7 @@ public class InputManager : MonoBehaviour {
 
 
 	public static event Func<Action<string>> FindIncrementInputProcess;
-	public static event Action IncrementInputFinished;
+	public static event Action<string> IncrementInputFinished;
 	void IncrementInput(string input) {
 		bool skip = IncrementSkip(input);
 		if (skip) return;
@@ -112,7 +112,7 @@ public class InputManager : MonoBehaviour {
 		Action<string> incrementAction = FindIncrementInputProcess?.Invoke();
 		if (incrementAction == null) incrementAction = BaseIncrement;
 		incrementAction(input);
-		IncrementInputFinished?.Invoke();
+		IncrementInputFinished?.Invoke(input);
 	}
 	int _skipTick = 0;
 	int skipTick {
@@ -121,14 +121,15 @@ public class InputManager : MonoBehaviour {
 		}
 		set {
 			_skipTick = value < 0 ? 0 : value;
-			skipTickChanged?.Invoke(_skipTick);
+			SkipTickChanged?.Invoke(_skipTick);
 		}
 	}
 	int skipRequirement = 3;
-	public static event Action<int> skipTickChanged;
+	public static event Action<int> SkipTickChanged;
+	public const string SkipString = "/";
 	// essentially typing "///" will try to skip - typing "/" four times in a row
 	bool IncrementSkip(string input) {
-		if (input != "/" || skipCharges == 0) {
+		if (input != SkipString || skipCharges == 0) {
 			skipTick = 0;
 			return false;
 		}
