@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Services.Authentication;
-using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
 public class MyLobby : NetworkBehaviour {
@@ -15,10 +14,12 @@ public class MyLobby : NetworkBehaviour {
 	#endregion
 
 	void Awake() {
-		LoadingSceneBool.Value = false;
-		LoadingCountdown.Value = sceneLoadTimer;
 		Instance = this;
 		SetupColoredLists();
+	}
+	public override void OnNetworkSpawn() {
+		LoadingSceneBool.Value = false;
+		LoadingCountdown.Value = sceneLoadTimer;
 	}
 
 	void Start() {

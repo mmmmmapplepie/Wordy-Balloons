@@ -2321,9 +2321,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 187.5}
+  m_AnchoredPosition: {x: 0, y: 337.49997}
   m_SizeDelta: {x: -40, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0.5, y: 0.9}
 --- !u!114 &447249986
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6554,9 +6554,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -187.49992}
+  m_AnchoredPosition: {x: 0, y: -37.5}
   m_SizeDelta: {x: -40, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0.5, y: 0.9}
 --- !u!114 &1120342040
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10218,6 +10218,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2353348033134298427, guid: a7095d1a73473674783ac1baa3bc8d0d, type: 3}
+      propertyPath: backgroundSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 23c451c762a6b2e498ea2c09a361c91e, type: 3}
     - target: {fileID: 3708850309431634557, guid: a7095d1a73473674783ac1baa3bc8d0d, type: 3}
       propertyPath: m_Name
       value: Backgrounds

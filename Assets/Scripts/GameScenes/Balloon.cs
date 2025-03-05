@@ -15,7 +15,6 @@ public class Balloon : NetworkBehaviour {
 	void Awake() {
 		startPos = Vector3.right * -flightWidth / 2f;
 		endPos = -startPos;
-		if (NetworkManager.Singleton.IsServer) realFlightHeight.Value = Random.Range(0.7f, 1.2f) * flightHeight;
 	}
 
 	TextMeshPro powerTxt;
@@ -24,6 +23,8 @@ public class Balloon : NetworkBehaviour {
 	public override void OnNetworkSpawn() {
 		base.OnNetworkSpawn();
 		transform.GetComponentInChildren<SpriteRenderer>().color = balloonColor.Value;
+
+		if (NetworkManager.Singleton.IsServer) realFlightHeight.Value = Random.Range(0.7f, 1.2f) * flightHeight;
 
 		powerTxt = transform.GetComponentInChildren<TextMeshPro>();
 

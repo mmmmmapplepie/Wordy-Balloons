@@ -4,15 +4,19 @@ using UnityEngine;
 public class BackgroundAnimation : MonoBehaviour {
 	public List<Animator> animators = new List<Animator>();
 	public Sprite backgroundSprite;
-	float width = 0;
-	float factor = 3f;
 	public float scrollSpeed = 1f;
 	const string slide = "backgroundSlide";
 	void Start() {
 		float height = Camera.main.orthographicSize * 2f;
 		float screenAspect = (float)Screen.width / Screen.height;
 		float spriteAspect = backgroundSprite.textureRect.width / backgroundSprite.textureRect.height;
-		width = screenAspect * factor * height / spriteAspect;
+		float width = screenAspect * height;
+
+		if (screenAspect > spriteAspect) {
+			height = width / spriteAspect;
+		} else {
+			width = height * spriteAspect;
+		}
 		transform.localScale = new Vector3(width, height, 1);
 
 		if (animators.Count == 0) return;

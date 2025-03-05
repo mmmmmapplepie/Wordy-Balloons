@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -6,8 +7,9 @@ using Unity.Netcode;
 using Unity.Services.Authentication;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
 
-public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler, IDropHandler, IPointerEnterHandler, IPointerExitHandler, IPointerUpHandler {
+public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler, IDropHandler, IPointerEnterHandler, IPointerExitHandler {
 	[SerializeField] TextMeshProUGUI playerNameTxt;
 	[SerializeField] GameObject kickBtn, loadingCover, activePlayerCover;
 	[SerializeField] TMP_Dropdown colorPicker;
@@ -17,6 +19,7 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 	public NetworkVariable<int> currColorIndex = new NetworkVariable<int>(0);
 	public NetworkVariable<int> siblingNum = new NetworkVariable<int>();
 	NetworkVariable<bool> joinConfirmed = new NetworkVariable<bool>(false);
+
 
 	public override void OnNetworkSpawn() {
 		SetDropDown();
@@ -127,23 +130,43 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 	public GameObject swapIndicator;
 	GameObject tempObj;
 	public static event System.Action<Transform, LobbyPlayer, LobbyPlayer> TeamChangeEvent;
+	RectTransform tempHolder;
+	Vector2 minMaxY;
+	void SetupTempHolder() {
+		tempHolder = transform.parent.parent.parent.GetComponent<RectTransform>();
+		Vector3[] corners = new Vector3[4];
+		tempHolder.GetLocalCorners(corners);
+		minMaxY.x = corners[0].y + GetComponent<RectTransform>().rect.height * 0.5f;
+		minMaxY.y = corners[1].y - GetComponent<RectTransform>().rect.height * 0.5f;
+	}
+	public static event Action DragBegin;
 	public void OnBeginDrag(PointerEventData eventData) {
 		if (!NetworkManager.Singleton.IsServer) return;
-		tempObj = Instantiate(gameObject, transform.parent.parent.parent);
+		if (tempHolder == null) SetupTempHolder();
+		RectTransform rt = GetComponent<RectTransform>();
+		DragBegin?.Invoke();
+		tempObj = Instantiate(gameObject, tempHolder);
+		tempObj.GetComponent<RectTransform>().anchorMin = Vector2.one * 0.5f;
+		tempObj.GetComponent<RectTransform>().anchorMax = Vector2.one * 0.5f;
 		tempObj.transform.SetAsLastSibling();
-		tempObj.GetComponent<RectTransform>().sizeDelta = new Vector2(GetComponent<RectTransform>().rect.size.x, GetComponent<RectTransform>().rect.size.y);
+		tempObj.GetComponent<RectTransform>().sizeDelta = new Vector2(rt.rect.size.x, rt.rect.size.y);
+		OnDrag(eventData);
 		CanvasGroup group = tempObj.AddComponent<CanvasGroup>();
 		group.blocksRaycasts = false;
+		swapIndicator.SetActive(true);
 	}
 
 	public void OnDrag(PointerEventData eventData) {
+		if (!NetworkManager.Singleton.IsServer) return;
 		if (tempObj != null) {
-			Vector2 mousePos = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(tempHolder, Input.mousePosition, Camera.main, out Vector2 mousePos);
 			mousePos.x = GetComponent<RectTransform>().position.x;
-			tempObj.GetComponent<RectTransform>().position = mousePos;
+			mousePos.y = Mathf.Clamp(mousePos.y, minMaxY.x, minMaxY.y);
+			tempObj.GetComponent<RectTransform>().localPosition = mousePos;
 		}
 	}
 	public void OnEndDrag(PointerEventData eventData) {
+		swapIndicator.SetActive(false);
 		Destroy(tempObj);
 	}
 
@@ -169,12 +192,18 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 
 	public void OnPointerExit(PointerEventData eventData) {
 		if (!NetworkManager.Singleton.IsServer) return;
+		GameObject dragObject = eventData.pointerDrag;
+		if (dragObject == null || dragObject.GetComponent<LobbyPlayer>() == null) return;
+		if (dragObject == gameObject) return;
 		swapIndicator.SetActive(false);
 	}
 
-	public void OnPointerUp(PointerEventData eventData) {
+
+	void Update() {
 		if (!NetworkManager.Singleton.IsServer) return;
-		swapIndicator.SetActive(false);
+		if (Input.GetMouseButtonUp(0)) {
+			swapIndicator.SetActive(false);
+		}
 	}
 }
 

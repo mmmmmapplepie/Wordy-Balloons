@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class BaseManager : NetworkBehaviour {
 
-	const int DefaultMaxHP = 2;
+	const int DefaultMaxHP = 50;
 	public static NetworkVariable<int> team1BaseHP = new NetworkVariable<int>(DefaultMaxHP);
 	public static NetworkVariable<int> team2BaseHP = new NetworkVariable<int>
 	(DefaultMaxHP);

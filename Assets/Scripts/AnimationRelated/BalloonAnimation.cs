@@ -13,6 +13,8 @@ public class BalloonAnimation : MonoBehaviour {
 	Material hsMat; // highlight and shadow mat.
 	Material bodyMat;
 	public void InitilizeAnimations(Color c) {
+		//maybe create smoke bomb particle effect.
+
 		Material wiggleMatCopy = new Material(wiggleMat);
 
 		int bumpsCount = Random.Range(2, 10);

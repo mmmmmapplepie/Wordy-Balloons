@@ -11,6 +11,7 @@ using System;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
+using System.Collections;
 
 public class LobbyManager : MonoBehaviour {
 	public const string RelayCode = "RelayCode";
@@ -32,12 +33,11 @@ public class LobbyManager : MonoBehaviour {
 	public async void Authenticate(string name = null) {
 		AuthenticationBegin?.Invoke();
 		try {
-			if (UnityServices.State == ServicesInitializationState.Uninitialized) {
-				InitializationOptions options = new InitializationOptions();
-				playerName = (name == null) ? "Player" + UnityEngine.Random.Range(0, 10000) : name;
-				options.SetProfile(playerName);
-				await UnityServices.InitializeAsync(options);
-			}
+			InitializationOptions options = new InitializationOptions();
+			playerName = (name == null) ? "Player" + UnityEngine.Random.Range(0, 10000) : name;
+			options.SetProfile(playerName);
+			await UnityServices.InitializeAsync(options);
+			if (AuthenticationService.Instance.IsSignedIn) AuthenticationService.Instance.SignOut();
 			if (!AuthenticationService.Instance.IsSignedIn) {
 				await AuthenticationService.Instance.SignInAnonymouslyAsync();
 				if (AuthenticationService.Instance != null) authenticationID = AuthenticationService.Instance.PlayerId;
