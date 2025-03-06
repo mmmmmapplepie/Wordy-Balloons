@@ -151,15 +151,15 @@ public class InputManager : MonoBehaviour {
 			return _skipCharges;
 		}
 		set {
-			_skipCharges = value < 0 ? 0 : value;
+			_skipCharges = Mathf.Clamp(value, 0, 3);
 		}
 	}
 	public static event Func<Func<bool>> FindCheckSkipFunction;
 	public static event Func<Action> FindSkipFunction;
 	public static event Action<bool> SkipAttemptResult;
-	public void TrySkipBtn() {
-		TrySkip();
-	}
+	// public void TrySkipBtn() {
+	// 	TrySkip();
+	// }
 	bool TrySkip() {
 		skipTick = 0;
 		Func<bool> canSkip = FindCheckSkipFunction?.Invoke();

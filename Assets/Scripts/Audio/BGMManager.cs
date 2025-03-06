@@ -9,7 +9,6 @@ public class BGMManager : MonoBehaviour {
 		if (instance != null) {
 			Destroy(gameObject); return;
 		}
-		print("start");
 		AudioPlayer.Instance.AddNewSound(menuBGM);
 		AudioPlayer.Instance.AddNewSound(battleBGM);
 

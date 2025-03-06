@@ -11,7 +11,6 @@ using System;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
-using System.Collections;
 
 public class LobbyManager : MonoBehaviour {
 	public const string RelayCode = "RelayCode";

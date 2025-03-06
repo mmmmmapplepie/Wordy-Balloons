@@ -38,16 +38,14 @@ public class BalloonManager : NetworkBehaviour {
 	}
 
 	public GameObject balloonPrefab;
-	public List<Color> colorList;
 	public Transform BalloonHolder;
 	[ServerRpc(RequireOwnership = false)]
 	void SpawnBalloonServerRpc(ulong teamID, int count) {
 		GameObject newBalloon = NetworkBehaviour.Instantiate(balloonPrefab, BalloonHolder);
 		Balloon script = newBalloon.GetComponent<Balloon>();
-		script.flyProgress.Value = 0f;
-		script.power.Value = count;
-		script.balloonTeam.Value = GameData.GetTeamFromClientID(teamID);
-		script.balloonColor.Value = colorList[GameData.ClientID_KEY_ColorIndex_VAL[teamID]];
+		script.tempPower = count;
+		script.tempTeam = GameData.GetTeamFromClientID(teamID);
+		script.tempColor = GameData.allColorOptions[GameData.ClientID_KEY_ColorIndex_VAL[teamID]];
 		newBalloon.GetComponent<NetworkObject>().Spawn();
 	}
 

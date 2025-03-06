@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Balloon : NetworkBehaviour {
 	float flyTime = 5f;
+	public int tempPower;
+	public Team tempTeam;
+	public Color tempColor;
 	[HideInInspector] public NetworkVariable<float> flyProgress = new NetworkVariable<float>(0f);
 	[HideInInspector] public NetworkVariable<int> power;
 	[HideInInspector] public NetworkVariable<Team> balloonTeam;
@@ -15,33 +18,28 @@ public class Balloon : NetworkBehaviour {
 	void Awake() {
 		startPos = Vector3.right * -flightWidth / 2f;
 		endPos = -startPos;
+		powerTxt = transform.GetComponentInChildren<TextMeshPro>();
 	}
 
 	TextMeshPro powerTxt;
 	public BalloonAnimation anim;
-
 	public override void OnNetworkSpawn() {
-		base.OnNetworkSpawn();
-		transform.GetComponentInChildren<SpriteRenderer>().color = balloonColor.Value;
-
-		if (NetworkManager.Singleton.IsServer) realFlightHeight.Value = Random.Range(0.7f, 1.2f) * flightHeight;
-
-		powerTxt = transform.GetComponentInChildren<TextMeshPro>();
-
-		flyProgress.OnValueChanged += progressChanged;
-		power.OnValueChanged += powerChanged;
-
-		powerTxt.text = power.Value.ToString();
-
-		anim.InitilizeAnimations(balloonColor.Value);
-
-		UpdateFlyProgress();
+		power.OnValueChanged += PowerChanged;
+		flyProgress.OnValueChanged += ProgressChanged;
+		if (NetworkManager.Singleton.IsServer) {
+			realFlightHeight.Value = Random.Range(0.7f, 1.2f) * flightHeight;
+			power.Value = tempPower;
+			balloonTeam.Value = tempTeam;
+			balloonColor.Value = tempColor;
+		}
+		PowerChanged(0, power.Value);
+		ProgressChanged(0f, 0f);
 		UpdateScale();
+		anim.InitilizeAnimations(balloonColor.Value);
 	}
 	public override void OnNetworkDespawn() {
-		base.OnNetworkDespawn();
-		flyProgress.OnValueChanged -= progressChanged;
-		power.OnValueChanged -= powerChanged;
+		flyProgress.OnValueChanged -= ProgressChanged;
+		power.OnValueChanged -= PowerChanged;
 	}
 
 	void Update() {
@@ -60,7 +58,7 @@ public class Balloon : NetworkBehaviour {
 		transform.localScale = Vector3.one * Mathf.Lerp(minScale, maxScale, power.Value / 15f);
 	}
 	Vector3 startPos, endPos;
-	void progressChanged(float previous, float current) {
+	void ProgressChanged(float previous, float current) {
 		if (current >= 1) {
 			HitBase();
 			return;
@@ -70,7 +68,7 @@ public class Balloon : NetworkBehaviour {
 		float p = ProgressBehaviour(realProgress);
 		transform.position = GetProgressPosition(startPos, endPos, p);
 	}
-	void powerChanged(int prev, int curr) {
+	void PowerChanged(int prev, int curr) {
 		powerTxt.text = curr.ToString();
 		UpdateScale();
 	}
@@ -106,29 +104,31 @@ public class Balloon : NetworkBehaviour {
 		return initialHP;
 	}
 
+
 	void TakeDamage(int dmg) {
+		if (power.Value - dmg <= 0) DestroyBalloon();
 		if (NetworkManager.Singleton.IsServer) {
 			power.Value = power.Value - dmg <= 0 ? 0 : power.Value - dmg;
 			powerTxt.text = power.Value.ToString();
 		}
-		if (power.Value <= 0) DestroyBalloon();
 	}
 	void DestroyBalloon(bool onBase = false) {
-		if (onBase) {
-			anim.BaseCollisionEffect();
-			if (NetworkManager.Singleton.IsServer) Destroy(gameObject);
-		} else {
-			anim.CollisionEffect();
-			if (NetworkManager.Singleton.IsServer) Destroy(gameObject);
-		}
+		DestroyEffectClientRpc(onBase);
+		if (NetworkManager.Singleton.IsServer) Destroy(gameObject);
+	}
+
+	[ClientRpc]
+	void DestroyEffectClientRpc(bool onBase = false) {
+		if (onBase) anim.BaseCollisionEffect();
+		else anim.CollisionEffect();
 	}
 
 	void HitBase() {
+		DestroyBalloon(true);
 		if (NetworkManager.Singleton.IsServer) {
 			BaseManager.DamageBase(balloonTeam.Value == Team.t1 ? Team.t2 : Team.t1, power.Value);
 			power.Value = 0;
 		}
-		DestroyBalloon(true);
 	}
 
 

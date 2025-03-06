@@ -12,8 +12,11 @@ public class BalloonAnimation : MonoBehaviour {
 	Material outlineMat;
 	Material hsMat; // highlight and shadow mat.
 	Material bodyMat;
+
 	public void InitilizeAnimations(Color c) {
-		//maybe create smoke bomb particle effect.
+		foreach (Transform t in transform) {
+			t.gameObject.SetActive(true);
+		}
 
 		Material wiggleMatCopy = new Material(wiggleMat);
 
@@ -34,6 +37,9 @@ public class BalloonAnimation : MonoBehaviour {
 		rotationRate = Random.Range(0, 90f);
 		rotationRate *= Mathf.Sign(Random.Range(-1f, 1f));
 		wiggleRate = Random.Range(2f, 8f);
+
+		//shoot effect (from cannon essentially)
+		BaseCollisionEffect();
 	}
 
 	float wiggleProgress = 0;
