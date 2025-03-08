@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ public class TypedBalloonAnimations : MonoBehaviour {
 	float oscillatorRange;
 	[Range(-1, 1)]
 	public float pivot = -1;//1 is make the bottom stationary, -1 make bottom stationary
+	Vector3 centerPos;
 	void Start() {
 		oscillatorRange = oscillator.maxPos - oscillator.minPos;
 	}
@@ -28,7 +30,7 @@ public class TypedBalloonAnimations : MonoBehaviour {
 		transform.localScale = new Vector3(horScale * scaleFactor, vertScale * scaleFactor, 1f);
 	}
 	void SetObjectPivot() {
-		transform.localPosition = new Vector3(0, 0.5f * transform.localScale.y * pivot, 0);
+		transform.localPosition = centerPos + new Vector3(0, 0.5f * transform.localScale.y * pivot, 0);
 	}
 
 	public void AddImpulse(float k) {
@@ -36,8 +38,24 @@ public class TypedBalloonAnimations : MonoBehaviour {
 	}
 
 	public const float animationTime = 1f;
+	float expPow = 8f;
 	public void CorrectEntryAnimation() {
-
+		StartCoroutine(EntryAnimation());
+	}
+	IEnumerator EntryAnimation() {
+		float t = 0;
+		float initialScale = scaleFactor;
+		float rotAdd = Random.Range(-180f, 180f);
+		while (t < animationTime) {
+			t += Time.deltaTime;
+			float r = 1f - 2f * Mathf.Pow(2f, -expPow * t / animationTime);
+			pivot = Mathf.Lerp(-1, 0, t / animationTime);
+			centerPos = Vector3.Lerp(Vector3.zero, -2f * Vector3.right, r);
+			scaleFactor = Mathf.Lerp(initialScale, 0, t / animationTime);
+			transform.rotation *= Quaternion.Euler(0, 0, rotAdd * Time.deltaTime);
+			yield return null;
+		}
+		Destroy(gameObject);
 	}
 
 }

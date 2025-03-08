@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -26,15 +27,13 @@ public class BalloonManager : NetworkBehaviour {
 		InputManager.CorrectEntryProcess -= SpawnBalloon;
 	}
 
-	public void BallonSpawnBtn(int id) {
-		SpawnBalloon(Random.Range(1, 20), (ulong)id);
-	}
-
-	public void SpawnBalloon(int wordLength, ulong teamID) {
-		SpawnBalloonServerRpc(teamID, wordLength);
-	}
 	public void SpawnBalloon(string word, ulong teamID) {
-		SpawnBalloonServerRpc(teamID, word.Length);
+		StartCoroutine(SpawnBalloonWithDelay(word.Length, teamID));
+	}
+	IEnumerator SpawnBalloonWithDelay(int count, ulong teamID) {
+		yield return new WaitForSeconds(TypedBalloonAnimations.animationTime);
+		if (!GameStateManager.IsGameRunning()) yield break;
+		SpawnBalloonServerRpc(teamID, count);
 	}
 
 	public GameObject balloonPrefab;

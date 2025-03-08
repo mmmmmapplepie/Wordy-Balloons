@@ -16,18 +16,20 @@ public class TypedBallloonManager : MonoBehaviour {
 		InputManager.CorrectEntryFinished -= CorrectEntry;
 		InputManager.NewTextSet -= NewTextSet;
 	}
-	float minScale = 0.5f, maxScale = 3f;
-	int prevTypedSize = 0;
+	float minScale = 0.5f, maxScale = 2.5f;
+	int prevTypedSize = -1;
 	float impulseSize = 5f;
 	void InputChanged() {
 		if (balloonInControl == null) return;
 		int currTypedSize = InputManager.Instance.typedString.Length;
-		if (currTypedSize == prevTypedSize) return;
-
-		float fillRatio = (float)currTypedSize / (float)InputManager.Instance.targetString.Length;
-		balloonInControl.scaleFactor = fillRatio;
+		if (prevTypedSize == currTypedSize) return;
+		int targetSize = InputManager.Instance.targetString.Length;
+		float fillRatio = (float)currTypedSize / (float)targetSize;
+		float targetMaxSize = Mathf.Max(minScale, targetSize * maxScale / 15f);
+		targetMaxSize = Mathf.Min(maxScale, targetMaxSize);
+		balloonInControl.scaleFactor = Mathf.Lerp(minScale, targetMaxSize, fillRatio);
 		if (currTypedSize < prevTypedSize) {
-			Instantiate(waterLeakEffect, balloonInControl.transform.position, Quaternion.identity);
+			Instantiate(waterLeakEffect, transform.position, Quaternion.identity);
 		}
 		balloonInControl.AddImpulse(Random.Range(-impulseSize, impulseSize));
 		prevTypedSize = currTypedSize;
@@ -42,11 +44,12 @@ public class TypedBallloonManager : MonoBehaviour {
 	void NewTextSet(string txt) {
 		if (balloonInControl != null) {
 			Instantiate(balloonPopEffect, balloonInControl.transform.position, Quaternion.identity);
-			Destroy(balloonInControl.transform.root.gameObject);
+			Destroy(balloonInControl.gameObject);
 		}
-		GameObject newBalloon = Instantiate(typedBalloonPrefab, transform.position, Quaternion.identity);
+		GameObject newBalloon = Instantiate(typedBalloonPrefab, transform.position, Quaternion.identity, transform);
 		balloonInControl = newBalloon.GetComponentInChildren<TypedBalloonAnimations>();
-		prevTypedSize = 0;
+		prevTypedSize = -1;
+		InputChanged();
 	}
 
 

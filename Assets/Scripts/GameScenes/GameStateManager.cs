@@ -60,6 +60,10 @@ public class GameStateManager : NetworkBehaviour {
 		}
 	}
 
+	public static bool IsGameRunning() {
+		return CurrGameResult != GameResult.Undecided && Time.timeScale != 0;
+	}
+
 	void TeamLoss(Team t) {
 		GameResult r = GameResult.Team1Win;
 		if (t == Team.t1) r = GameResult.Team2Win;

@@ -35,6 +35,7 @@ public class GameplayDataUI : NetworkBehaviour {
 	}
 
 	void Update() {
+		if (!GameStateManager.IsGameRunning()) return;
 		UpdatePlayerCount();
 		UpdatePointAndPointContribution();
 		UpdateSpeeds();

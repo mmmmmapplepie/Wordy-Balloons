@@ -31,7 +31,7 @@ public class TypedInputAudio : MonoBehaviour {
 	}
 	int prevtick = 0;
 	void SkipTickChange(int i) {
-		if (i <= prevtick || i > 2) { prevtick = i; return; }
+		if (i <= prevtick) { prevtick = i; return; }
 		AudioPlayer.PlayOneShot_Static(skiptickIncrease);
 		prevtick = i;
 	}

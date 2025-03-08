@@ -38,8 +38,9 @@ public class BalloonAnimation : MonoBehaviour {
 		rotationRate *= Mathf.Sign(Random.Range(-1f, 1f));
 		wiggleRate = Random.Range(2f, 8f);
 
-		//shoot effect (from cannon essentially)
-		BaseCollisionEffect();
+		GameObject newObj = Instantiate(fireEffect, transform.position, Quaternion.identity);
+		newObj.transform.localScale = transform.localScale;
+		// AudioPlayer.PlayOneShot_Static(fireSound, 1f);
 	}
 
 	float wiggleProgress = 0;
@@ -58,8 +59,8 @@ public class BalloonAnimation : MonoBehaviour {
 	}
 
 
-	public GameObject collisionEffect, baseCollisionEffect;
-	public AudioClip collisionSound;
+	public GameObject collisionEffect, baseCollisionEffect, fireEffect;
+	public AudioClip collisionSound, fireSound;
 	public void CollisionEffect() {
 		AudioPlayer.PlayOneShot_Static(collisionSound, 1f);
 		int ops = collisionEffect.transform.childCount;

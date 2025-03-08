@@ -19,10 +19,6 @@ public class HarmonicOscillator : MonoBehaviour {
 		driveFunction = fn;
 	}
 	Func<float> driveFunction;
-	Vector3 basePos;
-	void Start() {
-		basePos = transform.position;
-	}
 	void Update() {
 		Oscillate();
 	}
@@ -31,7 +27,7 @@ public class HarmonicOscillator : MonoBehaviour {
 		AddImpulses();
 		AddDisplacement();
 		CheckForWalls();
-		SetObjectPos();
+		// SetObjectPos();
 	}
 
 	float DefaultDriveFunction() {
@@ -75,10 +71,6 @@ public class HarmonicOscillator : MonoBehaviour {
 	void SetBouncePosition(int bounces, bool maxDir, float remainder) {
 		float realRemainder = (bounces % 2 != 0) == (bool)maxDir ? 1f - remainder : remainder;
 		position = Mathf.Lerp(minPos, maxPos, realRemainder);
-	}
-
-	void SetObjectPos() {
-		transform.position = basePos + Vector3.up * position;
 	}
 
 

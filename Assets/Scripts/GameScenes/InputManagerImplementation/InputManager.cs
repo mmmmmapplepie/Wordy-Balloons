@@ -26,6 +26,7 @@ public class InputManager : MonoBehaviour {
 	}
 	public static event Action InputProcessFinished;
 	void Update() {
+		if (!GameStateManager.IsGameRunning()) return;
 		ProcessInput();
 		InputProcessFinished?.Invoke();
 	}
