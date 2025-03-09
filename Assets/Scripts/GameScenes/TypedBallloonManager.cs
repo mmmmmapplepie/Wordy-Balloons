@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class TypedBallloonManager : MonoBehaviour {
@@ -46,10 +47,15 @@ public class TypedBallloonManager : MonoBehaviour {
 			Instantiate(balloonPopEffect, balloonInControl.transform.position, Quaternion.identity);
 			Destroy(balloonInControl.gameObject);
 		}
+		CreateNewTypedBalloon();
+		InputChanged();
+	}
+
+	void CreateNewTypedBalloon() {
 		GameObject newBalloon = Instantiate(typedBalloonPrefab, transform.position, Quaternion.identity, transform);
 		balloonInControl = newBalloon.GetComponentInChildren<TypedBalloonAnimations>();
+		newBalloon.transform.GetChild(newBalloon.transform.childCount - 1).GetComponent<SpriteRenderer>().color = GameData.allColorOptions[GameData.ClientID_KEY_ColorIndex_VAL[NetworkManager.Singleton.LocalClientId]];
 		prevTypedSize = -1;
-		InputChanged();
 	}
 
 

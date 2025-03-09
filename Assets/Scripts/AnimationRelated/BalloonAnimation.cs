@@ -40,7 +40,7 @@ public class BalloonAnimation : MonoBehaviour {
 
 		GameObject newObj = Instantiate(fireEffect, transform.position, Quaternion.identity);
 		newObj.transform.localScale = transform.localScale;
-		// AudioPlayer.PlayOneShot_Static(fireSound, 1f);
+		AudioPlayer.PlayOneShot_Static(fireSound, 0.5f);
 	}
 
 	float wiggleProgress = 0;

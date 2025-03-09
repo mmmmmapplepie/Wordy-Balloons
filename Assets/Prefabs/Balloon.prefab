@@ -476,7 +476,7 @@ MonoBehaviour:
   baseCollisionEffect: {fileID: 5333196219213776793, guid: 5129d6f2a555d1a4f8761d2530f976d8, type: 3}
   fireEffect: {fileID: 7214367085042643952, guid: 1a7789e59b6ccd044bf07d76324e0efe, type: 3}
   collisionSound: {fileID: 8300000, guid: 734e83a09e47e064fb8125f1759e93d6, type: 3}
-  fireSound: {fileID: 0}
+  fireSound: {fileID: 8300000, guid: 4cbe12847e3adf34f8991c4a8d70c78d, type: 3}
 --- !u!114 &-1977413652812716518
 MonoBehaviour:
   m_ObjectHideFlags: 0

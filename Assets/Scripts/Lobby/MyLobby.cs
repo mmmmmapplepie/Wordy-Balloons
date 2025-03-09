@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MyLobby : NetworkBehaviour {
 	public static MyLobby Instance;
@@ -24,6 +26,7 @@ public class MyLobby : NetworkBehaviour {
 
 	void Start() {
 		//creating lobby
+		LobbyManager.AuthenticationSuccess += AuthenticationDone;
 		LobbyManager.CreatedLobby += LobbyCreated;
 		LobbyNetcodeManager.ServerStartSuccess += ServerStartedSuccess;
 		LobbyNetcodeManager.ServerStartFail += ServerStartedFail;
@@ -48,6 +51,7 @@ public class MyLobby : NetworkBehaviour {
 	public override void OnDestroy() {
 		OnNetworkDespawn();
 		//creating lobby
+		LobbyManager.AuthenticationSuccess -= AuthenticationDone;
 		LobbyManager.CreatedLobby -= LobbyCreated;
 		LobbyNetcodeManager.ServerStartSuccess -= ServerStartedSuccess;
 		LobbyNetcodeManager.ServerStartFail -= ServerStartedFail;
@@ -466,6 +470,28 @@ public class MyLobby : NetworkBehaviour {
 		loadingSceneRoutine = null;
 		LoadingSceneBool.Value = false;
 	}
+
+	#endregion
+
+
+
+	#region Miscellaneous
+	const string PlayerNameKey = "PlayerName";
+	public TMP_InputField nameInputField;
+	void AuthenticationDone() {
+		if (PlayerPrefs.HasKey(PlayerNameKey)) {
+			SetNewName(PlayerPrefs.GetString(PlayerNameKey));
+		} else {
+			SetNewName(LobbyManager.playerName);
+		}
+
+	}
+	public void SetNewName(string name) {
+		LobbyManager.playerName = name;
+		PlayerPrefs.SetString(PlayerNameKey, name);
+		nameInputField.Set(name);
+	}
+
 
 	#endregion
 

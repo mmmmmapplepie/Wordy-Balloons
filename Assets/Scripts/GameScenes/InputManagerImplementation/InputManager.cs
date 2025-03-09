@@ -8,25 +8,26 @@ public class InputManager : MonoBehaviour {
 	public static InputManager Instance;
 	void Awake() {
 		Instance = this;
+		GameStateManager.countDownChanged += CheckGameStart;
+		GameStateManager.GameResultSetEvent += GameResultSet;
 	}
 	void OnDestroy() {
 		Instance = null;
 		_skipCharges = 3;
-	}
-	void OnEnable() {
-		GameStateManager.countDownChanged += CheckGameStart;
-	}
-	void OnDisable() {
 		GameStateManager.countDownChanged -= CheckGameStart;
+		GameStateManager.GameResultSetEvent -= GameResultSet;
 	}
 	void CheckGameStart(int count) {
 		if (count != 0) return;
 		SetNewTargetText();
 		canTakeInput = true;
 	}
+	void GameResultSet(GameStateManager.GameResult result) {
+		canTakeInput = false;
+	}
 	public static event Action InputProcessFinished;
 	void Update() {
-		if (!GameStateManager.IsGameRunning()) return;
+		if (!canTakeInput) return;
 		ProcessInput();
 		InputProcessFinished?.Invoke();
 	}
@@ -37,7 +38,6 @@ public class InputManager : MonoBehaviour {
 	public string displayString { get; set; } = "";
 	public static event Action TypedTextChanged;
 	void ProcessInput() {
-		if (!canTakeInput) return;
 		string input = Input.inputString;
 		if (input == null || input.Length == 0) return;
 		if (input.Contains("\r")) {

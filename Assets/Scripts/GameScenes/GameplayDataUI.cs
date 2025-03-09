@@ -17,6 +17,7 @@ public class GameplayDataUI : NetworkBehaviour {
 		InputManager.SkipTickChanged += SkipTickChanged;
 		InputManager.TypedTextChanged += UpdateAccuracy;
 		InputManager.CorrectEntryProcess += InputFired;
+		InputManager.WrongEntryProcess += WrongEntry;
 
 		BaseManager.BaseTakenDamage += BaseTakesDamageClientRpc;
 
@@ -26,6 +27,7 @@ public class GameplayDataUI : NetworkBehaviour {
 		InputManager.TypedTextChanged -= UpdateAccuracy;
 		InputManager.SkipTickChanged -= SkipTickChanged;
 		InputManager.CorrectEntryProcess -= InputFired;
+		InputManager.WrongEntryProcess -= WrongEntry;
 
 		BaseManager.BaseTakenDamage -= BaseTakesDamageClientRpc;
 
@@ -105,6 +107,18 @@ public class GameplayDataUI : NetworkBehaviour {
 	void UpdateTeamPointsServerRpc(Team team, int addition) {
 		if (team == Team.t1) team1Points.Value += addition;
 		if (team == Team.t2) team2Points.Value += addition;
+	}
+	int myWrongEntries = 0;
+	NetworkVariable<int> team1WrongEntries = new NetworkVariable<int>(0);
+	NetworkVariable<int> team2WrongEntries = new NetworkVariable<int>(0);
+	void WrongEntry() {
+		myWrongEntries++;
+		WrongEntryServerRpc(GameData.team1.Contains(NetworkManager.Singleton.LocalClientId) ? Team.t1 : Team.t2);
+	}
+	[ServerRpc]
+	void WrongEntryServerRpc(Team t) {
+		if (t == Team.t1) team1WrongEntries.Value++;
+		else team2WrongEntries.Value++;
 	}
 
 	void UpdatePointAndPointContribution() {
@@ -191,9 +205,19 @@ public class GameplayDataUI : NetworkBehaviour {
 
 
 	#region gameEnd stats
+	[Header("Game End Stats")]
+	public TextMeshProUGUI mySpeed;
+	public TextMeshProUGUI myAccuracy, ourPoints, ourWrongEntries;
+	public TextMeshProUGUI opposingPoints, opposingWrongEntries;
 	void GameResultChange(GameStateManager.GameResult result) {
 		if (result == GameStateManager.GameResult.Draw) return;
-		//show game stats
+		mySpeed.text = avgSpeedTxt.text;
+		myAccuracy.text = accuracyTxt.text;
+		ourPoints.text = (BalloonManager.team == Team.t1 ? team1Points.Value : team2Points.Value).ToString() + " (" + pointsContributedByMe.ToString() + ")";
+		ourWrongEntries.text = (BalloonManager.team == Team.t1 ? team1WrongEntries.Value : team2WrongEntries.Value).ToString() + " (" + myWrongEntries.ToString() + ")";
+
+		opposingPoints.text = (BalloonManager.team == Team.t1 ? team2Points.Value : team1Points.Value).ToString();
+		opposingWrongEntries.text = (BalloonManager.team == Team.t1 ? team2WrongEntries.Value : team1WrongEntries.Value).ToString();
 	}
 
 

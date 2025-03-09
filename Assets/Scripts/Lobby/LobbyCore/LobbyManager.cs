@@ -51,8 +51,8 @@ public class LobbyManager : MonoBehaviour {
 
 
 
-	[HideInInspector] public string authenticationID;
-	[HideInInspector] public static string playerName;
+	public string authenticationID;
+	public static string playerName;
 	public Lobby hostLobby, joinedLobby;
 	// DateTime latestLobbyInteraction;
 

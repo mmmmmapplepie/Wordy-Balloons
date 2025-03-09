@@ -44,7 +44,7 @@ public class GameStateManager : NetworkBehaviour {
 		countDown_NV.Value = 0;
 	}
 	public static event System.Action<int> countDownChanged;
-	public static event System.Action GameStartEvent, GameFinishEvent;
+	public static event System.Action GameStartEvent;
 	public static event System.Action<GameResult> GameResultSetEvent;
 	public static bool GameRunning { get; private set; }
 	public static GameResult CurrGameResult;
@@ -61,7 +61,7 @@ public class GameStateManager : NetworkBehaviour {
 	}
 
 	public static bool IsGameRunning() {
-		return CurrGameResult != GameResult.Undecided && Time.timeScale != 0;
+		return CurrGameResult == GameResult.Undecided && Time.timeScale != 0;
 	}
 
 	void TeamLoss(Team t) {
