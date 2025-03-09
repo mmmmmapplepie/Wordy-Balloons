@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
@@ -81,21 +82,24 @@ public class GameUI : MonoBehaviour {
 
 	#region Game Finish
 	[Header("Game Finish")] public GameObject menuBtn;
-	public GameObject connectionLost, victoryPanel, defeatPanel, endingPanel;
+	public GameObject connectionLost, victoryPanel, defeatPanel, endingPanel, gameplayUI;
 	public Sound victorySound, defeatSound;
 	void GameResultSet(GameStateManager.GameResult result) {
 		if (result == GameStateManager.GameResult.Draw) {
 			connectionLost.SetActive(true);
-		} else {
-			DisplayTeamWinning(result == GameStateManager.GameResult.Team1Win ? Team.t1 : Team.t2);
+			return;
 		}
-		//setup the stats
-		//show animation
-
+		menuBtn.SetActive(false);
+		gameplayUI.SetActive(false);
+		StartCoroutine(DelayedUIShow(result));
+	}
+	IEnumerator DelayedUIShow(GameStateManager.GameResult result) {
+		yield return new WaitForSeconds(BaseManager.BaseDestroyAnimationTime);
+		DisplayTeamWinning(result == GameStateManager.GameResult.Team1Win ? Team.t1 : Team.t2);
 		endingPanel.SetActive(true);
 		menusPanel.SetActive(true);
-		menuBtn.SetActive(false);
 	}
+
 
 
 	void DisplayTeamWinning(Team t) {

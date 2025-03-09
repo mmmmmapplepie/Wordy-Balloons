@@ -10,12 +10,17 @@ public class TypedBallloonManager : MonoBehaviour {
 		InputManager.WrongEntryFinished += WrongEntry;
 		InputManager.CorrectEntryFinished += CorrectEntry;
 		InputManager.NewTextSet += NewTextSet;
+
+		GameStateManager.GameResultSetEvent += StateChanged;
 	}
+
 	void OnDestroy() {
 		InputManager.InputProcessFinished -= InputChanged;
 		InputManager.WrongEntryFinished -= WrongEntry;
 		InputManager.CorrectEntryFinished -= CorrectEntry;
 		InputManager.NewTextSet -= NewTextSet;
+
+		GameStateManager.GameResultSetEvent += StateChanged;
 	}
 	float minScale = 0.5f, maxScale = 2.5f;
 	int prevTypedSize = -1;
@@ -58,7 +63,10 @@ public class TypedBallloonManager : MonoBehaviour {
 		prevTypedSize = -1;
 	}
 
-
+	private void StateChanged(GameStateManager.GameResult result) {
+		if (result == GameStateManager.GameResult.Undecided || result == GameStateManager.GameResult.Draw) return;
+		Destroy(balloonInControl.gameObject);
+	}
 
 
 }

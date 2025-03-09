@@ -67,7 +67,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		StopConnection();
 	}
 
-	void ShutDownNetwork() {
+	public static void ShutDownNetwork() {
 		if (!NetworkManager.Singleton.ShutdownInProgress) {
 			NetworkManager.Singleton.Shutdown();
 		}
