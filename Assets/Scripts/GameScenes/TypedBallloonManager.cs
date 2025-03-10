@@ -3,7 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 
 public class TypedBallloonManager : MonoBehaviour {
-	public GameObject typedBalloonPrefab, waterLeakEffect, balloonPopEffect;
+	public GameObject typedBalloonPrefab, waterLeakEffect, balloonPopEffect, starEffect;
 	TypedBalloonAnimations balloonInControl;
 	void Start() {
 		InputManager.InputProcessFinished += InputChanged;
@@ -44,6 +44,7 @@ public class TypedBallloonManager : MonoBehaviour {
 		Instantiate(balloonPopEffect, balloonInControl.transform.position, Quaternion.identity);
 	}
 	void CorrectEntry() {
+		Instantiate(starEffect, balloonInControl.transform.position, Quaternion.identity);
 		balloonInControl.CorrectEntryAnimation();
 		balloonInControl = null;
 	}
