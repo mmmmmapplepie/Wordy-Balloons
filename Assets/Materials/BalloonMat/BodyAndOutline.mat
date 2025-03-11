@@ -34,5 +34,5 @@ Material:
     - _Progress: -0.55
     - _Rotation: 0
     m_Colors:
-    - _Color: {r: 1, g: 0.25890982, b: 0.25890982, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

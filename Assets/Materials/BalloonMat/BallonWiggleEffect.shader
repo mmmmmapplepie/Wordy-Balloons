@@ -13,14 +13,13 @@ Shader "Custom/BallonWiggleEffect"
 
 			Tags {"Queue"="Transparent" "RenderType"="Transparent" "IgnoreProjector"="True"}
 
-			ZTest LEqual
+			ZWrite Off
+			ZTest Always
 
 			Blend SrcAlpha OneMinusSrcAlpha
-			// ZWrite Off
         Pass
         {
             CGPROGRAM
-
             #pragma vertex vert
             #pragma fragment frag
 

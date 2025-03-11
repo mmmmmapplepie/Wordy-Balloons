@@ -6,10 +6,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameUI : MonoBehaviour {
-	void Start() {
-		AudioPlayer.Instance.AddNewSound(victorySound);
-		AudioPlayer.Instance.AddNewSound(defeatSound);
-	}
+
 
 
 	void OnEnable() {
@@ -83,7 +80,6 @@ public class GameUI : MonoBehaviour {
 	#region Game Finish
 	[Header("Game Finish")] public GameObject menuBtn;
 	public GameObject connectionLost, victoryPanel, defeatPanel, endingPanel, gameplayUI;
-	public Sound victorySound, defeatSound;
 	void GameResultSet(GameStateManager.GameResult result) {
 		if (result == GameStateManager.GameResult.Draw) {
 			connectionLost.SetActive(true);
@@ -95,9 +91,9 @@ public class GameUI : MonoBehaviour {
 	}
 	IEnumerator DelayedUIShow(GameStateManager.GameResult result) {
 		yield return new WaitForSeconds(BaseManager.BaseDestroyAnimationTime);
-		DisplayTeamWinning(result == GameStateManager.GameResult.Team1Win ? Team.t1 : Team.t2);
 		endingPanel.SetActive(true);
 		menusPanel.SetActive(true);
+		DisplayTeamWinning(result == GameStateManager.GameResult.Team1Win ? Team.t1 : Team.t2);
 	}
 
 
@@ -106,10 +102,10 @@ public class GameUI : MonoBehaviour {
 		bool victory = t == BalloonManager.team;
 		if (victory) {
 			victoryPanel.SetActive(true);
-			AudioPlayer.Instance.PlaySound(victorySound.Name);
+			endingPanel.GetComponent<Animator>().Play("Victory");
 		} else {
 			defeatPanel.SetActive(true);
-			AudioPlayer.Instance.PlaySound(defeatSound.Name);
+			endingPanel.GetComponent<Animator>().Play("Defeat");
 		}
 	}
 

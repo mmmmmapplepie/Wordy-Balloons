@@ -79,7 +79,7 @@ public class AudioPlayer : MonoBehaviour {
 	public void ChangeLoop(string name, bool LoopIsTrue = true) {
 		FindSound(name).audioSource.loop = LoopIsTrue ? true : false;
 	}
-	List<FadedSounds> fadeSounds = new List<FadedSounds>();
+	List<FadeSound> fadeSounds = new List<FadeSound>();
 	public void PlaySound(string name, float fadeInTime = 0f, bool stopAllRoutines = false, float volume = 1f, bool scaleVolume = true, bool fadeInZero = true) {
 		Sound sound = FindSound(name);
 		if (sound == null) return;
@@ -93,7 +93,7 @@ public class AudioPlayer : MonoBehaviour {
 			sound.audioSource.volume = volume;
 			sound.audioSource.Play();
 		} else {
-			FadedSounds fadeSound = new FadedSounds(StartCoroutine(FadeInRoutine(sound, fadeInTime, volume)), name);
+			FadeSound fadeSound = new FadeSound(StartCoroutine(FadeInRoutine(sound, fadeInTime, volume)), name);
 			fadeSounds.Add(fadeSound);
 		}
 	}
@@ -118,7 +118,7 @@ public class AudioPlayer : MonoBehaviour {
 			sound.audioSource.volume = 0f;
 			sound.audioSource.Stop();
 		} else {
-			FadedSounds fadeSound = new FadedSounds(StartCoroutine(FadeOutRoutine(sound, fadeOutTime)), name);
+			FadeSound fadeSound = new FadeSound(StartCoroutine(FadeOutRoutine(sound, fadeOutTime)), name);
 			fadeSounds.Add(fadeSound);
 		}
 	}
@@ -136,7 +136,7 @@ public class AudioPlayer : MonoBehaviour {
 		sound.audioSource.Stop();
 	}
 	public void StopFadeRoutines(string name, bool stopAllRoutines = false) {
-		List<FadedSounds> fadesounds = null;
+		List<FadeSound> fadesounds = null;
 		if (stopAllRoutines) {
 			fadesounds = fadeSounds;
 		} else {
@@ -150,10 +150,10 @@ public class AudioPlayer : MonoBehaviour {
 		}
 		fadesounds.RemoveAll(x => x == null);
 	}
-	public class FadedSounds {
+	public class FadeSound {
 		public Coroutine Routine;
 		public string Name;
-		public FadedSounds(Coroutine routine, string name) {
+		public FadeSound(Coroutine routine, string name) {
 			this.Routine = routine;
 			this.Name = name;
 		}
@@ -170,7 +170,7 @@ public class AudioPlayer : MonoBehaviour {
 		if (changeTime == 0f) {
 			sound.audioSource.volume = targetVolume;
 		} else {
-			FadedSounds fadeSound = new FadedSounds(StartCoroutine(VolumeRoutine(sound, targetVolume, changeTime)), name);
+			FadeSound fadeSound = new FadeSound(StartCoroutine(VolumeRoutine(sound, targetVolume, changeTime)), name);
 			fadeSounds.Add(fadeSound);
 		}
 	}

@@ -15,9 +15,13 @@ public class BaseManager : NetworkBehaviour {
 
 	void Awake() {
 		GameStateManager.GameResultSetEvent += ResultChanged;
+
+		Balloon.BalloonCreated += BallonCreated;
 	}
 	public override void OnDestroy() {
 		GameStateManager.GameResultSetEvent -= ResultChanged;
+
+		Balloon.BalloonCreated += BallonCreated;
 	}
 
 	public static event Action BaseHPSet;
@@ -81,11 +85,30 @@ public class BaseManager : NetworkBehaviour {
 		// tr.GetComponent<Animator>().Play("Blink");
 	}
 
+
+
 	public Transform homeBase, awayBase;
 	public GameObject splashEffect, finalEffect;
 	public const float BaseDestroyAnimationTime = 7f;
 	public Sprite destroyedBaseSprite;
 	public AudioClip baseDestroySound, popSound;
+
+	void BallonCreated(Team t) {
+		Transform target = awayBase;
+		if (t == BalloonManager.team) {
+			target = homeBase;
+		}
+		target.GetComponent<Animator>().Play("CannonFire");
+	}
+
+
+
+
+
+
+
+
+
 	void ResultChanged(GameStateManager.GameResult result) {
 		if (result == GameStateManager.GameResult.Undecided || result == GameStateManager.GameResult.Draw) return;
 		Transform losingBase = homeBase;

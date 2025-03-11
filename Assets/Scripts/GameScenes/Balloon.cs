@@ -23,6 +23,7 @@ public class Balloon : NetworkBehaviour {
 
 	TextMeshPro powerTxt;
 	public BalloonAnimation anim;
+	public static event System.Action<Team> BalloonCreated;
 	public override void OnNetworkSpawn() {
 		power.OnValueChanged += PowerChanged;
 		flyProgress.OnValueChanged += ProgressChanged;
@@ -35,6 +36,7 @@ public class Balloon : NetworkBehaviour {
 		PowerChanged(0, power.Value);
 		ProgressChanged(0f, 0f);
 		UpdateScale();
+		BalloonCreated?.Invoke(balloonTeam.Value);
 		anim.InitilizeAnimations(balloonColor.Value);
 	}
 	public override void OnNetworkDespawn() {

@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Defeat
+  m_Name: test 1
   m_Shader: {fileID: 4800000, guid: 13ed90b8ac49ea54fa828bf66ff5ff14, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -29,10 +29,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Bumps: 22.4
-    - _MaxDistortion: -1
+    - _Bumps: 4.76
+    - _MaxDistortion: 1
     - _Progress: -0.55
-    - _Rotation: 259
+    - _Rotation: 0
     m_Colors:
-    - _Color: {r: 1, g: 0.16072029, b: 0.0702306, a: 1}
+    - _Color: {r: 1, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []

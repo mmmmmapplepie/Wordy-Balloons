@@ -66,7 +66,7 @@ public class TypedBallloonManager : MonoBehaviour {
 
 	private void StateChanged(GameStateManager.GameResult result) {
 		if (result == GameStateManager.GameResult.Undecided || result == GameStateManager.GameResult.Draw) return;
-		Destroy(balloonInControl.gameObject);
+		if (balloonInControl != null) Destroy(balloonInControl.gameObject);
 	}
 
 
