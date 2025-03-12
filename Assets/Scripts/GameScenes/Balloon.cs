@@ -12,12 +12,9 @@ public class Balloon : NetworkBehaviour {
 	[HideInInspector] public NetworkVariable<Team> balloonTeam;
 	[HideInInspector] public NetworkVariable<Color> balloonColor;
 
-	float flightWidth = 10f;
 	float flightHeight = 4f;
 	NetworkVariable<float> realFlightHeight = new NetworkVariable<float>(4f);
 	void Awake() {
-		startPos = Vector3.right * -flightWidth / 2f;
-		endPos = -startPos;
 		powerTxt = transform.GetComponentInChildren<TextMeshPro>();
 	}
 
@@ -59,7 +56,7 @@ public class Balloon : NetworkBehaviour {
 	void UpdateScale() {
 		transform.localScale = Vector3.one * Mathf.Lerp(minScale, maxScale, power.Value / 15f);
 	}
-	Vector3 startPos, endPos;
+	[HideInInspector] public Vector3 startPos, endPos;
 	void ProgressChanged(float previous, float current) {
 		if (current >= 1) {
 			HitBase();

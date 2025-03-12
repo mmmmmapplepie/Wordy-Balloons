@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class BalloonManager : NetworkBehaviour {
 
-
+	public Transform balloonStartPosition;
 	void Start() {
 		InputManager.CorrectEntryProcess += SpawnBalloon;
 	}
@@ -42,6 +42,8 @@ public class BalloonManager : NetworkBehaviour {
 	void SpawnBalloonServerRpc(ulong teamID, int count) {
 		GameObject newBalloon = NetworkBehaviour.Instantiate(balloonPrefab, BalloonHolder);
 		Balloon script = newBalloon.GetComponent<Balloon>();
+		script.startPos = balloonStartPosition.position;
+		script.endPos = -balloonStartPosition.position;
 		script.tempPower = count;
 		script.tempTeam = GameData.GetTeamFromClientID(teamID);
 		script.tempColor = GameData.allColorOptions[GameData.ClientID_KEY_ColorIndex_VAL[teamID]];

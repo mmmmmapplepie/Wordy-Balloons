@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class TypedBalloonAnimations : MonoBehaviour {
@@ -12,6 +13,7 @@ public class TypedBalloonAnimations : MonoBehaviour {
 	Vector3 centerPos;
 	void Start() {
 		oscillatorRange = oscillator.maxPos - oscillator.minPos;
+		transform.GetChild(transform.childCount - 1).GetComponent<SpriteRenderer>().color = GameData.allColorOptions[GameData.ClientID_KEY_ColorIndex_VAL[NetworkManager.Singleton.LocalClientId]];
 	}
 	void Update() {
 		SetObjectScale();
@@ -39,20 +41,27 @@ public class TypedBalloonAnimations : MonoBehaviour {
 
 	public const float animationTime = 1f;
 	float expPow = 8f;
-	public void CorrectEntryAnimation() {
-		StartCoroutine(EntryAnimation());
+	public void CorrectEntryAnimation(Vector3 target) {
+		StartCoroutine(EntryAnimation(target));
 	}
-	IEnumerator EntryAnimation() {
+	IEnumerator EntryAnimation(Vector3 target) {
 		float t = 0;
 		float initialScale = scaleFactor;
 		float rotAdd = Random.Range(-180f, 180f);
 		while (t < animationTime) {
 			t += Time.deltaTime;
-			float r = 1f - 2f * Mathf.Pow(2f, -expPow * t / animationTime);
+			float r = 1f - 2f * Mathf.Pow(3f, -expPow * t / animationTime);
 			pivot = Mathf.Lerp(-1, 0, t / animationTime);
-			centerPos = Vector3.Lerp(Vector3.zero, -2f * Vector3.right, r);
-			scaleFactor = Mathf.Lerp(initialScale, 0, t / animationTime);
+			centerPos = Vector3.Lerp(Vector3.zero, target, r);
+			scaleFactor = Mathf.Lerp(initialScale, 0.5f, t / animationTime);
 			transform.rotation *= Quaternion.Euler(0, 0, rotAdd * Time.deltaTime);
+
+			foreach (SpriteRenderer s in transform.GetComponents<SpriteRenderer>()) {
+				Color i = s.color;
+				i.a = 1f - t;
+				s.color = i;
+			}
+
 			yield return null;
 		}
 		Destroy(gameObject);

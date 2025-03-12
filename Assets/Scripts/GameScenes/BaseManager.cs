@@ -21,7 +21,7 @@ public class BaseManager : NetworkBehaviour {
 	public override void OnDestroy() {
 		GameStateManager.GameResultSetEvent -= ResultChanged;
 
-		Balloon.BalloonCreated += BallonCreated;
+		Balloon.BalloonCreated -= BallonCreated;
 	}
 
 	public static event Action BaseHPSet;
@@ -88,10 +88,6 @@ public class BaseManager : NetworkBehaviour {
 
 
 	public Transform homeBase, awayBase;
-	public GameObject splashEffect, finalEffect;
-	public const float BaseDestroyAnimationTime = 7f;
-	public Sprite destroyedBaseSprite;
-	public AudioClip baseDestroySound, popSound;
 
 	void BallonCreated(Team t) {
 		Transform target = awayBase;
@@ -108,6 +104,10 @@ public class BaseManager : NetworkBehaviour {
 
 
 
+	public GameObject splashEffect, finalEffect;
+	public const float BaseDestroyAnimationTime = 9f;
+	public Sprite baseMain_Destroyed, basePipe_Destroyed, baseCannon_Destroyed;
+	public AudioClip baseDestroySound, popSound, finalDestroySound;
 
 	void ResultChanged(GameStateManager.GameResult result) {
 		if (result == GameStateManager.GameResult.Undecided || result == GameStateManager.GameResult.Draw) return;
@@ -133,10 +133,14 @@ public class BaseManager : NetworkBehaviour {
 			if (created > 30) CancelInvoke();
 			yield return new WaitForSeconds(1.006f / created);//summed up gives about 5 seconds total
 		}
-		Instantiate(finalEffect, targetBase.position, Quaternion.identity);
-		//maybe a booming sound?
+		GameObject g = Instantiate(finalEffect, targetBase.position, Quaternion.identity);
+		g.transform.localScale = 2f * g.transform.localScale;
+		AudioPlayer.PlayOneShot_Static(finalDestroySound);
+		Destroy(targetBase.GetComponent<Animator>());
 
-		// sr.sprite = destroyedBaseSprite;
+		sr.sprite = baseMain_Destroyed;
+		targetBase.GetChild(0).GetComponent<SpriteRenderer>().sprite = basePipe_Destroyed;
+		targetBase.GetChild(1).GetComponent<SpriteRenderer>().sprite = baseCannon_Destroyed;
 	}
 	void PlaySound() {
 		AudioPlayer.PlayOneShot_Static(baseDestroySound);

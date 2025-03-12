@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class TypedBallloonManager : MonoBehaviour {
 	public GameObject typedBalloonPrefab, waterLeakEffect, balloonPopEffect, starEffect;
+	public Transform typedBalloonTarget;
 	TypedBalloonAnimations balloonInControl;
 	void Start() {
 		InputManager.InputProcessFinished += InputChanged;
@@ -22,7 +23,7 @@ public class TypedBallloonManager : MonoBehaviour {
 
 		GameStateManager.GameResultSetEvent += StateChanged;
 	}
-	float minScale = 0.5f, maxScale = 2.5f;
+	float minScale = 0.5f, maxScale = 2f;
 	int prevTypedSize = -1;
 	float impulseSize = 5f;
 	void InputChanged() {
@@ -45,7 +46,7 @@ public class TypedBallloonManager : MonoBehaviour {
 	}
 	void CorrectEntry() {
 		Instantiate(starEffect, balloonInControl.transform.position, Quaternion.identity);
-		balloonInControl.CorrectEntryAnimation();
+		balloonInControl.CorrectEntryAnimation(typedBalloonTarget.localPosition);
 		balloonInControl = null;
 	}
 	void NewTextSet(string txt) {
@@ -60,7 +61,6 @@ public class TypedBallloonManager : MonoBehaviour {
 	void CreateNewTypedBalloon() {
 		GameObject newBalloon = Instantiate(typedBalloonPrefab, transform.position, Quaternion.identity, transform);
 		balloonInControl = newBalloon.GetComponentInChildren<TypedBalloonAnimations>();
-		newBalloon.transform.GetChild(newBalloon.transform.childCount - 1).GetComponent<SpriteRenderer>().color = GameData.allColorOptions[GameData.ClientID_KEY_ColorIndex_VAL[NetworkManager.Singleton.LocalClientId]];
 		prevTypedSize = -1;
 	}
 

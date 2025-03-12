@@ -19,7 +19,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	}
 	public override void OnDestroy() {
 		OnNetworkDespawn();
-		base.OnDestroy();
+		ShutDownNetwork();
 	}
 	void OnClientDisconnectCallback(ulong clientID) {
 		if (clientID == NetworkManager.ServerClientId) {
@@ -68,7 +68,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	}
 
 	public static void ShutDownNetwork() {
-		if (!NetworkManager.Singleton.ShutdownInProgress) {
+		if (NetworkManager.Singleton != null && !NetworkManager.Singleton.ShutdownInProgress) {
 			NetworkManager.Singleton.Shutdown();
 		}
 	}
@@ -76,7 +76,6 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		ShutDownNetwork();
 		SceneManager.LoadScene(scene);
 	}
-
 
 
 
