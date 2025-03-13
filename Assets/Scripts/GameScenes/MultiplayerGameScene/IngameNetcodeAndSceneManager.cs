@@ -58,7 +58,6 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		GameResultChangeByConnection?.Invoke(GameStateManager.GameResult.Draw);
 	}
 	void ServerStopped(bool b) {
-		print("ServerStopped");
 		GameResultChangeByConnection?.Invoke(GameStateManager.GameResult.Draw);
 	}
 

@@ -12,4 +12,8 @@ public class MainMenuUI : MonoBehaviour {
 		if (SceneManager.GetSceneByName(name) == null) return;
 		SceneManager.LoadScene(name);
 	}
+
+	public void ActivateObject(GameObject o) {
+		o.SetActive(true);
+	}
 }

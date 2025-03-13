@@ -98,6 +98,9 @@ public class GameplayDataUI : NetworkBehaviour {
 	float startTime = 0;
 	List<(float timestamp, int points)> pointsForCurrSpeed = new List<(float timestamp, int points)>();
 	public TextMeshProUGUI currSpeedTxt, avgSpeedTxt, totalPointsTxt, pointContributionTxt;
+	public void AIInput(int count, ulong ID) {
+		InputFired(new string('*', count), ID);
+	}
 	void InputFired(string s, ulong localID) {
 		pointsContributedByMe += s.Length;
 		UpdateTeamPointsServerRpc(GameData.team1.Contains(localID) ? Team.t1 : Team.t2, s.Length);

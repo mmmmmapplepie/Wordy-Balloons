@@ -27,8 +27,11 @@ public class BalloonManager : NetworkBehaviour {
 		InputManager.CorrectEntryProcess -= SpawnBalloon;
 	}
 
+	public void SpawnBalloon(int length, ulong teamID) {
+		StartCoroutine(SpawnBalloonWithDelay(length, teamID));
+	}
 	public void SpawnBalloon(string word, ulong teamID) {
-		StartCoroutine(SpawnBalloonWithDelay(word.Length, teamID));
+		SpawnBalloon(word.Length, teamID);
 	}
 	IEnumerator SpawnBalloonWithDelay(int count, ulong teamID) {
 		yield return new WaitForSeconds(TypedBalloonAnimations.animationTime);
