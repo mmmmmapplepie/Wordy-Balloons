@@ -15,9 +15,9 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 	[SerializeField] TMP_Dropdown colorPicker;
 
 	NetworkVariable<FixedString64Bytes> playerName = new NetworkVariable<FixedString64Bytes>();
-	public NetworkVariable<ulong> clientID = new NetworkVariable<ulong>(ulong.MaxValue);
-	public NetworkVariable<int> currColorIndex = new NetworkVariable<int>(0);
-	public NetworkVariable<int> siblingNum = new NetworkVariable<int>();
+	[HideInInspector] public NetworkVariable<ulong> clientID = new NetworkVariable<ulong>(ulong.MaxValue);
+	[HideInInspector] public NetworkVariable<int> currColorIndex = new NetworkVariable<int>(0);
+	[HideInInspector] public NetworkVariable<int> siblingNum = new NetworkVariable<int>();
 	NetworkVariable<bool> joinConfirmed = new NetworkVariable<bool>(false);
 
 

@@ -1,0 +1,11 @@
+
+Gameplay:
+Game objective - You win when the opposing base has lost all health due to your balloons.
+Targetword - This is the word you have to type out, it is case sensitive so be careful. Correct letter and incorrect letters will have a different anmiation.
+Skip - If you type  <color="red">"/"</color> three times in a row you can skip the current word for a new word. The number of times you can skip is set and will get replenished when you successfully fire balloons.
+Stats - You can see some of the game stats on the bottom right such as speed, total balloon points fired, average accuracy and remaining skips available.
+
+Lobby:
+name - you can change your game name here.
+lobby player number - game can only be started when the lobby is full.
+

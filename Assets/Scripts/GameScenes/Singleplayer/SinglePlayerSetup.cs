@@ -1,15 +1,49 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SinglePlayerSetup : NetworkBehaviour {
+	public Slider speedSlider;
+	public TextMeshProUGUI sliderValue;
+	void Start() {
+		if (PlayerPrefs.HasKey(AISpeed)) {
+			SetAISpeed(PlayerPrefs.GetInt(AISpeed));
+			speedSlider.Set(PlayerPrefs.GetInt(AISpeed));
+		}
+	}
 
-	IEnumerator Start() {
-		if (NetworkManager.Singleton.IsConnectedClient) NetworkManager.Singleton.Shutdown();
+	const string AISpeed = "aiSpeed";
+	public void SetAISpeed(float value) {
+		SinglePlayerAI.lettersPerMinute = Mathf.RoundToInt(value);
+		PlayerPrefs.SetInt(AISpeed, Mathf.RoundToInt(value));
+		sliderValue.text = Mathf.RoundToInt(value).ToString();
+	}
 
-		while (NetworkManager.Singleton.IsConnectedClient || NetworkManager.Singleton.ShutdownInProgress) yield return null;
+	public void EnterGameMode(int i) {
+		Enum.TryParse(i.ToString(), out GameMode mode);
+		EnterWithGameMode(mode);
+	}
+	public void EnterWithGameMode(GameMode mode) {
+		GameData.gameMode = mode;
+		StartCoroutine(StartGameRoutine());
+
+	}
+
+	void ShutdownNetwork() {
+		if (NetworkManager.IsConnectedClient && !NetworkManager.ShutdownInProgress)
+			NetworkManager.Shutdown();
+	}
+
+	IEnumerator StartGameRoutine() {
+		while (NetworkManager.Singleton.IsConnectedClient) {
+			ShutdownNetwork();
+			yield return null;
+		}
 
 		FindObjectOfType<UnityTransport>().SetConnectionData("127.0.0.1", 7777);
 
@@ -32,7 +66,6 @@ public class SinglePlayerSetup : NetworkBehaviour {
 		GameData.team2.Add(computerID);
 
 		GameData.InSinglePlayerMode = true;
-		GameData.gameMode = GameMode.OwnEnemy;
 
 		NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
 	}

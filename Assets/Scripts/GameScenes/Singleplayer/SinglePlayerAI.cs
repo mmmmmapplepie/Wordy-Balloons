@@ -42,7 +42,7 @@ public class SinglePlayerAI : MonoBehaviour {
 	}
 
 	List<DictionaryEntry> DictionaryList = null;
-	int lettersPerMinute = 100;
+	public static int lettersPerMinute = 100;
 	float cumulativePower = 0;
 	int wordLength = -1;
 	public BalloonManager balloonManager;

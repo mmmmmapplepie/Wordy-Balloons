@@ -73,6 +73,7 @@ public class GameUI : MonoBehaviour {
 	}
 
 
+
 	#endregion
 
 
@@ -108,6 +109,8 @@ public class GameUI : MonoBehaviour {
 			endingPanel.GetComponent<Animator>().Play("Defeat");
 		}
 	}
+
+
 
 
 	#endregion

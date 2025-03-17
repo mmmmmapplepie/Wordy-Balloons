@@ -12,10 +12,10 @@ EditorBuildSettings:
     path: Assets/Scenes/LobbyScene.unity
     guid: 4bbb7537297a69342ac1de46d0b9a815
   - enabled: 1
-    path: Assets/Scenes/SingleplayerEntry.unity
-    guid: 791ff822e4cc9e54cb46f1eaad42eead
-  - enabled: 1
     path: Assets/Scenes/MultiplayerGameScene.unity
     guid: 87ef0e67964c6774aa9c2527f13622cb
+  - enabled: 1
+    path: Assets/Scenes/SinglePlayer.unity
+    guid: dd63488e517a9cd41a4caf690fe66a46
   m_configObjects:
     com.unity.renderstreaming.settings: {fileID: 11400000, guid: eaaad242393318e4f85c45e69c8837f0, type: 2}

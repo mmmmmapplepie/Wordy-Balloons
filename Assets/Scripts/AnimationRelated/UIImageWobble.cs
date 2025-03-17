@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -26,13 +25,22 @@ public class UIImageWobble : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 	Color highlightColor = new Color(1f, 1f, 150f / 255f, 1f);
 	Color clickColor = new Color(1f, 150f / 255f, 100f / 255f, 1f);
 	Color enteredColor;
+
+	public bool IncreaseSizeOnEnter = false;
+	public float sizeFactor = 1.1f;
 	public void OnPointerEnter(PointerEventData eventData) {
+		if (IncreaseSizeOnEnter) {
+			transform.localScale *= sizeFactor;
+		}
 		enteredColor = highlightColor;
 		if (!Interactable() || clicked) return;
 		img.color = enteredColor;
 	}
 
 	public void OnPointerExit(PointerEventData eventData) {
+		if (IncreaseSizeOnEnter) {
+			transform.localScale = Vector3.one;
+		}
 		enteredColor = Color.white;
 		if (!Interactable() || clicked) return;
 		img.color = enteredColor;

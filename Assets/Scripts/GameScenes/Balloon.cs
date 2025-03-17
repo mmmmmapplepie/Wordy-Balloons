@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Balloon : NetworkBehaviour {
 	float flyTime = 5f;
-	public int tempPower;
-	public Team tempTeam;
-	public Color tempColor;
+	[HideInInspector] public int tempPower;
+	[HideInInspector] public Team tempTeam;
+	[HideInInspector] public Color tempColor;
 	[HideInInspector] public NetworkVariable<float> flyProgress = new NetworkVariable<float>(0f);
 	[HideInInspector] public NetworkVariable<int> power;
 	[HideInInspector] public NetworkVariable<Team> balloonTeam;

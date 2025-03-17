@@ -16,9 +16,16 @@ public class Guide : MonoBehaviour {
 	int panelsInCenterAndRight = 0;
 	int centerIndex = 0;
 
+	public GameObject leftBtn, rightBtn;
 	private void Start() {
 		foreach (Transform t in panelContainer) {
+			if (!t.gameObject.activeInHierarchy) continue;
 			panels.Add(t.GetComponent<RectTransform>());
+		}
+		if (panels.Count < 2) {
+			leftBtn.SetActive(false);
+			rightBtn.SetActive(false);
+			return;
 		}
 		panelWidth = panels[0].rect.width;
 		EnsureMinimumPanels();

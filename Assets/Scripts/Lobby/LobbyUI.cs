@@ -94,10 +94,11 @@ public class LobbyUI : MonoBehaviour {
 	[SerializeField] GameObject lobbyCreationPanel;
 	public TMP_InputField lobbyName, lobbyCode;
 	public TMP_Dropdown lobbyModeDropDown, lobbyPlayerNumDropDown;
+
 	public void GoToCreateLobby() {
 		//reset lobby name and mode and maxplayer
-		lobbyModeDropDown.value = 0;
-		lobbyPlayerNumDropDown.value = 0;
+		lobbyModeDropDown.Set(0);
+		lobbyPlayerNumDropDown.Set(0);
 		lobbyName.text = "New Lobby";
 		lobbyCreationPanel.SetActive(true);
 	}
@@ -307,5 +308,10 @@ public class LobbyUI : MonoBehaviour {
 
 
 	#endregion
+
+	public void EnableObject(GameObject o) {
+		o.SetActive(true);
+	}
+
 
 }

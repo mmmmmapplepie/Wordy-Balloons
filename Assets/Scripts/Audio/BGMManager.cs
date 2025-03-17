@@ -26,7 +26,6 @@ public class BGMManager : MonoBehaviour {
 
 
 	void SceneLoaded(Scene scene, LoadSceneMode mode) {
-		print(scene.name);
 		if (scene.name == "MainMenu" || scene.name == "LobbyScene") {
 			if (AudioPlayer.Instance.CheckPlaying(battleBGM.Name)) AudioPlayer.Instance.StopSound(battleBGM.Name, 0.5f);
 			if (!AudioPlayer.Instance.CheckPlaying(menuBGM.Name)) { AudioPlayer.Instance.PlaySound(menuBGM.Name, 1f); }
