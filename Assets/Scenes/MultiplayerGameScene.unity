@@ -1066,7 +1066,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   balloonManager: {fileID: 1813721897}
-  dataHolder: {fileID: 1691777473}
 --- !u!4 &310222790
 Transform:
   m_ObjectHideFlags: 0
@@ -1863,6 +1862,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   countdownTxt: {fileID: 516848448}
+  tickAudio: {fileID: 8300000, guid: 68eef3021e57d6f4ea8c1dc4c053a3d8, type: 3}
+  startAudio: {fileID: 8300000, guid: 4d70aac043d9c51409867061196b1f22, type: 3}
   wordExplanationTxt: {fileID: 1573232566}
   menusPanel: {fileID: 1600918678}
   guidePanel: {fileID: 663986497}
@@ -3147,6 +3148,34 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 773995667}
     m_Modifications:
+    - target: {fileID: 5799188429268382220, guid: 63c87b7a1c5da9e4ca5d7bb33a69d62a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5799188429268382220, guid: 63c87b7a1c5da9e4ca5d7bb33a69d62a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5799188429268382220, guid: 63c87b7a1c5da9e4ca5d7bb33a69d62a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1674171513}
+    - target: {fileID: 5799188429268382220, guid: 63c87b7a1c5da9e4ca5d7bb33a69d62a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5799188429268382220, guid: 63c87b7a1c5da9e4ca5d7bb33a69d62a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: PlayOneshotClip
+      objectReference: {fileID: 0}
+    - target: {fileID: 5799188429268382220, guid: 63c87b7a1c5da9e4ca5d7bb33a69d62a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: OneshotSound, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 5799188429268382220, guid: 63c87b7a1c5da9e4ca5d7bb33a69d62a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 6200433439294133606, guid: 63c87b7a1c5da9e4ca5d7bb33a69d62a, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -3234,6 +3263,10 @@ PrefabInstance:
     - target: {fileID: 9175866832345284780, guid: 63c87b7a1c5da9e4ca5d7bb33a69d62a, type: 3}
       propertyPath: m_Name
       value: Guide
+      objectReference: {fileID: 0}
+    - target: {fileID: 9175866832345284780, guid: 63c87b7a1c5da9e4ca5d7bb33a69d62a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8880,6 +8913,7 @@ GameObject:
   - component: {fileID: 1674171512}
   - component: {fileID: 1674171511}
   - component: {fileID: 1674171510}
+  - component: {fileID: 1674171513}
   m_Layer: 5
   m_Name: HowToPlay
   m_TagString: Untagged
@@ -8951,9 +8985,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 493678118}
-        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
-        m_MethodName: PlayOneshotClip
+      - m_Target: {fileID: 493678117}
+        m_TargetAssemblyTypeName: GameUI, Assembly-CSharp
+        m_MethodName: ToggleGuide
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8963,9 +8997,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 493678117}
-        m_TargetAssemblyTypeName: GameUI, Assembly-CSharp
-        m_MethodName: ToggleGuide
+      - m_Target: {fileID: 1674171513}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -9013,6 +9047,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1674171508}
   m_CullTransparentMesh: 1
+--- !u!114 &1674171513
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1674171508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d4d3f7bf17a2c044a7712dff5cde611, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clip: {fileID: 8300000, guid: d5160855b7a182243b29dbd07c850c25, type: 3}
+  volume: 1
 --- !u!1 &1691777468
 GameObject:
   m_ObjectHideFlags: 0

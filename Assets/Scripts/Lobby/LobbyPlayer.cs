@@ -22,6 +22,7 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 
 
 	public override void OnNetworkSpawn() {
+		base.OnNetworkSpawn();
 		SetDropDown();
 		ColorChanged(-1, currColorIndex.Value);
 		clientID.OnValueChanged += CheckActivePlayer;
@@ -44,6 +45,7 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 		playerName.OnValueChanged -= NameChanged;
 		joinConfirmed.OnValueChanged -= LoadStateChanged;
 		siblingNum.OnValueChanged -= ChangePos;
+		base.OnNetworkDespawn();
 	}
 
 	public void SetColor(int newIndex) {

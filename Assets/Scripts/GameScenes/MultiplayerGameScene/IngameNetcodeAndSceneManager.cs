@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	public override void OnNetworkSpawn() {
+		base.OnNetworkSpawn();
 		NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
 		NetworkManager.Singleton.OnServerStopped += ServerStopped;
 		if (NetworkManager.IsServer) {
@@ -14,12 +15,14 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		}
 	}
 	public override void OnNetworkDespawn() {
+		base.OnNetworkDespawn();
 		if (NetworkManager.Singleton == null) return;
 		NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnectCallback;
 	}
 	public override void OnDestroy() {
 		OnNetworkDespawn();
 		ShutDownNetwork();
+		base.OnDestroy();
 	}
 	void OnClientDisconnectCallback(ulong clientID) {
 		if (clientID == NetworkManager.ServerClientId) {
@@ -70,10 +73,6 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		if (NetworkManager.Singleton != null && !NetworkManager.Singleton.ShutdownInProgress) {
 			NetworkManager.Singleton.Shutdown();
 		}
-	}
-	public void GoToScene(string scene) {
-		ShutDownNetwork();
-		SceneManager.LoadScene(scene);
 	}
 
 

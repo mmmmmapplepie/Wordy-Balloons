@@ -10,6 +10,7 @@ public class GameStateManager : NetworkBehaviour {
 		CurrGameResult = GameResult.Undecided;
 	}
 	public override void OnNetworkSpawn() {
+		base.OnNetworkSpawn();
 		NetworkManager.SceneManager.OnLoadEventCompleted += SceneLoadedForAll;
 		countDown_NV.OnValueChanged += CountDownChanged;
 
@@ -24,10 +25,11 @@ public class GameStateManager : NetworkBehaviour {
 		BaseManager.TeamLose -= TeamLoss;
 
 		IngameNetcodeAndSceneManager.GameResultChangeByConnection -= SetGameResult;
+		base.OnNetworkDespawn();
 	}
 
-	// float countDownTime = 3;
-	float countDownTime = 0.1f;
+	float countDownTime = 3;
+	// float countDownTime = 0.1f;
 	private void SceneLoadedForAll(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut) {
 		if (NetworkManager.Singleton.IsServer) StartCoroutine(StartCountDown());
 	}

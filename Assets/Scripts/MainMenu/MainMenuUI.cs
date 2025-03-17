@@ -16,4 +16,8 @@ public class MainMenuUI : MonoBehaviour {
 	public void ActivateObject(GameObject o) {
 		o.SetActive(true);
 	}
+
+	public void CloseGame() {
+		Application.Quit();
+	}
 }

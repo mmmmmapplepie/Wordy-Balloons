@@ -35,7 +35,10 @@ public class GameUI : MonoBehaviour {
 
 
 	[Header("Game State")] public TextMeshProUGUI countdownTxt;
+	public AudioClip tickAudio, startAudio;
 	void ChangeCountDown(int val) {
+		if (val > 0) AudioPlayer.PlayOneShot_Static(tickAudio, 0.2f);
+		else if (val == 0) AudioPlayer.PlayOneShot_Static(startAudio, 0.5f);
 		countdownTxt.text = val.ToString();
 		countdownTxt.transform.parent.gameObject.SetActive(val == 0 ? false : true);
 	}
@@ -69,7 +72,7 @@ public class GameUI : MonoBehaviour {
 	}
 	public void GoToScene(string s) {
 		NetworkManager.Singleton.Shutdown();
-		SceneManager.LoadScene(s);
+		SceneManager.LoadScene(s, LoadSceneMode.Single);
 	}
 
 

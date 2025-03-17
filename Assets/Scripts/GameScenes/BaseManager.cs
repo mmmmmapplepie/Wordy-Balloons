@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class BaseManager : NetworkBehaviour {
 
-	const int DefaultMaxHP = 5;
+	const int DefaultMaxHP = 50;
 	public static NetworkVariable<int> team1BaseHP = new NetworkVariable<int>(DefaultMaxHP);
 	public static NetworkVariable<int> team2BaseHP = new NetworkVariable<int>
 	(DefaultMaxHP);
@@ -22,6 +22,7 @@ public class BaseManager : NetworkBehaviour {
 		GameStateManager.GameResultSetEvent -= ResultChanged;
 
 		Balloon.BalloonCreated -= BallonCreated;
+		base.OnDestroy();
 	}
 
 	public static event Action BaseHPSet;
@@ -32,9 +33,9 @@ public class BaseManager : NetworkBehaviour {
 		team2BaseHP.OnValueChanged += BaseHP2Changed;
 	}
 	public override void OnNetworkDespawn() {
-		base.OnNetworkDespawn();
 		team1BaseHP.OnValueChanged += BaseHP1Changed;
 		team2BaseHP.OnValueChanged += BaseHP2Changed;
+		base.OnNetworkDespawn();
 	}
 	public static void SetBaseHP(int team1HP, int team2HP) {
 		team1BaseHP.Value = team1HP;
@@ -118,7 +119,7 @@ public class BaseManager : NetworkBehaviour {
 
 	IEnumerator BaseDestroyAnimation(Transform targetBase) {
 		//disable damaged base overlay objects.
-		InvokeRepeating(nameof(PlaySound), 1f, 1f);
+		//disable damaged base overlay objects.f);
 		SpriteRenderer sr = targetBase.GetComponent<SpriteRenderer>();
 		Bounds targetBounds = sr.bounds;
 		Vector2 xRange = new Vector2(targetBounds.min.x, targetBounds.max.x);

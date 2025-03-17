@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SinglePlayerAI : MonoBehaviour {
-	public static Action UpdateMethod;
+	Action UpdateMethod;
 	void Awake() {
 		GameStateManager.countDownChanged += CheckGameStart;
 		if (!GameData.InSinglePlayerMode) {
@@ -46,7 +46,6 @@ public class SinglePlayerAI : MonoBehaviour {
 	float cumulativePower = 0;
 	int wordLength = -1;
 	public BalloonManager balloonManager;
-	public GameplayDataUI dataHolder;
 
 	void BasicAI() {
 		if (wordLength < 1) {
@@ -57,8 +56,7 @@ public class SinglePlayerAI : MonoBehaviour {
 		cumulativePower += Time.deltaTime * lettersPerMinute / 60f;
 		if (cumulativePower >= wordLength && wordLength > 0) {
 			cumulativePower -= wordLength;
-			balloonManager.SpawnBalloon(wordLength, 1);
-			dataHolder.AIInput(wordLength, 1);
+			this.balloonManager.SpawnBalloon(wordLength, 1);
 			wordLength = 0;
 		}
 	}

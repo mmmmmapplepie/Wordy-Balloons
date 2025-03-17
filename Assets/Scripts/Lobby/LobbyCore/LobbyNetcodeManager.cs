@@ -20,6 +20,7 @@ public class LobbyNetcodeManager : NetworkBehaviour {
 	}
 
 	public override void OnNetworkSpawn() {
+		base.OnNetworkSpawn();
 		NetworkManager.Singleton.OnClientConnectedCallback += ClientConnectedToNGO;
 		NetworkManager.Singleton.OnServerStarted += ServerStarted;
 		NetworkManager.Singleton.OnServerStopped += ServerStopped;
@@ -42,6 +43,7 @@ public class LobbyNetcodeManager : NetworkBehaviour {
 			NetworkManager.Singleton.OnClientDisconnectCallback -= ClientDisconnectedFromNGO;
 			NetworkManager.Singleton.OnClientStopped -= ClientStopped;
 		}
+		base.OnDestroy();
 	}
 
 	public void StartHost() {

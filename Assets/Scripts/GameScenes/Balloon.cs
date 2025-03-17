@@ -22,6 +22,7 @@ public class Balloon : NetworkBehaviour {
 	public BalloonAnimation anim;
 	public static event System.Action<Team> BalloonCreated;
 	public override void OnNetworkSpawn() {
+		base.OnNetworkSpawn();
 		power.OnValueChanged += PowerChanged;
 		flyProgress.OnValueChanged += ProgressChanged;
 		if (NetworkManager.Singleton.IsServer) {
@@ -39,6 +40,7 @@ public class Balloon : NetworkBehaviour {
 	public override void OnNetworkDespawn() {
 		flyProgress.OnValueChanged -= ProgressChanged;
 		power.OnValueChanged -= PowerChanged;
+		base.OnNetworkDespawn();
 	}
 
 	void Update() {

@@ -20,6 +20,7 @@ public class MyLobby : NetworkBehaviour {
 		SetupColoredLists();
 	}
 	public override void OnNetworkSpawn() {
+		base.OnNetworkSpawn();
 		LoadingSceneBool.Value = false;
 		LoadingCountdown.Value = sceneLoadTimer;
 	}

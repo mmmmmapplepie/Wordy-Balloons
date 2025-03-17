@@ -16,20 +16,22 @@ public class GameplayDataUI : NetworkBehaviour {
 
 		InputManager.SkipTickChanged += SkipTickChanged;
 		InputManager.TypedTextChanged += UpdateAccuracy;
-		InputManager.CorrectEntryProcess += InputFired;
 		InputManager.WrongEntryProcess += WrongEntry;
 
 		BaseManager.BaseTakenDamage += BaseTakesDamageClientRpc;
+
+		BalloonManager.BalloonSpawned += InputFired;
 
 		GameStateManager.GameResultSetEvent += GameResultChange;
 	}
 	public override void OnDestroy() {
 		InputManager.TypedTextChanged -= UpdateAccuracy;
 		InputManager.SkipTickChanged -= SkipTickChanged;
-		InputManager.CorrectEntryProcess -= InputFired;
 		InputManager.WrongEntryProcess -= WrongEntry;
 
 		BaseManager.BaseTakenDamage -= BaseTakesDamageClientRpc;
+
+		BalloonManager.BalloonSpawned -= InputFired;
 
 		GameStateManager.GameResultSetEvent -= GameResultChange;
 
@@ -98,13 +100,13 @@ public class GameplayDataUI : NetworkBehaviour {
 	float startTime = 0;
 	List<(float timestamp, int points)> pointsForCurrSpeed = new List<(float timestamp, int points)>();
 	public TextMeshProUGUI currSpeedTxt, avgSpeedTxt, totalPointsTxt, pointContributionTxt;
-	public void AIInput(int count, ulong ID) {
-		InputFired(new string('*', count), ID);
-	}
-	void InputFired(string s, ulong localID) {
-		pointsContributedByMe += s.Length;
-		UpdateTeamPointsServerRpc(GameData.team1.Contains(localID) ? Team.t1 : Team.t2, s.Length);
-		pointsForCurrSpeed.Add((Time.time, s.Length));
+	public void InputFired(int count, ulong ID) {
+		if (ID == NetworkManager.Singleton.LocalClientId) {
+			pointsContributedByMe += count;
+			pointsForCurrSpeed.Add((Time.time, count));
+		}
+
+		UpdateTeamPointsServerRpc(GameData.team1.Contains(ID) ? Team.t1 : Team.t2, count);
 	}
 	[ServerRpc(RequireOwnership = false)]
 	void UpdateTeamPointsServerRpc(Team team, int addition) {
@@ -115,8 +117,8 @@ public class GameplayDataUI : NetworkBehaviour {
 	NetworkVariable<int> team1WrongEntries = new NetworkVariable<int>(0);
 	NetworkVariable<int> team2WrongEntries = new NetworkVariable<int>(0);
 	void WrongEntry() {
-		myWrongEntries++;
 		WrongEntryServerRpc(GameData.team1.Contains(NetworkManager.Singleton.LocalClientId) ? Team.t1 : Team.t2);
+		myWrongEntries++;
 	}
 	[ServerRpc]
 	void WrongEntryServerRpc(Team t) {

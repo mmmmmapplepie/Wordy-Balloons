@@ -23,8 +23,8 @@ public class BalloonManager : NetworkBehaviour {
 
 
 	public override void OnDestroy() {
-		base.OnDestroy();
 		InputManager.CorrectEntryProcess -= SpawnBalloon;
+		base.OnDestroy();
 	}
 
 	public void SpawnBalloon(int length, ulong teamID) {
@@ -33,6 +33,7 @@ public class BalloonManager : NetworkBehaviour {
 	public void SpawnBalloon(string word, ulong teamID) {
 		SpawnBalloon(word.Length, teamID);
 	}
+	public static event System.Action<int, ulong> BalloonSpawned;
 	IEnumerator SpawnBalloonWithDelay(int count, ulong teamID) {
 		yield return new WaitForSeconds(TypedBalloonAnimations.animationTime);
 		if (!GameStateManager.IsGameRunning()) yield break;
@@ -51,6 +52,7 @@ public class BalloonManager : NetworkBehaviour {
 		script.tempTeam = GameData.GetTeamFromClientID(teamID);
 		script.tempColor = GameData.allColorOptions[GameData.ClientID_KEY_ColorIndex_VAL[teamID]];
 		newBalloon.GetComponent<NetworkObject>().Spawn();
+		BalloonSpawned?.Invoke(count, teamID);
 	}
 
 
