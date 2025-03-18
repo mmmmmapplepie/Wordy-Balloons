@@ -53,12 +53,13 @@ public class TypedBalloonAnimations : MonoBehaviour {
 			float r = 1f - 2f * Mathf.Pow(3f, -expPow * t / animationTime);
 			pivot = Mathf.Lerp(-1, 0, t / animationTime);
 			centerPos = Vector3.Lerp(Vector3.zero, target, r);
-			scaleFactor = Mathf.Lerp(initialScale, 0.5f, t / animationTime);
+			scaleFactor = Mathf.Lerp(initialScale, 0.3f, t / animationTime);
 			transform.rotation *= Quaternion.Euler(0, 0, rotAdd * Time.deltaTime);
 
-			foreach (SpriteRenderer s in transform.GetComponents<SpriteRenderer>()) {
+			foreach (Transform tr in transform) {
+				SpriteRenderer s = tr.GetComponent<SpriteRenderer>();
 				Color i = s.color;
-				i.a = 1f - t;
+				i.a = 1f - Mathf.Pow(t / animationTime, 10f);
 				s.color = i;
 			}
 

@@ -119,7 +119,7 @@ public class BaseManager : NetworkBehaviour {
 
 	IEnumerator BaseDestroyAnimation(Transform targetBase) {
 		//disable damaged base overlay objects.
-		//disable damaged base overlay objects.f);
+		InvokeRepeating(nameof(PlaySound), 1f, 1f);
 		SpriteRenderer sr = targetBase.GetComponent<SpriteRenderer>();
 		Bounds targetBounds = sr.bounds;
 		Vector2 xRange = new Vector2(targetBounds.min.x, targetBounds.max.x);
