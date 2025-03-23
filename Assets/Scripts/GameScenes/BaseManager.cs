@@ -114,6 +114,7 @@ public class BaseManager : NetworkBehaviour {
 		if (result == GameStateManager.GameResult.Undecided || result == GameStateManager.GameResult.Draw) return;
 		Transform losingBase = homeBase;
 		if (result == GameStateManager.GameResult.Team1Win && BalloonManager.team == Team.t1) losingBase = awayBase;
+		if (result == GameStateManager.GameResult.Team2Win && BalloonManager.team == Team.t2) losingBase = awayBase;
 		StartCoroutine(BaseDestroyAnimation(losingBase));
 	}
 

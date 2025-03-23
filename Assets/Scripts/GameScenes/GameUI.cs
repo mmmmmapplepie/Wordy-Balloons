@@ -85,12 +85,13 @@ public class GameUI : MonoBehaviour {
 	[Header("Game Finish")] public GameObject menuBtn;
 	public GameObject connectionLost, victoryPanel, defeatPanel, endingPanel, gameplayUI;
 	void GameResultSet(GameStateManager.GameResult result) {
+		menuBtn.SetActive(false);
+		gameplayUI.SetActive(false);
 		if (result == GameStateManager.GameResult.Draw) {
+			menusPanel.SetActive(true);
 			connectionLost.SetActive(true);
 			return;
 		}
-		menuBtn.SetActive(false);
-		gameplayUI.SetActive(false);
 		StartCoroutine(DelayedUIShow(result));
 	}
 	IEnumerator DelayedUIShow(GameStateManager.GameResult result) {

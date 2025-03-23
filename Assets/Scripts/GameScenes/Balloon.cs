@@ -30,8 +30,11 @@ public class Balloon : NetworkBehaviour {
 			power.Value = tempPower;
 			balloonTeam.Value = tempTeam;
 			balloonColor.Value = tempColor;
+			startP.Value = startPos;
+			endP.Value = endPos;
 		}
 		PowerChanged(0, power.Value);
+
 		ProgressChanged(0f, 0f);
 		UpdateScale();
 		BalloonCreated?.Invoke(balloonTeam.Value);
@@ -58,6 +61,7 @@ public class Balloon : NetworkBehaviour {
 	void UpdateScale() {
 		transform.localScale = Vector3.one * Mathf.Lerp(minScale, maxScale, power.Value / 15f);
 	}
+	NetworkVariable<Vector3> startP = new NetworkVariable<Vector3>(), endP = new NetworkVariable<Vector3>();
 	[HideInInspector] public Vector3 startPos, endPos;
 	void ProgressChanged(float previous, float current) {
 		if (current >= 1) {
@@ -67,7 +71,7 @@ public class Balloon : NetworkBehaviour {
 		float realProgress = current;
 		if (balloonTeam.Value != BalloonManager.team) realProgress = 1 - current;
 		float p = ProgressBehaviour(realProgress);
-		transform.position = GetProgressPosition(startPos, endPos, p);
+		transform.position = GetProgressPosition(startP.Value, endP.Value, p);
 	}
 	void PowerChanged(int prev, int curr) {
 		powerTxt.text = curr.ToString();

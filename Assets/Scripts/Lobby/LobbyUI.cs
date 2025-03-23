@@ -22,6 +22,7 @@ public class LobbyUI : MonoBehaviour {
 	void Start() {
 		MyLobby.LobbyFull += LobbyFull;
 		MyLobby.SceneLoadingError += LoadingSceneError;
+		MyLobby.LoadingNextScene += OpenLoadingPanel;
 		MyLobby.LoadingCountdown.OnValueChanged += LoadingCountdown;
 		MyLobby.LoadingSceneBool.OnValueChanged += LoadingSceneStateChange;
 
@@ -49,6 +50,7 @@ public class LobbyUI : MonoBehaviour {
 	void OnDestroy() {
 		MyLobby.LobbyFull -= LobbyFull;
 		MyLobby.SceneLoadingError -= LoadingSceneError;
+		MyLobby.LoadingNextScene -= OpenLoadingPanel;
 		MyLobby.LoadingCountdown.OnValueChanged -= LoadingCountdown;
 		MyLobby.LoadingSceneBool.OnValueChanged -= LoadingSceneStateChange;
 

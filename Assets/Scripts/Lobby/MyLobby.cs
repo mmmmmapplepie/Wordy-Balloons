@@ -6,6 +6,7 @@ using Unity.Netcode;
 using Unity.Services.Authentication;
 using UnityEngine;
 using UnityEngine.UI;
+using Newtonsoft.Json;
 
 public class MyLobby : NetworkBehaviour {
 	public static MyLobby Instance;
@@ -82,7 +83,8 @@ public class MyLobby : NetworkBehaviour {
 	Dictionary<ulong, string> ClientID_KEY_LobbyID_VAL = new Dictionary<ulong, string>();
 	HashSet<ulong> team1 = new HashSet<ulong>(), team2 = new HashSet<ulong>();
 	List<LobbyPlayer> playersObjects = new List<LobbyPlayer>();
-	int team1Max = 0; int team2Max = 0;
+	// int team1Max = 0; int team2Max = 0;
+	int teamMax = 3; int teamMin = 1;
 
 	#endregion
 
@@ -117,11 +119,17 @@ public class MyLobby : NetworkBehaviour {
 		team2.Clear();
 		playersObjects.Clear();
 		int slots = LobbyManager.Instance.hostLobby.MaxPlayers;
-		team1Max = Mathf.CeilToInt(slots / 2f);
-		team2Max = slots - team1Max;
+		SetTeamMaxAndMin(slots);
+		// team1Max = Mathf.CeilToInt(slots / 2f);
+		// team2Max = slots - team1Max;
 		StopAllCoroutines();
 		tempJoinedList.Clear();
 	}
+	void SetTeamMaxAndMin(int maxSlots) {
+		teamMax = maxSlots > 3 ? 3 : maxSlots - 1;
+		teamMin = 1;
+	}
+
 	#endregion
 
 
@@ -134,16 +142,25 @@ public class MyLobby : NetworkBehaviour {
 	List<(string id, Coroutine timeout)> tempJoinedList = new List<(string id, Coroutine timeout)>();
 	void JoinedLobbyTemp(string id) {
 		if (!NetworkManager.Singleton.IsServer) return;
+
+		if (LoadingSceneBool.Value == true) {
+			//kick player
+			LobbyManager.Instance.KickFromLobby(id);
+			return;
+		}
+
 		StopTimeout(id);
 		Coroutine newJoinTimeout = StartCoroutine(nameof(JoinConfirmationTimeout), id);
 		tempJoinedList.Add((id, newJoinTimeout));
 	}
-	void StopTimeout(string id) {
+	bool StopTimeout(string id) {
 		int inx = tempJoinedList.FindIndex(x => x.id == id);
 		if (inx != -1) {
 			StopCoroutine(tempJoinedList[inx].timeout);
 			tempJoinedList.RemoveAt(inx);
+			return true;
 		}
+		return false;
 	}
 	const float JoinConfirmationTimeoutTime = 10f;
 	IEnumerator JoinConfirmationTimeout(string id) {
@@ -166,7 +183,7 @@ public class MyLobby : NetworkBehaviour {
 
 	[ServerRpc(RequireOwnership = false)]
 	void SendLobbyJoinConfirmationServerRPC(string lobbyID, ulong clientID, string playerName) {
-		StopTimeout(lobbyID);
+		if (!StopTimeout(lobbyID)) return;//for disabling ppl joining once scene loading is started.
 		if (!ClientID_KEY_LobbyID_VAL.ContainsKey(clientID)) ClientID_KEY_LobbyID_VAL.Add(clientID, lobbyID);
 		LobbyPlayer playerObj = FindPlayerFromClientID(clientID);
 		if (playerObj != null) playerObj.ConfirmJoin(playerName);
@@ -224,7 +241,8 @@ public class MyLobby : NetworkBehaviour {
 	}
 
 	Team GetTeamToPlaceIn() {
-		return team1.Count < team1Max ? Team.t1 : Team.t2;
+		return team1.Count < teamMax ? Team.t1 : Team.t2;
+		// return team1.Count < team1Max ? Team.t1 : Team.t2;
 	}
 
 	LobbyPlayer AddPlayerToLobby(ulong clientID) {
@@ -255,7 +273,7 @@ public class MyLobby : NetworkBehaviour {
 
 	void RemovePlayer(ulong id) {
 		LobbyPlayer p = FindPlayerFromClientID(id);
-		RemovePlayerObject(p);
+		if (p != null) RemovePlayerObject(p);
 		team1.Remove(id);
 		team2.Remove(id);
 		ClientID_KEY_ColorIndex_VAL.Remove(id);
@@ -270,19 +288,22 @@ public class MyLobby : NetworkBehaviour {
 		if (LoadingSceneBool.Value) return;
 		if (swapPlayer == null) {
 			if (targetT == team1Holder) {
-				if (team1.Contains(dragPlayer.clientID.Value) || team1Holder.childCount >= team1Max) return;
+				if (team1.Contains(dragPlayer.clientID.Value) || team1Holder.childCount >= teamMax) return;
+				// if (team1.Contains(dragPlayer.clientID.Value) || team1Holder.childCount >= team1Max) return;
 				team2.Remove(dragPlayer.clientID.Value);
 				team1.Add(dragPlayer.clientID.Value);
 				dragPlayer.gameObject.GetComponent<NetworkObject>().TrySetParent(team1Holder);
 				dragPlayer.transform.SetAsLastSibling();
 			}
 			if (targetT == team2Holder) {
-				if (team2.Contains(dragPlayer.clientID.Value) || team2Holder.childCount >= team2Max) return;
+				if (team2.Contains(dragPlayer.clientID.Value) || team2Holder.childCount >= teamMax) return;
+				// if (team2.Contains(dragPlayer.clientID.Value) || team2Holder.childCount >= team2Max) return;
 				team1.Remove(dragPlayer.clientID.Value);
 				team2.Add(dragPlayer.clientID.Value);
 				dragPlayer.gameObject.GetComponent<NetworkObject>().TrySetParent(team2Holder);
 				dragPlayer.transform.SetAsLastSibling();
 			}
+			CheckIfPlayersFilled();
 			return;
 		}
 
@@ -301,6 +322,7 @@ public class MyLobby : NetworkBehaviour {
 		swapPlayer.gameObject.GetComponent<NetworkObject>().TrySetParent(dragObjHolder);
 		dragPlayer.siblingNum.Value = swapObjOrder;
 		swapPlayer.siblingNum.Value = dragObjOrder;
+		CheckIfPlayersFilled();
 	}
 
 	#endregion
@@ -361,17 +383,17 @@ public class MyLobby : NetworkBehaviour {
 
 
 	#region Entering game
-	public static event Action SceneLoadingError;
+	public static event Action SceneLoadingError, LoadingNextScene;
 	public static event Action<bool> LobbyFull;
 
 	public static NetworkVariable<bool> LoadingSceneBool = new NetworkVariable<bool>(false);
 	public static NetworkVariable<int> LoadingCountdown = new NetworkVariable<int>();
 
 	Coroutine loadingSceneRoutine = null;
-	const int sceneLoadTimer = 3, setTimeout = 8;
-	//when scene loading set : disable : leaving, chaging team/color, kicking
+	const int sceneLoadTimer = 3, sceneLoadTimeout = 8;
 	public void CheckIfPlayersFilled() {
-		LobbyFull?.Invoke(team1Max + team2Max == team1.Count + team2.Count);
+		LobbyFull?.Invoke(team1.Count > 0 && team2.Count > 0);
+		// LobbyFull?.Invoke(team1Max + team2Max == team1.Count + team2.Count);
 	}
 	public void EnterGame() {
 		StopSceneLoading();
@@ -379,9 +401,9 @@ public class MyLobby : NetworkBehaviour {
 	}
 	IEnumerator LoadNextScene() {
 		LoadingSceneBool.Value = true;
-		SendTeamListsRPC();
+		SetupGameDataRPC();
 
-		float timeout = setTimeout;
+		float timeout = sceneLoadTimeout;
 		while (dataRpcConfirmationReceived > 0 && timeout > 0) {
 			timeout -= Time.unscaledDeltaTime;
 			yield return null;
@@ -400,14 +422,14 @@ public class MyLobby : NetworkBehaviour {
 		}
 		LoadingCountdown.Value = countDown;
 
+		LoadingNextScene?.Invoke();
+
 		SceneEventProgressStatus sceneStatus = NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
 		if (sceneStatus != SceneEventProgressStatus.Started) {
 			SceneLoadingError?.Invoke();
 			StopSceneLoading();
 		} else {
 			//change data
-
-
 			GameData.InSinglePlayerMode = false;
 			GameData.allColorOptions = allColorOptions;
 			GameData.ClientID_KEY_ColorIndex_VAL = ClientID_KEY_ColorIndex_VAL;
@@ -415,12 +437,24 @@ public class MyLobby : NetworkBehaviour {
 			GameData.team1 = team1; GameData.team2 = team2;
 		}
 	}
+	string SerializeHashSet<T>(HashSet<T> set) {
+		return JsonConvert.SerializeObject(set);
+	}
+	string SerializeDictionary<TKey, TValue>(Dictionary<TKey, TValue> dict) {
+		return JsonConvert.SerializeObject(dict);
+	}
+	HashSet<T> DeserializeHashSet<T>(string json) {
+		return JsonConvert.DeserializeObject<HashSet<T>>(json);
+	}
+	Dictionary<TKey, TValue> DeserializeDictionary<TKey, TValue>(string json) {
+		return JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(json);
+	}
 
 	#region Sending team data to clients
 	float timeTeamRPCSent;
 	const string splitter = "/", teamSplitter = ":";
 	int dataRpcConfirmationReceived = 0;
-	void SendTeamListsRPC() {
+	void SetupGameDataRPC() {
 		timeTeamRPCSent = Time.unscaledTime;
 		dataRpcConfirmationReceived = team1.Count + team2.Count;
 
@@ -435,10 +469,12 @@ public class MyLobby : NetworkBehaviour {
 		}
 		teamList.Remove(teamList.Length - 1);
 
-		SendTeamListClientRpc(teamList, timeTeamRPCSent);
+		string id_color = SerializeDictionary<ulong, int>(ClientID_KEY_ColorIndex_VAL);
+
+		SendTeamListClientRpc(teamList, timeTeamRPCSent, id_color);
 	}
 	[ClientRpc]
-	void SendTeamListClientRpc(string teamIDs, float timeSent) {
+	void SendTeamListClientRpc(string teamIDs, float timeSent, string id_color) {
 		string[] teamLists = teamIDs.Split(teamSplitter);
 		string[] team1List = teamLists[0].Split(splitter);
 		string[] team2List = teamLists[1].Split(splitter);
@@ -454,6 +490,12 @@ public class MyLobby : NetworkBehaviour {
 		foreach (string s in team2List) {
 			if (ulong.TryParse(s, out ulong clientID)) GameData.team2.Add(clientID);
 		}
+
+
+		GameData.ClientID_KEY_ColorIndex_VAL = DeserializeDictionary<ulong, int>(id_color);
+
+		GameData.InSinglePlayerMode = false;
+		GameData.allColorOptions = allColorOptions;
 		TeamUpdatedServerRpc(timeSent);
 	}
 	[ServerRpc(RequireOwnership = false)]

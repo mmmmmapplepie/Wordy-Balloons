@@ -78,14 +78,12 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 				kickBtn.SetActive(true);
 			}
 		}
-
-		EnableColorpicker();
 	}
-
 	void CheckActivePlayer(ulong id, ulong clientID) {
 		if (clientID == NetworkManager.Singleton.LocalClientId) {
 			activePlayerCover.SetActive(true);
 		}
+		EnableColorpicker();
 	}
 
 	void EnableColorpicker() {
