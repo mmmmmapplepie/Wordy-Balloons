@@ -385,6 +385,7 @@ public class MyLobby : NetworkBehaviour {
 	#region Entering game
 	public static event Action SceneLoadingError, LoadingNextScene;
 	public static event Action<bool> LobbyFull;
+	public AudioClip countdownSound;
 
 	public static NetworkVariable<bool> LoadingSceneBool = new NetworkVariable<bool>(false);
 	public static NetworkVariable<int> LoadingCountdown = new NetworkVariable<int>();
@@ -418,6 +419,7 @@ public class MyLobby : NetworkBehaviour {
 		while (countDown > 0) {
 			LoadingCountdown.Value = countDown;
 			countDown--;
+			AudioPlayer.PlayOneShot_Static(countdownSound, 0.3f);
 			yield return new WaitForSeconds(1f);
 		}
 		LoadingCountdown.Value = countDown;

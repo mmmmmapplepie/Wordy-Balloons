@@ -17,26 +17,31 @@ public class GameplayDataUI : NetworkBehaviour {
 		InputManager.SkipTickChanged += SkipTickChanged;
 		InputManager.TypedTextChanged += UpdateAccuracy;
 		InputManager.WrongEntryProcess += WrongEntry;
+		InputManager.CorrectEntryProcess += CorrectEntry;
 
 		BaseManager.BaseTakenDamage += BaseTakesDamageClientRpc;
 
-		BalloonManager.BalloonSpawned += InputFired;
+		BalloonManager.BalloonSpawned += BalloonFired;
 
 		GameStateManager.GameResultSetEvent += GameResultChange;
 	}
+
 	public override void OnDestroy() {
 		InputManager.TypedTextChanged -= UpdateAccuracy;
 		InputManager.SkipTickChanged -= SkipTickChanged;
 		InputManager.WrongEntryProcess -= WrongEntry;
+		InputManager.CorrectEntryProcess -= CorrectEntry;
 
 		BaseManager.BaseTakenDamage -= BaseTakesDamageClientRpc;
 
-		BalloonManager.BalloonSpawned -= InputFired;
+		BalloonManager.BalloonSpawned -= BalloonFired;
 
 		GameStateManager.GameResultSetEvent -= GameResultChange;
 
 		base.OnDestroy();
 	}
+
+
 
 	void Update() {
 		if (!GameStateManager.IsGameRunning()) return;
@@ -45,9 +50,6 @@ public class GameplayDataUI : NetworkBehaviour {
 		UpdateSpeeds();
 		UpdateSkipCharges();
 	}
-
-
-
 
 
 	#region PlayerCount
@@ -59,9 +61,9 @@ public class GameplayDataUI : NetworkBehaviour {
 		} else {
 			if (NetworkManager.Singleton.IsServer) {
 				playerCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
-			}
-			if (NetworkManager.Singleton.IsClient) {
-				playerCountTxt.text = "Players: " + playerCount.ToString();
+				playerCountTxt.text = "Players: " + playerCount.Value.ToString();
+			} else if (NetworkManager.Singleton.IsClient) {
+				playerCountTxt.text = "Players: " + playerCount.Value.ToString();
 			}
 		}
 	}
@@ -100,14 +102,21 @@ public class GameplayDataUI : NetworkBehaviour {
 	float startTime = 0;
 	List<(float timestamp, int points)> pointsForCurrSpeed = new List<(float timestamp, int points)>();
 	public TextMeshProUGUI currSpeedTxt, avgSpeedTxt, totalPointsTxt, pointContributionTxt;
-	public void InputFired(int count, ulong ID) {
-		if (ID == NetworkManager.Singleton.LocalClientId) {
-			pointsContributedByMe += count;
-			pointsForCurrSpeed.Add((Time.time, count));
-		}
+	public void BalloonFired(int count, ulong ID) {
+		ClientRpcParams param = new ClientRpcParams {
+			Send = new ClientRpcSendParams {
+				TargetClientIds = new ulong[] { ID }
+			}
+		};
+		UpdatePointsClientRpc(count, param);
 
 		UpdateTeamPointsServerRpc(GameData.team1.Contains(ID) ? Team.t1 : Team.t2, count);
 	}
+	[ClientRpc]
+	void UpdatePointsClientRpc(int points, ClientRpcParams clientRpcParams = default) {
+		pointsContributedByMe += points;
+	}
+
 	[ServerRpc(RequireOwnership = false)]
 	void UpdateTeamPointsServerRpc(Team team, int addition) {
 		if (team == Team.t1) team1Points.Value += addition;
@@ -116,11 +125,14 @@ public class GameplayDataUI : NetworkBehaviour {
 	int myWrongEntries = 0;
 	NetworkVariable<int> team1WrongEntries = new NetworkVariable<int>(0);
 	NetworkVariable<int> team2WrongEntries = new NetworkVariable<int>(0);
+	void CorrectEntry(string entry, ulong id) {
+		pointsForCurrSpeed.Add((Time.time, entry.Length));
+	}
 	void WrongEntry() {
 		WrongEntryServerRpc(GameData.team1.Contains(NetworkManager.Singleton.LocalClientId) ? Team.t1 : Team.t2);
 		myWrongEntries++;
 	}
-	[ServerRpc]
+	[ServerRpc(RequireOwnership = false)]
 	void WrongEntryServerRpc(Team t) {
 		if (t == Team.t1) team1WrongEntries.Value++;
 		else team2WrongEntries.Value++;

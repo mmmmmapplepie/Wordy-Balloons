@@ -5673,6 +5673,7 @@ MonoBehaviour:
   - {r: 0, g: 0.07363939, b: 1, a: 1}
   - {r: 0, g: 0, b: 0, a: 1}
   - {r: 1, g: 1, b: 1, a: 1}
+  countdownSound: {fileID: 8300000, guid: 68eef3021e57d6f4ea8c1dc4c053a3d8, type: 3}
   nameInputField: {fileID: 420782338}
 --- !u!1 &932971838
 GameObject:
