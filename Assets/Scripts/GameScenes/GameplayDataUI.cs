@@ -103,12 +103,14 @@ public class GameplayDataUI : NetworkBehaviour {
 	List<(float timestamp, int points)> pointsForCurrSpeed = new List<(float timestamp, int points)>();
 	public TextMeshProUGUI currSpeedTxt, avgSpeedTxt, totalPointsTxt, pointContributionTxt;
 	public void BalloonFired(int count, ulong ID) {
-		ClientRpcParams param = new ClientRpcParams {
-			Send = new ClientRpcSendParams {
-				TargetClientIds = new ulong[] { ID }
-			}
-		};
-		UpdatePointsClientRpc(count, param);
+		if (NetworkManager.Singleton.ConnectedClientsIds.Contains(ID)) {
+			ClientRpcParams param = new ClientRpcParams {
+				Send = new ClientRpcSendParams {
+					TargetClientIds = new ulong[] { ID }
+				}
+			};
+			UpdatePointsClientRpc(count, param);
+		}
 
 		UpdateTeamPointsServerRpc(GameData.team1.Contains(ID) ? Team.t1 : Team.t2, count);
 	}
@@ -122,10 +124,11 @@ public class GameplayDataUI : NetworkBehaviour {
 		if (team == Team.t1) team1Points.Value += addition;
 		if (team == Team.t2) team2Points.Value += addition;
 	}
-	int myWrongEntries = 0;
+	int myWrongEntries = 0, myCorrectEntries = 0;
 	NetworkVariable<int> team1WrongEntries = new NetworkVariable<int>(0);
 	NetworkVariable<int> team2WrongEntries = new NetworkVariable<int>(0);
 	void CorrectEntry(string entry, ulong id) {
+		myCorrectEntries++;
 		pointsForCurrSpeed.Add((Time.time, entry.Length));
 	}
 	void WrongEntry() {
@@ -144,7 +147,7 @@ public class GameplayDataUI : NetworkBehaviour {
 		if (teamPoints == 0) return;
 		pointContributionTxt.text = ((pointsContributedByMe / teamPoints) * 100).ToString("f0") + "%";
 	}
-
+	int avgSpd = 0;
 	void UpdateSpeeds() {
 		for (int i = 0; i < pointsForCurrSpeed.Count;) {
 			if (Time.time - pointsForCurrSpeed[i].timestamp > timeToSample) pointsForCurrSpeed.RemoveAt(0);
@@ -153,7 +156,8 @@ public class GameplayDataUI : NetworkBehaviour {
 			}
 		}
 		float sampleRatio = 60f;
-		avgSpeedTxt.text = (sampleRatio * pointsContributedByMe / (Time.time - startTime)).ToString("f0");
+		avgSpd = Mathf.FloorToInt(sampleRatio * pointsContributedByMe / (Time.time - startTime));
+		avgSpeedTxt.text = avgSpd.ToString();
 
 		if (pointsForCurrSpeed.Count == 0) { currSpeedTxt.text = "0"; return; }
 
@@ -171,6 +175,7 @@ public class GameplayDataUI : NetworkBehaviour {
 	string targetText = "";
 	string prevTyped = "";
 	int totalTyped = 0;
+	int avgAccuracy = 0;
 	int totalTypedAccurate = 0;
 	void UpdateAccuracy() {
 		if (targetText != InputManager.Instance.targetString) {
@@ -188,9 +193,8 @@ public class GameplayDataUI : NetworkBehaviour {
 			if (tempTyped[i] == targetText[i]) totalTypedAccurate++;
 			totalTyped++;
 		}
-
-		accuracyTxt.text = (100f * totalTypedAccurate / totalTyped).ToString("f0") + "%";
-
+		avgAccuracy = Mathf.FloorToInt(100f * totalTypedAccurate / totalTyped);
+		accuracyTxt.text = avgAccuracy.ToString() + "%";
 		prevTyped = tempTyped;
 	}
 	#endregion
@@ -227,6 +231,7 @@ public class GameplayDataUI : NetworkBehaviour {
 	public TextMeshProUGUI myAccuracy, ourPoints, ourWrongEntries;
 	public TextMeshProUGUI opposingPoints, opposingWrongEntries;
 	void GameResultChange(GameStateManager.GameResult result) {
+		UpdateStats(result);
 		if (result == GameStateManager.GameResult.Draw) return;
 		mySpeed.text = avgSpeedTxt.text;
 		myAccuracy.text = accuracyTxt.text;
@@ -237,6 +242,34 @@ public class GameplayDataUI : NetworkBehaviour {
 		opposingWrongEntries.text = (BalloonManager.team == Team.t1 ? team2WrongEntries.Value : team1WrongEntries.Value).ToString();
 	}
 
+
+	void UpdateStats(GameStateManager.GameResult r) {
+		int result = GetWinDrawLossResult(r);
+		Stats.totalGames++;
+		if (result == 0) Stats.draws++;
+		else if (result == 1) Stats.wins++;
+		else Stats.losses++;
+		if (GameData.InSinglePlayerMode) {
+			Stats.singlePlayerGames++;
+			if (result == 1 && SinglePlayerAI.AISpeed > Stats.highestComputerSpeedDefeated) Stats.highestComputerSpeedDefeated = SinglePlayerAI.AISpeed;
+		} else Stats.multiPlayerGames++;
+
+		Stats.rightEntries += myCorrectEntries;
+		Stats.wrongEntries += myWrongEntries;
+		Stats.pointsCreated += pointsContributedByMe;
+
+		Stats.averageSpeed = (float)((Stats.totalGames - 1) * Stats.averageSpeed + avgSpd) / (float)Stats.totalGames;
+		Stats.averageAccuracy = (float)((Stats.totalGames - 1) * Stats.averageAccuracy + avgAccuracy) / (float)Stats.totalGames;
+		Stats.AddToSpeedList(avgSpd);
+		Stats.AddToAccuracyList(avgAccuracy);
+
+		Stats.SetData();
+	}
+	int GetWinDrawLossResult(GameStateManager.GameResult result) {
+		if (GameStateManager.GameResult.Draw == result) return 0;
+		else if (result == GameStateManager.GameResult.Team1Win && BalloonManager.team == Team.t1 || result == GameStateManager.GameResult.Team2Win && BalloonManager.team == Team.t2) return 1;
+		else return -1;
+	}
 
 
 	#endregion

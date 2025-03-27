@@ -42,7 +42,7 @@ public class SinglePlayerAI : MonoBehaviour {
 	}
 
 	List<DictionaryEntry> DictionaryList = null;
-	public static int lettersPerMinute = 100;
+	public static int AISpeed = 100;
 	float cumulativePower = 0;
 	int wordLength = -1;
 	public BalloonManager balloonManager;
@@ -53,7 +53,7 @@ public class SinglePlayerAI : MonoBehaviour {
 			if (DictionaryList == null) return;
 			wordLength = DictionaryList[UnityEngine.Random.Range(0, DictionaryList.Count)].word.Length;
 		}
-		cumulativePower += Time.deltaTime * lettersPerMinute / 60f;
+		cumulativePower += Time.deltaTime * AISpeed / 60f;
 		if (cumulativePower >= wordLength && wordLength > 0) {
 			cumulativePower -= wordLength;
 			this.balloonManager.SpawnBalloon(wordLength, 1);

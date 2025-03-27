@@ -8,6 +8,8 @@ public class Guide : MonoBehaviour {
 
 	public RectTransform panelContainer; // The parent container holding the panels
 	List<RectTransform> panels = new List<RectTransform>(); // List of panels
+	public float gapRatio;
+	float gapBetweenPanels;
 	float panelWidth = 500f; // Width of each panel
 	public float shiftDuration = 0.5f; // Animation duration
 	public float fadedAlpha = 0.2f; // Transparency for non-centered panels
@@ -28,6 +30,7 @@ public class Guide : MonoBehaviour {
 			return;
 		}
 		panelWidth = panels[0].rect.width;
+		gapBetweenPanels = panelWidth * gapRatio;
 		EnsureMinimumPanels();
 		CorrectPanelPositions();
 	}
@@ -54,7 +57,7 @@ public class Guide : MonoBehaviour {
 	private void CorrectPanelPositions() {
 		for (int i = 0; i < panels.Count; i++) {
 			int relativeIndex = i - centerIndex;
-			panels[i].anchoredPosition = new Vector2(relativeIndex * panelWidth, 0);
+			panels[i].anchoredPosition = new Vector2(relativeIndex * (panelWidth + gapBetweenPanels), 0);
 		}
 		panelContainer.anchoredPosition = Vector2.zero;
 		SetTransparency();
@@ -83,7 +86,7 @@ public class Guide : MonoBehaviour {
 		float elapsedTime = 0f;
 		int direction = right ? 1 : -1;
 		Vector2 startPosition = panelContainer.anchoredPosition;
-		Vector2 targetPosition = startPosition + new Vector2(-direction * panelWidth, 0);
+		Vector2 targetPosition = startPosition + new Vector2(-direction * (panelWidth + gapBetweenPanels), 0);
 		CanvasGroup fade = panels[centerIndex].GetComponent<CanvasGroup>();
 		CanvasGroup show = panels[centerIndex + (right ? 1 : -1)].GetComponent<CanvasGroup>();
 

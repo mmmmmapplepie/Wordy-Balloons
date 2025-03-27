@@ -3,14 +3,14 @@ using UnityEngine;
 
 public class BalloonAnimation : MonoBehaviour {
 	public Material wiggleMat;
-	public Transform bodyHolder;
+	public Transform bodyHolder, outlineHolder;
 	public SpriteRenderer highlight, shadow, body, outline;
 
 
 	float distortionMax, rotationRate, wiggleRate;
 
 	Material outlineMat;
-	Material hsMat; // highlight and shadow mat.
+	Material hsMat;
 	Material bodyMat;
 
 	public void InitilizeAnimations(Color c) {
@@ -46,6 +46,7 @@ public class BalloonAnimation : MonoBehaviour {
 	float wiggleProgress = 0;
 	void Update() {
 		bodyHolder.localRotation *= Quaternion.Euler(0, 0, Time.deltaTime * rotationRate);
+		outlineHolder.localRotation = bodyHolder.localRotation;
 		hsMat.SetFloat("_Rotation", bodyHolder.localEulerAngles.z);
 
 

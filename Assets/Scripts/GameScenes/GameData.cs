@@ -18,4 +18,4 @@ public class GameData : NetworkBehaviour {
 }
 public enum Team { t1, t2 };
 //normal is normal, eraser everything is erased when typing something wrong, own enemy - if you fire with mistake you take damage instead.
-public enum GameMode { Normal, Eraser, OwnEnemy }
+public enum GameMode { Normal, Eraser, Own_Enemy }

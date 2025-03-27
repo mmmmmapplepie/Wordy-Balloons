@@ -29,7 +29,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Bumps: 2
+    - _Bumps: 5
     - _MaxDistortion: 1
     - _Progress: -0.55
     - _Rotation: 0

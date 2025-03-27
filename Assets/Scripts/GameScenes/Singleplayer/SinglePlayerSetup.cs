@@ -19,7 +19,7 @@ public class SinglePlayerSetup : NetworkBehaviour {
 
 	const string AISpeed = "aiSpeed";
 	public void SetAISpeed(float value) {
-		SinglePlayerAI.lettersPerMinute = Mathf.RoundToInt(value);
+		SinglePlayerAI.AISpeed = Mathf.RoundToInt(value);
 		PlayerPrefs.SetInt(AISpeed, Mathf.RoundToInt(value));
 		sliderValue.text = Mathf.RoundToInt(value).ToString();
 	}
