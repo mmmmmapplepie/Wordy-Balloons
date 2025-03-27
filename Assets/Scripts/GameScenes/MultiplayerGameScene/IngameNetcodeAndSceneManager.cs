@@ -25,6 +25,11 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		base.OnDestroy();
 	}
 	void OnClientDisconnectCallback(ulong clientID) {
+		if (clientID == NetworkManager.Singleton.LocalClientId) {
+			GameStateManager.GameResult loss = GameStateManager.GameResult.Team1Win;
+			if (BalloonManager.team == Team.t1) loss = GameStateManager.GameResult.Team2Win;
+			GameResultChangeByConnection?.Invoke(loss);
+		}
 		if (clientID == NetworkManager.ServerClientId) {
 			StopConnection();
 			return;

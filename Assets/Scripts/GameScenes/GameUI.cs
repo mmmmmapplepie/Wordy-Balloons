@@ -71,10 +71,13 @@ public class GameUI : MonoBehaviour {
 		guidePanel.SetActive(!guidePanel.activeInHierarchy);
 	}
 	public void GoToScene(string s) {
+		if (GameStateManager.CurrGameResult == GameStateManager.GameResult.Undecided) {
+			SaveData?.Invoke();
+		}
 		NetworkManager.Singleton.Shutdown();
 		SceneManager.LoadScene(s, LoadSceneMode.Single);
 	}
-
+	public static event System.Action SaveData;
 
 
 	#endregion

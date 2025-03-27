@@ -242,7 +242,6 @@ public class MyLobby : NetworkBehaviour {
 
 	Team GetTeamToPlaceIn() {
 		return team1.Count < teamMax ? Team.t1 : Team.t2;
-		// return team1.Count < team1Max ? Team.t1 : Team.t2;
 	}
 
 	LobbyPlayer AddPlayerToLobby(ulong clientID) {

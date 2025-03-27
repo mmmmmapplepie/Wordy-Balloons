@@ -7,7 +7,7 @@ using Unity.Netcode;
 using Unity.Services.Authentication;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 
 public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler, IDropHandler, IPointerEnterHandler, IPointerExitHandler {
 	[SerializeField] TextMeshProUGUI playerNameTxt;
@@ -37,6 +37,10 @@ public class LobbyPlayer : NetworkBehaviour, IBeginDragHandler, IEndDragHandler,
 
 		loadingCover.SetActive(!joinConfirmed.Value);
 		NameChanged(default, playerName.Value);
+		transform.localScale = Vector3.one;
+	}
+	void LateUpdate() {
+		transform.localScale = Vector3.one;
 	}
 
 	public override void OnNetworkDespawn() {

@@ -24,6 +24,7 @@ public class GameplayDataUI : NetworkBehaviour {
 		BalloonManager.BalloonSpawned += BalloonFired;
 
 		GameStateManager.GameResultSetEvent += GameResultChange;
+		GameUI.SaveData += UpdateStats;
 	}
 
 	public override void OnDestroy() {
@@ -37,6 +38,7 @@ public class GameplayDataUI : NetworkBehaviour {
 		BalloonManager.BalloonSpawned -= BalloonFired;
 
 		GameStateManager.GameResultSetEvent -= GameResultChange;
+		GameUI.SaveData += UpdateStats;
 
 		base.OnDestroy();
 	}
@@ -241,8 +243,11 @@ public class GameplayDataUI : NetworkBehaviour {
 		opposingPoints.text = (BalloonManager.team == Team.t1 ? team2Points.Value : team1Points.Value).ToString();
 		opposingWrongEntries.text = (BalloonManager.team == Team.t1 ? team2WrongEntries.Value : team1WrongEntries.Value).ToString();
 	}
-
-
+	void UpdateStats() {
+		GameStateManager.GameResult loss = GameStateManager.GameResult.Team1Win;
+		if (BalloonManager.team == Team.t1) loss = GameStateManager.GameResult.Team2Win;
+		UpdateStats(loss);
+	}
 	void UpdateStats(GameStateManager.GameResult r) {
 		int result = GetWinDrawLossResult(r);
 		Stats.totalGames++;
