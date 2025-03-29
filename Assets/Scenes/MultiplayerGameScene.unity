@@ -2020,7 +2020,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '-'
+  m_text: 3
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9bf19d42cb3556747ae9366cf4fd2be5, type: 2}
   m_sharedMaterial: {fileID: 2164040, guid: 9bf19d42cb3556747ae9366cf4fd2be5, type: 2}
