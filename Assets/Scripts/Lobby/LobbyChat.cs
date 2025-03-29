@@ -20,23 +20,23 @@ public class LobbyChat : NetworkBehaviour {
 	}
 
 	public override void OnNetworkSpawn() {
+		ClearChat();
 		chatList.OnListChanged += ChatListChanged;
 	}
 
 	public override void OnNetworkDespawn() {
 		base.OnNetworkDespawn();
+		ClearChat();
 		chatList.OnListChanged -= ChatListChanged;
 	}
 
 	void Start() {
 		hexColor = ColorUtility.ToHtmlStringRGB(nameColor);
 		LobbyNetcodeManager.ClientStartSuccess += JoinedLobby;
-		LobbyNetcodeManager.ShuttingDownNetwork += ClearChat;
 	}
 	public override void OnDestroy() {
 		base.OnDestroy();
 		LobbyNetcodeManager.ClientStartSuccess -= JoinedLobby;
-		LobbyNetcodeManager.ShuttingDownNetwork -= ClearChat;
 	}
 
 	void JoinedLobby() {
@@ -49,7 +49,11 @@ public class LobbyChat : NetworkBehaviour {
 	}
 
 	void ClearChat() {
-		if (NetworkManager.Singleton.IsServer) chatList.Clear();
+		try {
+			if (chatList != null) chatList.Clear();
+		} catch (Exception e) {
+			print(e);
+		}
 		foreach (Transform t in chatHolder) {
 			Destroy(t.gameObject);
 		}

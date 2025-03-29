@@ -46,8 +46,8 @@ public class LobbyUI : MonoBehaviour {
 		LobbyManager.ListLobbySuccess += LobbyListFound;
 		LobbyManager.ListLobbyFailure += ListLobbiesFail;
 
-		GoToCreateLobby();
-		CreateLobby();
+		// GoToCreateLobby();
+		// CreateLobby();
 	}
 	void OnDestroy() {
 		MyLobby.LobbyFull -= LobbyFull;
