@@ -38,7 +38,7 @@ public class GameplayDataUI : NetworkBehaviour {
 		BalloonManager.BalloonSpawned -= BalloonFired;
 
 		GameStateManager.GameResultSetEvent -= GameResultChange;
-		GameUI.SaveData += UpdateStats;
+		GameUI.SaveData -= UpdateStats;
 
 		base.OnDestroy();
 	}
@@ -248,7 +248,10 @@ public class GameplayDataUI : NetworkBehaviour {
 		if (BalloonManager.team == Team.t1) loss = GameStateManager.GameResult.Team2Win;
 		UpdateStats(loss);
 	}
+	bool dataUpdated = false;
 	void UpdateStats(GameStateManager.GameResult r) {
+		if (dataUpdated) return;
+		dataUpdated = true;
 		int result = GetWinDrawLossResult(r);
 		Stats.totalGames++;
 		if (result == 0) Stats.draws++;

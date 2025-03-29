@@ -382,7 +382,7 @@ public class MyLobby : NetworkBehaviour {
 
 
 	#region Entering game
-	public static event Action SceneLoadingError, LoadingNextScene;
+	public static event Action SceneLoadingError;
 	public static event Action<bool> LobbyFull;
 	public AudioClip countdownSound;
 
@@ -422,8 +422,6 @@ public class MyLobby : NetworkBehaviour {
 			yield return new WaitForSeconds(1f);
 		}
 		LoadingCountdown.Value = countDown;
-
-		LoadingNextScene?.Invoke();
 
 		SceneEventProgressStatus sceneStatus = NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
 		if (sceneStatus != SceneEventProgressStatus.Started) {
@@ -511,6 +509,7 @@ public class MyLobby : NetworkBehaviour {
 
 	public void StopSceneLoading() {
 		if (loadingSceneRoutine != null) StopCoroutine(loadingSceneRoutine);
+		LoadingCountdown.Value = sceneLoadTimer;
 		loadingSceneRoutine = null;
 		LoadingSceneBool.Value = false;
 	}

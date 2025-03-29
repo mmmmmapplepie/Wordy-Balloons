@@ -22,7 +22,6 @@ public class LobbyUI : MonoBehaviour {
 	void Start() {
 		MyLobby.LobbyFull += LobbyFull;
 		MyLobby.SceneLoadingError += LoadingSceneError;
-		MyLobby.LoadingNextScene += OpenLoadingPanel;
 		MyLobby.LoadingCountdown.OnValueChanged += LoadingCountdown;
 		MyLobby.LoadingSceneBool.OnValueChanged += LoadingSceneStateChange;
 
@@ -46,11 +45,13 @@ public class LobbyUI : MonoBehaviour {
 
 		LobbyManager.ListLobbySuccess += LobbyListFound;
 		LobbyManager.ListLobbyFailure += ListLobbiesFail;
+
+		GoToCreateLobby();
+		CreateLobby();
 	}
 	void OnDestroy() {
 		MyLobby.LobbyFull -= LobbyFull;
 		MyLobby.SceneLoadingError -= LoadingSceneError;
-		MyLobby.LoadingNextScene -= OpenLoadingPanel;
 		MyLobby.LoadingCountdown.OnValueChanged -= LoadingCountdown;
 		MyLobby.LoadingSceneBool.OnValueChanged -= LoadingSceneStateChange;
 
@@ -188,6 +189,7 @@ public class LobbyUI : MonoBehaviour {
 	}
 
 	[SerializeField] CanvasGroup lobbyPanel;
+	[SerializeField] TextMeshProUGUI lobbyNameTxt;
 
 	//shoudl be called when NGO host is connected.
 	void LobbyCreationSuccess() {
@@ -212,8 +214,12 @@ public class LobbyUI : MonoBehaviour {
 
 
 
-
+	public void CopyLobbyCode() {
+		GUIUtility.systemCopyBuffer = lobbyCodeTxt.text;
+	}
 	void LobbyJoined() {
+		lobbyNameTxt.text = LobbyManager.Instance.joinedLobby.Name;
+		lobbyCodeTxt.transform.parent.gameObject.SetActive(NetworkManager.Singleton.IsServer);
 		HidePanelsExceptChosen();
 		startGameBtn.interactable = false;
 		LobbyUpdate(LobbyManager.Instance.joinedLobby);
@@ -278,6 +284,7 @@ public class LobbyUI : MonoBehaviour {
 	}
 	void LoadingCountdown(int old, int n) {
 		loadCountdown.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = n.ToString();
+		if (n == 0) { OpenLoadingPanel(); }
 	}
 	void LoadingSceneStateChange(bool old, bool loadingScene) {
 		ChangeToLoadingSceneMode(loadingScene);

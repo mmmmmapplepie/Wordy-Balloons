@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class LobbyNetcodeManager : NetworkBehaviour {
-	public static event Action ServerStartSuccess, ServerStartFail, ServerStoppedEvent;
+	public static event Action ServerStartSuccess, ServerStartFail, ServerStoppedEvent, ShuttingDownNetwork;
 	public static event Action ClientStartSuccess, ClientStartFail;
 	public static event Action<ulong> ClientConnected, ClientDisconnected;
 	public static event Action<bool> ClientStoppedEvent;
@@ -55,8 +55,10 @@ public class LobbyNetcodeManager : NetworkBehaviour {
 	public void StartClient() {
 		if (!NetworkManager.Singleton.StartClient()) ClientStartFail?.Invoke();
 	}
+
 	public void ShutDownNetwork() {
 		print("Shutdown NGO");
+		ShuttingDownNetwork?.Invoke();
 		if (NetworkManager.Singleton == null) return;
 		if (!NetworkManager.Singleton.ShutdownInProgress) {
 			NetworkManager.Singleton.Shutdown();
