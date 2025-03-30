@@ -6,7 +6,8 @@ using UnityEngine.SceneManagement;
 
 public class GameStateManager : NetworkBehaviour {
 	void Awake() {
-		GameRunning = GameData.InSinglePlayerMode;
+		// GameRunning = GameData.InSinglePlayerMode;
+		CountdownFinished = false;
 		CurrGameResult = GameResult.Undecided;
 	}
 	public override void OnNetworkSpawn() {
@@ -28,13 +29,13 @@ public class GameStateManager : NetworkBehaviour {
 		base.OnNetworkDespawn();
 	}
 
-	float countDownTime = 3;
+	const int countDownTime = 3;
 	// float countDownTime = 0.1f;
 	private void SceneLoadedForAll(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut) {
 		if (NetworkManager.Singleton.IsServer) StartCoroutine(StartCountDown());
 	}
 
-	NetworkVariable<int> countDown_NV = new NetworkVariable<int>(0);
+	NetworkVariable<int> countDown_NV = new NetworkVariable<int>(countDownTime + 1);
 	IEnumerator StartCountDown() {
 		if (GameStateManager.CurrGameResult != GameStateManager.GameResult.Undecided) yield break;
 		float t = countDownTime;
@@ -50,7 +51,7 @@ public class GameStateManager : NetworkBehaviour {
 	public static event System.Action<int> countDownChanged;
 	public static event System.Action GameStartEvent;
 	public static event System.Action<GameResult> GameResultSetEvent;
-	public static bool GameRunning { get; private set; }
+	public static bool CountdownFinished { get; private set; }
 	public static GameResult CurrGameResult;
 	void CountDownChanged(int prev, int newVal) {
 		if (CurrGameResult != GameResult.Undecided) {
@@ -59,11 +60,16 @@ public class GameStateManager : NetworkBehaviour {
 		}
 		countDownChanged?.Invoke(newVal);
 		if (newVal == 0) {
-			GameRunning = true;
+			CountdownFinished = true;
 			GameStartEvent?.Invoke();
 		}
 	}
-
+	void Update() {
+		if (CountdownFinished == false && countDown_NV.Value == 0 && IsGameRunning()) {
+			CountdownFinished = true;
+			GameStartEvent?.Invoke();
+		}
+	}
 	public static bool IsGameRunning() {
 		return CurrGameResult == GameResult.Undecided && Time.timeScale != 0;
 	}
@@ -83,7 +89,6 @@ public class GameStateManager : NetworkBehaviour {
 		CurrGameResult = r;
 		GameResultSetEvent?.Invoke(r);
 		IngameNetcodeAndSceneManager.ShutDownNetwork();
-		GameRunning = false;
 	}
 
 

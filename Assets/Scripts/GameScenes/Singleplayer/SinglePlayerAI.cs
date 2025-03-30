@@ -5,7 +5,7 @@ using UnityEngine;
 public class SinglePlayerAI : MonoBehaviour {
 	Action UpdateMethod;
 	void Awake() {
-		GameStateManager.countDownChanged += CheckGameStart;
+		GameStateManager.GameStartEvent += CheckGameStart;
 		if (!GameData.InSinglePlayerMode) {
 			UpdateMethod = null;
 		} else {
@@ -15,11 +15,10 @@ public class SinglePlayerAI : MonoBehaviour {
 		}
 	}
 	void OnDestroy() {
-		GameStateManager.countDownChanged -= CheckGameStart;
+		GameStateManager.GameStartEvent -= CheckGameStart;
 	}
 	bool gameStarted = false;
-	void CheckGameStart(int count) {
-		if (count != 0) return;
+	void CheckGameStart() {
 		gameStarted = true;
 	}
 

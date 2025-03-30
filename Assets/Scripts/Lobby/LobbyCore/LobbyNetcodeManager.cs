@@ -18,7 +18,6 @@ public class LobbyNetcodeManager : NetworkBehaviour {
 	void Awake() {
 		Instance = this;
 
-		LobbyManager.LeaveLobbyBegin += ShutDownNetwork;
 	}
 
 	public override void OnNetworkSpawn() {
@@ -37,7 +36,6 @@ public class LobbyNetcodeManager : NetworkBehaviour {
 		base.OnDestroy();
 		Instance = null;
 
-		LobbyManager.LeaveLobbyBegin -= ShutDownNetwork;
 	}
 	public override void OnNetworkDespawn() {
 		if (NetworkManager.Singleton != null) {
@@ -59,6 +57,7 @@ public class LobbyNetcodeManager : NetworkBehaviour {
 	public void StartClient() {
 		if (!NetworkManager.Singleton.StartClient()) ClientStartFail?.Invoke();
 	}
+
 
 	public void ShutDownNetwork() {
 		print("Shutdown NGO");

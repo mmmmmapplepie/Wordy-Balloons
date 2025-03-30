@@ -38,12 +38,11 @@ public class GameUI : MonoBehaviour {
 	public AudioClip tickAudio, startAudio;
 	void ChangeCountDown(int val) {
 		if (val > 0) AudioPlayer.PlayOneShot_Static(tickAudio, 0.2f);
-		else if (val == 0) AudioPlayer.PlayOneShot_Static(startAudio, 0.5f);
 		countdownTxt.text = val.ToString();
-		countdownTxt.transform.parent.gameObject.SetActive(val == 0 ? false : true);
 	}
 	void GameStart() {
-		//show Game start text. and sound effect.
+		AudioPlayer.PlayOneShot_Static(startAudio, 0.5f);
+		countdownTxt.transform.parent.gameObject.SetActive(false);
 	}
 
 

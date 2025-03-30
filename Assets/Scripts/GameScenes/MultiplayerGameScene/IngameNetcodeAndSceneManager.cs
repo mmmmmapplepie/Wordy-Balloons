@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class IngameNetcodeAndSceneManager : NetworkBehaviour {
+	void Awake() {
+		shutdownNetworkEvent += StopChecksForConnection;
+	}
 	public override void OnNetworkSpawn() {
 		base.OnNetworkSpawn();
 		NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
@@ -18,11 +22,14 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		base.OnNetworkDespawn();
 		if (NetworkManager.Singleton == null) return;
 		NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnectCallback;
+		NetworkManager.Singleton.OnServerStopped -= ServerStopped;
 	}
 	public override void OnDestroy() {
+		shutdownNetworkEvent -= StopChecksForConnection;
 		OnNetworkDespawn();
 		ShutDownNetwork();
 		base.OnDestroy();
+		Time.timeScale = 1f;
 	}
 	void OnClientDisconnectCallback(ulong clientID) {
 		if (clientID == NetworkManager.Singleton.LocalClientId) {
@@ -38,6 +45,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		GameData.team1.Remove(clientID);
 		GameData.team2.Remove(clientID);
 		GameData.ClientID_KEY_LobbyID_VAL.Remove(clientID);
+		if (reconnectingClients.Count > 0) CheckDisconnectedIsInReconnectionTimeout(clientID);
 		CheckTeamEmpty();
 	}
 	void CheckAllPlayersPresent() {
@@ -66,7 +74,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		GameResultChangeByConnection?.Invoke(GameStateManager.GameResult.Draw);
 	}
 	void ServerStopped(bool b) {
-		GameResultChangeByConnection?.Invoke(GameStateManager.GameResult.Draw);
+		StopConnection();
 	}
 
 	[ClientRpc]
@@ -74,7 +82,9 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		StopConnection();
 	}
 
+	public static event Action shutdownNetworkEvent;
 	public static void ShutDownNetwork() {
+		shutdownNetworkEvent?.Invoke();
 		if (NetworkManager.Singleton != null && !NetworkManager.Singleton.ShutdownInProgress) {
 			NetworkManager.Singleton.Shutdown();
 		}
@@ -84,6 +94,113 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 
 
 
+
+
+
+
+	#region connectionHandling
+	float pingRate = 4f, waitTime = 4f;
+	float pingWaitTime;
+	void Update() {
+		if (GameData.InSinglePlayerMode) return;
+		if (GameStateManager.CurrGameResult != GameStateManager.GameResult.Undecided) return;
+
+		if (NetworkManager.Singleton.IsHost) {
+			PingClientsForConnection();
+		}
+		CheckLackOfServerPing();
+	}
+
+	public GameObject reconnectingPanel;
+	public TextMeshProUGUI reconnectingIssueTxt;
+
+	float latestServerPingReceivedTime = 0f;
+	bool noServerPing = false;
+	void CheckLackOfServerPing() {
+		if (Time.time - latestServerPingReceivedTime > pingWaitTime * 1.5f) {
+			reconnectingIssueTxt.text = "Server Unresponsive";
+			noServerPing = true;
+		}
+		if (!noServerPing && !waitingForPlayers) {
+			ChangeReconnectionState(false);
+		} else {
+			ChangeReconnectionState(true);
+		}
+	}
+	List<ulong> idsWaitingForRepliesFrom = new List<ulong>();
+	HashSet<ulong> reconnectingClients = new HashSet<ulong>();
+	uint pingIndex = 0;
+	float lastPingTime = -100f;
+	void PingClientsForConnection() {
+		if (Time.unscaledTime - lastPingTime < pingRate) return;
+		CheckReplies();
+		idsWaitingForRepliesFrom = NetworkManager.Singleton.ConnectedClientsIds.ToList();
+		print(idsWaitingForRepliesFrom.Count);
+		lastPingTime = Time.unscaledTime;
+		pingIndex++;
+		print($"Pinging clinets {pingIndex}");
+		PingClientsForConnectionClientRpc(pingIndex);
+	}
+	void CheckReplies() {
+		foreach (ulong id in reconnectingClients) {
+			if (!NetworkManager.Singleton.ConnectedClientsIds.Contains(id)) reconnectingClients.Remove(id);
+		}
+		foreach (ulong id in idsWaitingForRepliesFrom) {
+			if (!NetworkManager.Singleton.ConnectedClientsIds.Contains(id)) {
+				continue;
+			}
+			reconnectingClients.Add(id);
+		}
+		foreach (ulong id in reconnectingClients) {
+			print(id);
+		}
+		if (reconnectingClients.Count > 0) {
+			PauseGameClientRpc(reconnectingClients.Count);
+		} else {
+			ResumeGameClientRpc();
+		}
+	}
+	[ClientRpc]
+	void PingClientsForConnectionClientRpc(uint index) {
+		print($"ping receveid: {index}");
+		noServerPing = false;
+		latestServerPingReceivedTime = Time.unscaledTime;
+		PingReceivedReplyServerRpc(NetworkManager.Singleton.LocalClientId, index);
+	}
+	[ServerRpc(RequireOwnership = false)]
+	void PingReceivedReplyServerRpc(ulong id, uint index) {
+		print($"Ping received from {id} with index {index}");
+		if (index != pingIndex) return;
+		idsWaitingForRepliesFrom.Remove(id);
+		reconnectingClients.Remove(id);
+	}
+
+	bool waitingForPlayers = false;
+	[ClientRpc]
+	void PauseGameClientRpc(int playersReconnecting) {
+		waitingForPlayers = true;
+		reconnectingIssueTxt.text = $"{playersReconnecting}: Player(s) trying to reconnect";
+	}
+	[ClientRpc]
+	void ResumeGameClientRpc() {
+		waitingForPlayers = false;
+	}
+	void ChangeReconnectionState(bool waitingForReconnection) {
+		reconnectingPanel.SetActive(waitingForReconnection);
+		Time.timeScale = waitingForReconnection ? 0f : 1f;
+	}
+
+	void CheckDisconnectedIsInReconnectionTimeout(ulong id) {
+		reconnectingClients.Remove(id);
+		if (reconnectingClients.Count == 0) ResumeGameClientRpc();
+	}
+
+	void StopChecksForConnection() {
+		CancelInvoke();
+		reconnectingPanel.SetActive(false);
+	}
+
+	#endregion
 
 
 }

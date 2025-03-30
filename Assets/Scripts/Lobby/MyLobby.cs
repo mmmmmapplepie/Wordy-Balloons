@@ -135,7 +135,6 @@ public class MyLobby : NetworkBehaviour {
 
 	#region  LobbyJoining
 	void JoinedLobby() {
-		Debug.LogWarning("Lobby joined");
 		LobbyJoined?.Invoke();
 		LobbyNetcodeManager.Instance.StartClient();
 	}
@@ -393,7 +392,6 @@ public class MyLobby : NetworkBehaviour {
 	const int sceneLoadTimer = 3, sceneLoadTimeout = 8;
 	public void CheckIfPlayersFilled() {
 		LobbyFull?.Invoke(team1.Count > 0 && team2.Count > 0);
-		// LobbyFull?.Invoke(team1Max + team2Max == team1.Count + team2.Count);
 	}
 	public void EnterGame() {
 		StopSceneLoading();

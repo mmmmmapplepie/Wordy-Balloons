@@ -8,17 +8,16 @@ public class InputManager : MonoBehaviour {
 	public static InputManager Instance;
 	void Awake() {
 		Instance = this;
-		GameStateManager.countDownChanged += CheckGameStart;
+		GameStateManager.GameStartEvent += CheckGameStart;
 		GameStateManager.GameResultSetEvent += GameResultSet;
 	}
 	void OnDestroy() {
 		Instance = null;
 		_skipCharges = 3;
-		GameStateManager.countDownChanged -= CheckGameStart;
+		GameStateManager.GameStartEvent -= CheckGameStart;
 		GameStateManager.GameResultSetEvent -= GameResultSet;
 	}
-	void CheckGameStart(int count) {
-		if (count != 0) return;
+	void CheckGameStart() {
 		SetNewTargetText();
 		canTakeInput = true;
 	}
@@ -27,7 +26,7 @@ public class InputManager : MonoBehaviour {
 	}
 	public static event Action InputProcessFinished;
 	void Update() {
-		if (!canTakeInput) return;
+		if (!canTakeInput || Time.timeScale == 0) return;
 		ProcessInput();
 		InputProcessFinished?.Invoke();
 	}

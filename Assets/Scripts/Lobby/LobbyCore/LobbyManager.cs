@@ -18,25 +18,21 @@ public class LobbyManager : MonoBehaviour {
 	public const string GameMode = "GameMode";
 	public const string PlayerName = "PlayerName";
 
-	// CancellationTokenSource ExitScene;
-	// CancellationToken ExitToken;
 	public static LobbyManager Instance;
 	void Awake() {
 		Instance = this;
-		// ExitScene = new CancellationTokenSource();
-		// ExitToken = ExitScene.Token;
 	}
 	void Start() {
 		Authenticate();
 	}
 	public async void Authenticate(string name = null) {
 		AuthenticationBegin?.Invoke();
-		if (UnityServices.State == ServicesInitializationState.Initialized) print(AuthenticationService.Instance.IsSignedIn);
 		try {
 			InitializationOptions options = new InitializationOptions();
 			playerName = (name == null) ? "Player" + UnityEngine.Random.Range(0, 10000) : name;
 			options.SetProfile(playerName);
 			await UnityServices.InitializeAsync(options);
+			// if (AuthenticationService.Instance.IsSignedIn) AuthenticationService.Instance.SignOut();
 			if (AuthenticationService.Instance.IsSignedIn) AuthenticationService.Instance.SignOut(true);
 			if (!AuthenticationService.Instance.IsSignedIn) {
 				await AuthenticationService.Instance.SignInAnonymouslyAsync();
@@ -60,7 +56,6 @@ public class LobbyManager : MonoBehaviour {
 
 	//others
 	public static event Action AuthenticationBegin, AuthenticationSuccess, AuthenticationFailure;
-	public static event Action LobbyManagerResetEvent;
 
 	//creating lobby
 	public static event Action LobbyCreationBegin, CreatedLobbyEvent, LobbyCreationFailure;
@@ -376,7 +371,6 @@ public class LobbyManager : MonoBehaviour {
 	}
 	public async void LeaveLobby(string authenticationID, bool SendEvents = true) {
 		if (SendEvents) LeaveLobbyBegin?.Invoke();
-		print("Leave lobby called");
 		try {
 			await UnsubscribeFromLobbyEvents();
 		} catch (Exception e) {
@@ -396,6 +390,14 @@ public class LobbyManager : MonoBehaviour {
 		joinedLobby = null;
 		hostLobby = null;
 		if (SendEvents) LeaveLobbyComplete?.Invoke();
+	}
+	async void DeleteLobby() {
+		if (joinedLobby != null) return;
+		try {
+			await LobbyService.Instance.DeleteLobbyAsync(joinedLobby.Id);
+		} catch (Exception e) {
+			print(e);
+		}
 	}
 	void LobbyDeleted() {
 		LeaveLobby();
@@ -432,7 +434,7 @@ public class LobbyManager : MonoBehaviour {
 	public async void MakeLobbyPublic(bool makePublic = true) {
 		try {
 			hostLobby = await Lobbies.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions {
-				IsPrivate = makePublic
+				IsPrivate = !makePublic
 			});
 			joinedLobby = hostLobby;
 		} catch (LobbyServiceException e) {
@@ -448,12 +450,8 @@ public class LobbyManager : MonoBehaviour {
 
 	void OnDestroy() {
 		Instance = null;
-		ResetLobbyManager();
-	}
-
-	void ResetLobbyManager(bool sendEvents = false) {
-		LeaveLobby();
-		LobbyManagerResetEvent?.Invoke();
+		DeleteLobby();
+		if (MyLobby.LoadingSceneBool.Value != true) LeaveLobby();
 	}
 
 	bool NGOConnected() {

@@ -50,7 +50,7 @@ public class LobbyChat : NetworkBehaviour {
 
 	void ClearChat() {
 		try {
-			if (chatList != null) chatList.Clear();
+			if (chatList != null && NetworkManager.Singleton.IsServer) chatList.Clear();
 		} catch (Exception e) {
 			print(e);
 		}
