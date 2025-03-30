@@ -26,9 +26,10 @@ public class LobbyUI : MonoBehaviour {
 		MyLobby.LoadingSceneBool.OnValueChanged += LoadingSceneStateChange;
 
 		LobbyManager.AuthenticationBegin += OpenLoadingPanel;
-		LobbyManager.AuthenticationSuccess += CloseTransitionPanels;
+		LobbyManager.AuthenticationSuccess += CloseAllPanels;
 		LobbyManager.AuthenticationSuccess += ListLobbyRefresh;
 		LobbyManager.AuthenticationFailure += AuthenticationFail;
+		LobbyManager.NetConnectionStateEvent += NetworkConnectionState;
 
 		LobbyManager.LobbyCreationBegin += OpenLoadingPanel;
 		MyLobby.LobbyCreatedEvent += LobbyCreationSuccess;
@@ -56,9 +57,10 @@ public class LobbyUI : MonoBehaviour {
 		MyLobby.LoadingSceneBool.OnValueChanged -= LoadingSceneStateChange;
 
 		LobbyManager.AuthenticationBegin -= OpenLoadingPanel;
-		LobbyManager.AuthenticationSuccess -= CloseTransitionPanels;
+		LobbyManager.AuthenticationSuccess -= CloseAllPanels;
 		LobbyManager.AuthenticationSuccess -= ListLobbyRefresh;
 		LobbyManager.AuthenticationFailure -= AuthenticationFail;
+		LobbyManager.NetConnectionStateEvent -= NetworkConnectionState;
 
 		LobbyManager.LobbyCreationBegin -= OpenLoadingPanel;
 		MyLobby.LobbyCreatedEvent -= LobbyCreationSuccess;
@@ -160,7 +162,7 @@ public class LobbyUI : MonoBehaviour {
 	void OpenLoadingPanel() {
 		HidePanelsExceptChosen(LoadingPanel);
 	}
-	public void CloseTransitionPanels() {
+	public void CloseAllPanels() {
 		// if (!LobbyNetcodeManager.CanStopSceneLoading) return;
 		HidePanelsExceptChosen(null);
 	}
@@ -179,7 +181,19 @@ public class LobbyUI : MonoBehaviour {
 			panelToOpen.SetActive(true);
 		}
 	}
-
+	public TextMeshProUGUI connectedTxt;
+	public AtomAnimationController connectionAnimController;
+	void NetworkConnectionState(bool connected) {
+		if (connected) {
+			connectedTxt.text = "Connected";
+			connectedTxt.color = new Color(0, 1, 1, 1);
+			connectionAnimController.AnimateStart();
+		} else {
+			connectedTxt.text = "Disconnected";
+			connectedTxt.color = new Color(1, 0, 0, 1);
+			connectionAnimController.AnimateStop();
+		}
+	}
 	[SerializeField] TextMeshProUGUI ErrorTxtBx;
 	void AuthenticationFail() {
 		ErrorTxtBx.text = "Connection failed";
@@ -197,7 +211,7 @@ public class LobbyUI : MonoBehaviour {
 		lobbyCreationPanel.SetActive(false);
 		LobbyUpdate(LobbyManager.Instance.hostLobby);
 		ToggleLobby(true);
-		CloseTransitionPanels();
+		CloseAllPanels();
 	}
 	void ToggleLobby(bool interactable) {
 		if (lobbyPanel == null) return;

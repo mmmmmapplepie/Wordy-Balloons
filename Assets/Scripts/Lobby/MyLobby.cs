@@ -29,7 +29,7 @@ public class MyLobby : NetworkBehaviour {
 	void Start() {
 		//creating lobby
 		LobbyManager.AuthenticationSuccess += AuthenticationDone;
-		LobbyManager.CreatedLobby += LobbyCreated;
+		LobbyManager.CreatedLobbyEvent += LobbyCreated;
 		LobbyNetcodeManager.ServerStartSuccess += ServerStartedSuccess;
 		LobbyNetcodeManager.ServerStartFail += ServerStartedFail;
 
@@ -54,7 +54,7 @@ public class MyLobby : NetworkBehaviour {
 		OnNetworkDespawn();
 		//creating lobby
 		LobbyManager.AuthenticationSuccess -= AuthenticationDone;
-		LobbyManager.CreatedLobby -= LobbyCreated;
+		LobbyManager.CreatedLobbyEvent -= LobbyCreated;
 		LobbyNetcodeManager.ServerStartSuccess -= ServerStartedSuccess;
 		LobbyNetcodeManager.ServerStartFail -= ServerStartedFail;
 

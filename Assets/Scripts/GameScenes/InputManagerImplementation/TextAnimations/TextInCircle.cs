@@ -1,19 +1,17 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-
+[ExecuteAlways]
 public class TextInCircle : MonoBehaviour {
 	public GameObject textHolder;
 	TMP_Text text;
 	public float radius;
 	public bool useRadiusAsRatioOfTextWidth = false;
 	public float gapRatio = 1f;
-
 	void Update() {
 		AnimateText();
 	}
 	void AnimateText() {
-		// if (Time.time > 4f) return;
 		if (text == null && !textHolder.TryGetComponent<TMP_Text>(out text)) {
 			return;
 		}

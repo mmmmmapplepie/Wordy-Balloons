@@ -31,16 +31,16 @@ public class LobbyManager : MonoBehaviour {
 	}
 	public async void Authenticate(string name = null) {
 		AuthenticationBegin?.Invoke();
+		if (UnityServices.State == ServicesInitializationState.Initialized) print(AuthenticationService.Instance.IsSignedIn);
 		try {
 			InitializationOptions options = new InitializationOptions();
 			playerName = (name == null) ? "Player" + UnityEngine.Random.Range(0, 10000) : name;
 			options.SetProfile(playerName);
 			await UnityServices.InitializeAsync(options);
-			if (AuthenticationService.Instance.IsSignedIn) AuthenticationService.Instance.SignOut();
+			if (AuthenticationService.Instance.IsSignedIn) AuthenticationService.Instance.SignOut(true);
 			if (!AuthenticationService.Instance.IsSignedIn) {
 				await AuthenticationService.Instance.SignInAnonymouslyAsync();
 				if (AuthenticationService.Instance != null) authenticationID = AuthenticationService.Instance.PlayerId;
-				print(playerName);
 			}
 			AuthenticationSuccess?.Invoke();
 		} catch (Exception e) {
@@ -51,7 +51,7 @@ public class LobbyManager : MonoBehaviour {
 
 
 
-	public string authenticationID;
+	[HideInInspector] public string authenticationID;
 	public static string playerName;
 	public Lobby hostLobby, joinedLobby;
 	// DateTime latestLobbyInteraction;
@@ -63,7 +63,7 @@ public class LobbyManager : MonoBehaviour {
 	public static event Action LobbyManagerResetEvent;
 
 	//creating lobby
-	public static event Action LobbyCreationBegin, CreatedLobby, LobbyCreationFailure;
+	public static event Action LobbyCreationBegin, CreatedLobbyEvent, LobbyCreationFailure;
 	public static event Action RelayFailure;
 
 	//joining lobby
@@ -94,6 +94,7 @@ public class LobbyManager : MonoBehaviour {
 		// Debug.LogWarning("LobbyJoined:" + joinedLobby + "\n netconnection" + NetworkManager.Singleton.IsConnectedClient);
 		//you may need polling for edges cases where the events dont work for some reason.
 		LobbyPoll();
+		CheckNetworkConnected();
 	}
 	async void LobbyHeartbeat() {
 		if (hostLobby == null) { heartBeatElapsed = 0; return; }
@@ -121,6 +122,18 @@ public class LobbyManager : MonoBehaviour {
 			lobbyPollElapsed += Time.deltaTime;
 		}
 	}
+	public static event Action<bool> NetConnectionStateEvent;
+	public static bool connectedToNet = false;
+	void CheckNetworkConnected() {
+		if (!AuthenticationService.Instance.IsSignedIn) return;
+		if (Application.internetReachability == NetworkReachability.NotReachable) {
+			connectedToNet = false;
+			NetConnectionStateEvent?.Invoke(false);
+		} else {
+			connectedToNet = true;
+			NetConnectionStateEvent?.Invoke(true);
+		}
+	}
 
 	#endregion
 
@@ -131,6 +144,7 @@ public class LobbyManager : MonoBehaviour {
 		LobbyCreationBegin?.Invoke();
 		if (NGOConnected()) {
 			LobbyCreationFailure?.Invoke();
+			LeaveLobby();
 			return;
 		}
 		try {
@@ -157,7 +171,7 @@ public class LobbyManager : MonoBehaviour {
 			});
 			joinedLobby = hostLobby;
 			await SubscribeToLobbyEvents();
-			CreatedLobby?.Invoke();
+			CreatedLobbyEvent?.Invoke();
 		} catch (Exception e) {
 			print(e);
 			LeaveLobby();
@@ -173,6 +187,7 @@ public class LobbyManager : MonoBehaviour {
 	}
 
 	async Task SubscribeToLobbyEvents() {
+		//add a 5 sec timer here for timeout incase
 		try {
 			lobbyCallback = new LobbyEventCallbacks();
 			lobbyCallback.LobbyChanged += LobbyChanged;
@@ -190,6 +205,8 @@ public class LobbyManager : MonoBehaviour {
 			if (temp == null) return;
 			await temp.UnsubscribeAsync();
 		} catch (Exception e) {
+			lobbyCallback = null;
+			LobbyEvents = null;
 			print(e);
 			throw e;
 		}
@@ -359,7 +376,7 @@ public class LobbyManager : MonoBehaviour {
 	}
 	public async void LeaveLobby(string authenticationID, bool SendEvents = true) {
 		if (SendEvents) LeaveLobbyBegin?.Invoke();
-
+		print("Leave lobby called");
 		try {
 			await UnsubscribeFromLobbyEvents();
 		} catch (Exception e) {
@@ -412,13 +429,12 @@ public class LobbyManager : MonoBehaviour {
 			ListLobbyFailure?.Invoke(null);
 		}
 	}
-	public async void MakeLobbyPublic() {
+	public async void MakeLobbyPublic(bool makePublic = true) {
 		try {
 			hostLobby = await Lobbies.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions {
-				IsPrivate = false
+				IsPrivate = makePublic
 			});
 			joinedLobby = hostLobby;
-			// LobbyCreationSuccess?.Invoke();
 		} catch (LobbyServiceException e) {
 			print(e.Reason);
 			LeaveLobby();
@@ -433,14 +449,9 @@ public class LobbyManager : MonoBehaviour {
 	void OnDestroy() {
 		Instance = null;
 		ResetLobbyManager();
-		AuthenticationService.Instance.SignOut();
-		// ExitScene.Cancel();
-		// ExitScene.Dispose();
 	}
 
-	//if references and such not properly nulled when leaving etc (or stuck)
 	void ResetLobbyManager(bool sendEvents = false) {
-		// LeaveLobby(sendEvents);
 		LeaveLobby();
 		LobbyManagerResetEvent?.Invoke();
 	}
