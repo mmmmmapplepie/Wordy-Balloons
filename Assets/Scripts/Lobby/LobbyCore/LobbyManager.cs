@@ -32,7 +32,6 @@ public class LobbyManager : MonoBehaviour {
 			playerName = (name == null) ? "Player" + UnityEngine.Random.Range(0, 10000) : name;
 			options.SetProfile(playerName);
 			await UnityServices.InitializeAsync(options);
-			// if (AuthenticationService.Instance.IsSignedIn) AuthenticationService.Instance.SignOut();
 			if (AuthenticationService.Instance.IsSignedIn) AuthenticationService.Instance.SignOut(true);
 			if (!AuthenticationService.Instance.IsSignedIn) {
 				await AuthenticationService.Instance.SignInAnonymouslyAsync();
