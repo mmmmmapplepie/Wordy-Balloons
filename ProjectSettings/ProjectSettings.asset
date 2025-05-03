@@ -157,7 +157,7 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Standalone: com.DefaultCompany.TestProject
+    Standalone: com.mmmapplePie.Wordy-Balloons
   buildNumber:
     Standalone: 0
     VisionOS: 0
@@ -946,10 +946,10 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: 9c81cf66-86ca-48f8-b4c2-456f9e05e7fb
+  cloudProjectId: 1907a49c-a370-477e-93fc-64afff2163fd
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: TestProject
+  projectName: Wordy Balloons
   organizationId: mmmapplepie
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0

@@ -85,10 +85,7 @@ public class LobbyManager : MonoBehaviour {
 	float heartBeatElapsed = 0, heartBeatPeriod = 15f;
 	void Update() {
 		LobbyHeartbeat();
-		// Debug.LogWarning("LobbyJoined:" + joinedLobby + "\n netconnection" + NetworkManager.Singleton.IsConnectedClient);
-		//you may need polling for edges cases where the events dont work for some reason.
 		LobbyPoll();
-		CheckNetworkConnected();
 	}
 	async void LobbyHeartbeat() {
 		if (hostLobby == null) { heartBeatElapsed = 0; return; }
@@ -116,18 +113,6 @@ public class LobbyManager : MonoBehaviour {
 			lobbyPollElapsed += Time.deltaTime;
 		}
 	}
-	public static event Action<bool> NetConnectionStateEvent;
-	public static bool connectedToNet = false;
-	void CheckNetworkConnected() {
-		if (!AuthenticationService.Instance.IsSignedIn) return;
-		if (Application.internetReachability == NetworkReachability.NotReachable) {
-			connectedToNet = false;
-			NetConnectionStateEvent?.Invoke(false);
-		} else {
-			connectedToNet = true;
-			NetConnectionStateEvent?.Invoke(true);
-		}
-	}
 
 	#endregion
 
@@ -152,6 +137,7 @@ public class LobbyManager : MonoBehaviour {
 				}
 			};
 			hostLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, lobbyMaxPlayerNumber, lobbyDetails);
+
 			//assign relay
 			Allocation relayAlloc = await AllocateRelay(lobbyMaxPlayerNumber);
 			NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(relayAlloc, "dtls"));

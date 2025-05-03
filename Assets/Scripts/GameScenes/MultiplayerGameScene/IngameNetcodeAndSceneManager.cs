@@ -13,6 +13,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	public override void OnNetworkSpawn() {
 		base.OnNetworkSpawn();
 		NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
+		NetworkManager.Singleton.OnClientStopped += ClientStopped;
 		NetworkManager.Singleton.OnServerStopped += ServerStopped;
 		if (NetworkManager.IsServer) {
 			CheckAllPlayersPresent();
@@ -22,6 +23,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		base.OnNetworkDespawn();
 		if (NetworkManager.Singleton == null) return;
 		NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnectCallback;
+		NetworkManager.Singleton.OnClientStopped -= ClientStopped;
 		NetworkManager.Singleton.OnServerStopped -= ServerStopped;
 	}
 	public override void OnDestroy() {
@@ -30,6 +32,9 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		ShutDownNetwork();
 		base.OnDestroy();
 		Time.timeScale = 1f;
+	}
+	void ClientStopped(bool host) {
+		if (NetworkManager.Singleton.IsConnectedClient) OnClientDisconnectCallback(NetworkManager.Singleton.LocalClientId);
 	}
 	void OnClientDisconnectCallback(ulong clientID) {
 		if (clientID == NetworkManager.Singleton.LocalClientId) {

@@ -29,7 +29,7 @@ public class LobbyUI : MonoBehaviour {
 		LobbyManager.AuthenticationSuccess += CloseAllPanels;
 		LobbyManager.AuthenticationSuccess += ListLobbyRefresh;
 		LobbyManager.AuthenticationFailure += AuthenticationFail;
-		LobbyManager.NetConnectionStateEvent += NetworkConnectionState;
+		InternetConnectivityCheck.ConnectedStateEvent += NetworkConnectionState;
 
 		LobbyManager.LobbyCreationBegin += OpenLoadingPanel;
 		MyLobby.LobbyCreatedEvent += LobbyCreationSuccess;
@@ -60,7 +60,7 @@ public class LobbyUI : MonoBehaviour {
 		LobbyManager.AuthenticationSuccess -= CloseAllPanels;
 		LobbyManager.AuthenticationSuccess -= ListLobbyRefresh;
 		LobbyManager.AuthenticationFailure -= AuthenticationFail;
-		LobbyManager.NetConnectionStateEvent -= NetworkConnectionState;
+		InternetConnectivityCheck.ConnectedStateEvent -= NetworkConnectionState;
 
 		LobbyManager.LobbyCreationBegin -= OpenLoadingPanel;
 		MyLobby.LobbyCreatedEvent -= LobbyCreationSuccess;
@@ -101,7 +101,6 @@ public class LobbyUI : MonoBehaviour {
 	public TMP_Dropdown lobbyModeDropDown, lobbyPlayerNumDropDown;
 
 	public void GoToCreateLobby() {
-		//reset lobby name and mode and maxplayer
 		lobbyModeDropDown.Set(0);
 		lobbyPlayerNumDropDown.Set(0);
 		lobbyName.text = "New Lobby";
@@ -127,14 +126,32 @@ public class LobbyUI : MonoBehaviour {
 	}
 
 	public void CreateLobby() {
+		if (!CheckInternetConnected()) return;
 		LobbyManager.Instance.CreateLobby(lobbyName.text, ConvertDropDownValueToGameModeString(lobbyModeDropDown.value), lobbyPlayerNumDropDown.value + 2);
 	}
 	public void QuickJoin() {
+		if (!CheckInternetConnected()) return;
 		LobbyManager.Instance.QuickJoinLobby();
 	}
 	public void JoinLobbyByCode() {
+		if (!CheckInternetConnected()) return;
 		LobbyManager.Instance.JoinLobbyByCode(lobbyCode.text);
 		lobbyCode.text = "";
+	}
+	public void JoinLobby(Lobby lobby) {
+		if (!CheckInternetConnected()) return;
+		LobbyManager.Instance.JoinLobbyByID(lobby.Id);
+	}
+	bool CheckInternetConnected() {
+		if (!InternetConnectivityCheck.connected) {
+			ShowErrorTxt("No Internet Connection.");
+			return false;
+		}
+		return true;
+	}
+	void ShowErrorTxt(string error) {
+		ErrorTxtBx.text = error;
+		HidePanelsExceptChosen(ErrorPanel);
 	}
 
 	public void LeaveLobby() {
@@ -276,7 +293,8 @@ public class LobbyUI : MonoBehaviour {
 			Transform newOption = Instantiate(lobbyOptionPrefab, lobbiesListHolder);
 			//set the values for the script and give it a listener for the join lobby by ID thingy
 			LobbyOption lobbyOption = newOption.GetComponent<LobbyOption>();
-			lobbyOption.SetOption(l);
+			Lobby inputLobby = l;
+			lobbyOption.SetOption(this, inputLobby);
 		}
 	}
 	public GameObject lobbyListingFailNotificationObject;
