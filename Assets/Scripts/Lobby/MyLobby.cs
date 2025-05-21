@@ -12,7 +12,8 @@ public class MyLobby : NetworkBehaviour {
 	public static MyLobby Instance;
 
 	#region Events
-	public static event Action LobbyCreatedEvent, LobbyLeft, LobbyDeleted, LobbyJoined, LobbyJoinFail;
+	public static event Action LobbyCreatedEvent, LobbyJoined;
+	//  LobbyLeft, LobbyDeleted, LobbyJoinFail;
 
 	#endregion
 
@@ -46,6 +47,8 @@ public class MyLobby : NetworkBehaviour {
 		LobbyNetcodeManager.ClientDisconnected += ClientDisconnected;
 		LobbyNetcodeManager.ClientStoppedEvent += ClientStopped;
 
+		InternetConnectivityCheck.ConnectedStateEvent += CheckInternetState;
+
 		LobbyPlayer.TeamChangeEvent += ChangeTeam;
 		TeamBox.TeamChangeEvent += ChangeTeam;
 	}
@@ -71,6 +74,8 @@ public class MyLobby : NetworkBehaviour {
 		LobbyNetcodeManager.ClientDisconnected -= ClientDisconnected;
 		LobbyNetcodeManager.ClientStoppedEvent -= ClientStopped;
 
+		InternetConnectivityCheck.ConnectedStateEvent -= CheckInternetState;
+
 		LobbyPlayer.TeamChangeEvent -= ChangeTeam;
 		TeamBox.TeamChangeEvent -= ChangeTeam;
 		base.OnDestroy();
@@ -83,23 +88,22 @@ public class MyLobby : NetworkBehaviour {
 	Dictionary<ulong, string> ClientID_KEY_LobbyID_VAL = new Dictionary<ulong, string>();
 	HashSet<ulong> team1 = new HashSet<ulong>(), team2 = new HashSet<ulong>();
 	List<LobbyPlayer> playersObjects = new List<LobbyPlayer>();
-	// int team1Max = 0; int team2Max = 0;
-	int teamMax = 3; int teamMin = 1;
+	int teamMax = 3;
 
 	#endregion
 
 
 	#region  LobbyCreation
 	void LobbyCreated() {
-		Debug.LogWarning("Lobby Created");
+		// Debug.LogWarning("Lobby Created");
 		LobbyNetcodeManager.Instance.StartHost();
 	}
 	void ServerStartedFail() {
-		Debug.LogWarning("Server start fail");
+		// Debug.LogWarning("Server start fail");
 		LobbyManager.Instance.LeaveLobby();
 	}
 	void ServerStartedSuccess() {
-		Debug.LogWarning("Server started");
+		// Debug.LogWarning("Server started");
 		LobbyCreatedEvent?.Invoke();
 		InitializeNewLobby();
 		LobbyManager.Instance.MakeLobbyPublic();
@@ -120,14 +124,11 @@ public class MyLobby : NetworkBehaviour {
 		playersObjects.Clear();
 		int slots = LobbyManager.Instance.hostLobby.MaxPlayers;
 		SetTeamMaxAndMin(slots);
-		// team1Max = Mathf.CeilToInt(slots / 2f);
-		// team2Max = slots - team1Max;
 		StopAllCoroutines();
 		tempJoinedList.Clear();
 	}
 	void SetTeamMaxAndMin(int maxSlots) {
 		teamMax = maxSlots > 3 ? 3 : maxSlots - 1;
-		teamMin = 1;
 	}
 
 	#endregion
@@ -175,7 +176,7 @@ public class MyLobby : NetworkBehaviour {
 		}
 	}
 	void ClientStartedSuccess() {
-		Debug.LogWarning("Client started");
+		// Debug.LogWarning("Client started");
 		if (LobbyManager.Instance.joinedLobby == null) { LeaveLobby(); return; }
 		SendLobbyJoinConfirmationServerRPC(AuthenticationService.Instance.PlayerId, NetworkManager.Singleton.LocalClientId, LobbyManager.playerName);
 	}
@@ -196,6 +197,10 @@ public class MyLobby : NetworkBehaviour {
 		// Debug.LogWarning(id.ToString() + " : client started. Total connected: " + NetworkManager.Singleton.ConnectedClients.Count);
 	}
 	#endregion
+
+	void CheckInternetState(bool connected) {
+		if (connected == false) LeaveLobby();
+	}
 
 
 	#region  LobbyLeaving
@@ -220,6 +225,7 @@ public class MyLobby : NetworkBehaviour {
 		if (lobbyID != null) LobbyManager.Instance.KickFromLobby(lobbyID);
 	}
 	void ClientStopped(bool b) {
+		LeaveLobby();
 	}
 
 	#endregion
@@ -287,7 +293,6 @@ public class MyLobby : NetworkBehaviour {
 		if (swapPlayer == null) {
 			if (targetT == team1Holder) {
 				if (team1.Contains(dragPlayer.clientID.Value) || team1Holder.childCount >= teamMax) return;
-				// if (team1.Contains(dragPlayer.clientID.Value) || team1Holder.childCount >= team1Max) return;
 				team2.Remove(dragPlayer.clientID.Value);
 				team1.Add(dragPlayer.clientID.Value);
 				dragPlayer.gameObject.GetComponent<NetworkObject>().TrySetParent(team1Holder);
@@ -295,7 +300,6 @@ public class MyLobby : NetworkBehaviour {
 			}
 			if (targetT == team2Holder) {
 				if (team2.Contains(dragPlayer.clientID.Value) || team2Holder.childCount >= teamMax) return;
-				// if (team2.Contains(dragPlayer.clientID.Value) || team2Holder.childCount >= team2Max) return;
 				team1.Remove(dragPlayer.clientID.Value);
 				team2.Add(dragPlayer.clientID.Value);
 				dragPlayer.gameObject.GetComponent<NetworkObject>().TrySetParent(team2Holder);
@@ -420,13 +424,14 @@ public class MyLobby : NetworkBehaviour {
 			yield return new WaitForSeconds(1f);
 		}
 		LoadingCountdown.Value = countDown;
+		yield return new WaitForSeconds(1f);
 
 		SceneEventProgressStatus sceneStatus = NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
 		if (sceneStatus != SceneEventProgressStatus.Started) {
 			SceneLoadingError?.Invoke();
 			StopSceneLoading();
 		} else {
-			//change data
+			//set game data
 			GameData.InSinglePlayerMode = false;
 			GameData.allColorOptions = allColorOptions;
 			GameData.ClientID_KEY_ColorIndex_VAL = ClientID_KEY_ColorIndex_VAL;

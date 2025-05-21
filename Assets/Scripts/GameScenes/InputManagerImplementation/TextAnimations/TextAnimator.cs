@@ -26,7 +26,7 @@ public class TextAnimator : MonoBehaviour {
 		}
 	}
 
-	public static event Func<Action<InputManager, TMP_Text>> FindTextAnimationFunction;
+	// public static event Func<Action<InputManager, TMP_Text>> FindTextAnimationFunction;
 	void AnimateText() {
 		text.text = inputManager.displayString;
 		if (inputManager == null) return;

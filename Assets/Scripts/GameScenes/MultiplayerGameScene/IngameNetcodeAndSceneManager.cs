@@ -15,6 +15,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
 		NetworkManager.Singleton.OnClientStopped += ClientStopped;
 		NetworkManager.Singleton.OnServerStopped += ServerStopped;
+
 		if (NetworkManager.IsServer) {
 			CheckAllPlayersPresent();
 		}
@@ -25,6 +26,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnectCallback;
 		NetworkManager.Singleton.OnClientStopped -= ClientStopped;
 		NetworkManager.Singleton.OnServerStopped -= ServerStopped;
+
 	}
 	public override void OnDestroy() {
 		shutdownNetworkEvent -= StopChecksForConnection;
@@ -41,6 +43,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 			GameStateManager.GameResult loss = GameStateManager.GameResult.Team1Win;
 			if (BalloonManager.team == Team.t1) loss = GameStateManager.GameResult.Team2Win;
 			GameResultChangeByConnection?.Invoke(loss);
+			ChangeReconnectionState(false);
 		}
 		if (clientID == NetworkManager.ServerClientId) {
 			StopConnection();
@@ -51,7 +54,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		GameData.team2.Remove(clientID);
 		GameData.ClientID_KEY_LobbyID_VAL.Remove(clientID);
 		if (reconnectingClients.Count > 0) CheckDisconnectedIsInReconnectionTimeout(clientID);
-		CheckTeamEmpty();
+		CheckAllPlayersPresent();
 	}
 	void CheckAllPlayersPresent() {
 		Dictionary<ulong, string> LCID = GameData.ClientID_KEY_LobbyID_VAL;
@@ -77,6 +80,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	void StopConnection() {
 		ShutDownNetwork();
 		GameResultChangeByConnection?.Invoke(GameStateManager.GameResult.Draw);
+		ChangeReconnectionState(false);
 	}
 	void ServerStopped(bool b) {
 		StopConnection();
@@ -104,7 +108,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 
 
 	#region connectionHandling
-	float pingRate = 4f, waitTime = 4f;
+	float pingRate = 4f;
 	float pingWaitTime;
 	void Update() {
 		if (GameData.InSinglePlayerMode) return;
@@ -126,7 +130,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 			reconnectingIssueTxt.text = "Server Unresponsive";
 			noServerPing = true;
 		}
-		if (!noServerPing && !waitingForPlayers) {
+		if ((!noServerPing && !waitingForPlayers) || GameStateManager.CurrGameResult == GameStateManager.GameResult.Undecided) {
 			ChangeReconnectionState(false);
 		} else {
 			ChangeReconnectionState(true);

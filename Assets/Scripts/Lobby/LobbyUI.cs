@@ -209,6 +209,8 @@ public class LobbyUI : MonoBehaviour {
 			connectedTxt.text = "Disconnected";
 			connectedTxt.color = new Color(1, 0, 0, 1);
 			connectionAnimController.AnimateStop();
+
+			ChangeToLoadingSceneMode(false);
 		}
 	}
 	[SerializeField] TextMeshProUGUI ErrorTxtBx;
@@ -281,7 +283,8 @@ public class LobbyUI : MonoBehaviour {
 		ToggleLobby(false);
 	}
 	void LeaveLobbyComplete() {
-		HidePanelsExceptChosen();
+		if (ErrorPanel.activeInHierarchy == true) HidePanelsExceptChosen(ErrorPanel);
+		else HidePanelsExceptChosen();
 	}
 
 	public Transform lobbiesListHolder, lobbyOptionPrefab;
