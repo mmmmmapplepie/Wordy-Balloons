@@ -283,6 +283,7 @@ public class LobbyUI : MonoBehaviour {
 		ToggleLobby(false);
 	}
 	void LeaveLobbyComplete() {
+		if (ErrorPanel == null) return;
 		if (ErrorPanel.activeInHierarchy == true) HidePanelsExceptChosen(ErrorPanel);
 		else HidePanelsExceptChosen();
 	}

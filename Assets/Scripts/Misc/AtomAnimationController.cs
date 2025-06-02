@@ -46,6 +46,7 @@ public class AtomAnimationController : MonoBehaviour {
 		UpdateColors(start, progress);
 	}
 	void UpdateSpeeds(bool start, float progress) {
+		if (orbitAnims == null) return;
 		foreach (ElectronOrbit orbit in orbitAnims) {
 			orbit.orbitSpeed = Mathf.Lerp(0f, targetSpeed, progress);
 		}

@@ -183,6 +183,8 @@ public class LobbyManager : MonoBehaviour {
 		try {
 			ILobbyEvents temp = LobbyEvents;
 			if (temp == null) return;
+			lobbyCallback = null;
+			LobbyEvents = null;
 			await temp.UnsubscribeAsync();
 		} catch (Exception e) {
 			lobbyCallback = null;
@@ -190,8 +192,6 @@ public class LobbyManager : MonoBehaviour {
 			print(e);
 			throw e;
 		}
-		lobbyCallback = null;
-		LobbyEvents = null;
 	}
 
 	void LobbyChanged(ILobbyChanges changes) {
@@ -320,6 +320,7 @@ public class LobbyManager : MonoBehaviour {
 		string relayCode = joinedLobby.Data[RelayCode].Value;
 		try {
 			JoinAllocation joinRelayAlloc = await JoinRelay(relayCode);
+			await AddTimeout(SubscribeToLobbyEvents());
 			await SubscribeToLobbyEvents();
 			NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinRelayAlloc, "dtls"));
 			JoinedLobby?.Invoke();
@@ -376,15 +377,24 @@ public class LobbyManager : MonoBehaviour {
 		hostLobby = null;
 		if (SendEvents) LeaveLobbyComplete?.Invoke();
 	}
+	bool MovingToAnotherScene = false;
 	async void DeleteLobby() {
-		if (joinedLobby != null) return;
+		MovingToAnotherScene = true;
 		try {
+			await UnsubscribeFromLobbyEvents();
+		} catch (Exception e) {
+			print(e);
+		}
+		try {
+			Debug.LogError("deleting lobby");
 			await LobbyService.Instance.DeleteLobbyAsync(joinedLobby.Id);
+			Debug.LogError("done stuff");
 		} catch (Exception e) {
 			print(e);
 		}
 	}
 	void LobbyDeleted() {
+		if (MovingToAnotherScene) return;
 		LeaveLobby();
 	}
 	#endregion
@@ -429,7 +439,25 @@ public class LobbyManager : MonoBehaviour {
 		}
 	}
 	#endregion
+	TimeSpan myTimeout = TimeSpan.FromSeconds(0.5);
+	public async Task<T> AddTimeout<T>(Task<T> task) {
+		Task delayTask = Task.Delay(myTimeout);
+		Task completedTask = await Task.WhenAny(task, delayTask);
 
+		if (completedTask == delayTask)
+			throw new TimeoutException("The operation timed out.");
+
+		return await task;
+	}
+	public async Task AddTimeout(Task task) {
+		Task delayTask = Task.Delay(myTimeout);
+		Task completedTask = await Task.WhenAny(task, delayTask);
+
+		if (completedTask == delayTask)
+			throw new TimeoutException("The operation timed out.");
+
+		await task;
+	}
 
 
 
