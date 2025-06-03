@@ -25,6 +25,14 @@ public class MyLobby : NetworkBehaviour {
 		base.OnNetworkSpawn();
 		LoadingSceneBool.Value = false;
 		LoadingCountdown.Value = sceneLoadTimer;
+		LoadingSceneBool.OnValueChanged += LoadingSceneBoolChanged;
+
+
+	}
+
+	public override void OnNetworkDespawn() {
+		base.OnNetworkDespawn();
+		LoadingSceneBool.OnValueChanged -= LoadingSceneBoolChanged;
 	}
 
 	void Start() {
@@ -392,7 +400,11 @@ public class MyLobby : NetworkBehaviour {
 	public static NetworkVariable<bool> LoadingSceneBool = new NetworkVariable<bool>(false);
 	public static NetworkVariable<int> LoadingCountdown = new NetworkVariable<int>();
 
-	Coroutine loadingSceneRoutine = null;
+	void LoadingSceneBoolChanged(bool previous, bool loading) {
+		if (loadTimeoutRoutine != null) StopCoroutine(loadTimeoutRoutine);
+		if (loading) loadTimeoutRoutine = StartCoroutine(LoadTimeoutRoutine());
+	}
+	Coroutine loadingSceneRoutine = null, loadTimeoutRoutine = null;
 	const int sceneLoadTimer = 3, sceneLoadTimeout = 8;
 	public void CheckIfPlayersFilled() {
 		LobbyFull?.Invoke(team1.Count > 0 && team2.Count > 0);
@@ -515,6 +527,14 @@ public class MyLobby : NetworkBehaviour {
 		LoadingCountdown.Value = sceneLoadTimer;
 		loadingSceneRoutine = null;
 		LoadingSceneBool.Value = false;
+
+		if (loadTimeoutRoutine != null) StopCoroutine(loadTimeoutRoutine);
+		loadTimeoutRoutine = null;
+	}
+	float loadingSceneTimeoutTime = 10f;
+	IEnumerator LoadTimeoutRoutine() {
+		yield return new WaitForSecondsRealtime(loadingSceneTimeoutTime);
+		LeaveLobby();
 	}
 
 	#endregion

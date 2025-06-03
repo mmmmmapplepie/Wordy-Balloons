@@ -21,6 +21,7 @@ public class LobbyManager : MonoBehaviour {
 	public static LobbyManager Instance;
 	void Awake() {
 		Instance = this;
+		InternetConnectivityCheck.ConnectedStateEvent += ConnectionChanged;
 	}
 	void Start() {
 		Authenticate();
@@ -42,6 +43,15 @@ public class LobbyManager : MonoBehaviour {
 			print(e);
 			AuthenticationFailure?.Invoke();
 		}
+	}
+
+	bool conn = true;
+
+	void ConnectionChanged(bool connected) {
+		if (conn != connected && connected == true) {
+			Authenticate();
+		}
+		conn = connected;
 	}
 
 
@@ -150,7 +160,7 @@ public class LobbyManager : MonoBehaviour {
 				}
 			});
 			joinedLobby = hostLobby;
-			await SubscribeToLobbyEvents();
+			await TaskTimeout.AddTimeout(SubscribeToLobbyEvents());
 			CreatedLobbyEvent?.Invoke();
 		} catch (Exception e) {
 			print(e);
@@ -185,7 +195,7 @@ public class LobbyManager : MonoBehaviour {
 			if (temp == null) return;
 			lobbyCallback = null;
 			LobbyEvents = null;
-			await temp.UnsubscribeAsync();
+			await TaskTimeout.AddTimeout(temp.UnsubscribeAsync());
 		} catch (Exception e) {
 			lobbyCallback = null;
 			LobbyEvents = null;
@@ -268,7 +278,7 @@ public class LobbyManager : MonoBehaviour {
 				Player = GetNewPlayer(playerName)
 			};
 
-			joinedLobby = await Lobbies.Instance.JoinLobbyByIdAsync(lobbyID, options);
+			joinedLobby = await TaskTimeout.AddTimeout<Lobby>(Lobbies.Instance.JoinLobbyByIdAsync(lobbyID, options));
 			await JoinLobby();
 		} catch (Exception e) {
 			print(e);
@@ -288,7 +298,7 @@ public class LobbyManager : MonoBehaviour {
 				Player = GetNewPlayer(playerName)
 			};
 
-			joinedLobby = await Lobbies.Instance.JoinLobbyByCodeAsync(code, options);
+			joinedLobby = await TaskTimeout.AddTimeout<Lobby>(Lobbies.Instance.JoinLobbyByCodeAsync(code, options));
 
 			await JoinLobby();
 		} catch (Exception e) {
@@ -308,7 +318,7 @@ public class LobbyManager : MonoBehaviour {
 			QuickJoinLobbyOptions options = new QuickJoinLobbyOptions {
 				Player = GetNewPlayer(playerName)
 			};
-			joinedLobby = await LobbyService.Instance.QuickJoinLobbyAsync(options);
+			joinedLobby = await TaskTimeout.AddTimeout<Lobby>(LobbyService.Instance.QuickJoinLobbyAsync(options));
 			await JoinLobby();
 		} catch (Exception e) {
 			print(e);
@@ -320,8 +330,7 @@ public class LobbyManager : MonoBehaviour {
 		string relayCode = joinedLobby.Data[RelayCode].Value;
 		try {
 			JoinAllocation joinRelayAlloc = await JoinRelay(relayCode);
-			await AddTimeout(SubscribeToLobbyEvents());
-			await SubscribeToLobbyEvents();
+			await TaskTimeout.AddTimeout(SubscribeToLobbyEvents());
 			NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinRelayAlloc, "dtls"));
 			JoinedLobby?.Invoke();
 		} catch (Exception e) {
@@ -349,6 +358,7 @@ public class LobbyManager : MonoBehaviour {
 		}
 	}
 	public void KickedFromLobby() {
+		if (MyLobby.LoadingSceneBool.Value) return;
 		KickedFromLobbyEvent?.Invoke();
 		LeaveLobby();
 	}
@@ -377,9 +387,7 @@ public class LobbyManager : MonoBehaviour {
 		hostLobby = null;
 		if (SendEvents) LeaveLobbyComplete?.Invoke();
 	}
-	bool MovingToAnotherScene = false;
 	async void DeleteLobby() {
-		MovingToAnotherScene = true;
 		try {
 			await UnsubscribeFromLobbyEvents();
 		} catch (Exception e) {
@@ -394,7 +402,7 @@ public class LobbyManager : MonoBehaviour {
 		}
 	}
 	void LobbyDeleted() {
-		if (MovingToAnotherScene) return;
+		if (MyLobby.LoadingSceneBool.Value) return;
 		LeaveLobby();
 	}
 	#endregion
@@ -439,29 +447,11 @@ public class LobbyManager : MonoBehaviour {
 		}
 	}
 	#endregion
-	TimeSpan myTimeout = TimeSpan.FromSeconds(0.5);
-	public async Task<T> AddTimeout<T>(Task<T> task) {
-		Task delayTask = Task.Delay(myTimeout);
-		Task completedTask = await Task.WhenAny(task, delayTask);
-
-		if (completedTask == delayTask)
-			throw new TimeoutException("The operation timed out.");
-
-		return await task;
-	}
-	public async Task AddTimeout(Task task) {
-		Task delayTask = Task.Delay(myTimeout);
-		Task completedTask = await Task.WhenAny(task, delayTask);
-
-		if (completedTask == delayTask)
-			throw new TimeoutException("The operation timed out.");
-
-		await task;
-	}
 
 
 
 	void OnDestroy() {
+		InternetConnectivityCheck.ConnectedStateEvent -= ConnectionChanged;
 		Instance = null;
 		DeleteLobby();
 		if (MyLobby.LoadingSceneBool.Value != true) LeaveLobby();
