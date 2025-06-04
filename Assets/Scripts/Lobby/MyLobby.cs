@@ -51,6 +51,7 @@ public class MyLobby : NetworkBehaviour {
 		LobbyManager.LeaveLobbyComplete += LeaveLobby;
 		LobbyManager.KickedFromLobbyEvent += LeaveLobby;
 		LobbyNetcodeManager.ServerStoppedEvent += ServerStopped;
+		LobbyNetcodeManager.TransportFailureEvent += ServerStopped;
 		LobbyNetcodeManager.ClientDisconnected += ClientDisconnected;
 		LobbyNetcodeManager.ClientStoppedEvent += ClientStopped;
 
@@ -78,6 +79,7 @@ public class MyLobby : NetworkBehaviour {
 		LobbyManager.LeaveLobbyComplete -= LeaveLobby;
 		LobbyManager.KickedFromLobbyEvent -= LeaveLobby;
 		LobbyNetcodeManager.ServerStoppedEvent -= ServerStopped;
+		LobbyNetcodeManager.TransportFailureEvent -= ServerStopped;
 		LobbyNetcodeManager.ClientDisconnected -= ClientDisconnected;
 		LobbyNetcodeManager.ClientStoppedEvent -= ClientStopped;
 

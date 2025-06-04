@@ -22,12 +22,16 @@ public class LobbyManager : MonoBehaviour {
 	void Awake() {
 		Instance = this;
 		InternetConnectivityCheck.ConnectedStateEvent += ConnectionChanged;
+		LobbyNetcodeManager.TransportFailureEvent += TransportFail;
 	}
 	void Start() {
 		Authenticate();
 	}
 	public async void Authenticate(string name = null) {
 		AuthenticationBegin?.Invoke();
+		if (UnityServices.State == ServicesInitializationState.Initialized && AuthenticationService.Instance.IsSignedIn) {
+			await CleanupLingeringHooks();
+		}
 		try {
 			InitializationOptions options = new InitializationOptions();
 			playerName = (name == null) ? "Player" + UnityEngine.Random.Range(0, 10000) : name;
@@ -38,12 +42,38 @@ public class LobbyManager : MonoBehaviour {
 				await AuthenticationService.Instance.SignInAnonymouslyAsync();
 				if (AuthenticationService.Instance != null) authenticationID = AuthenticationService.Instance.PlayerId;
 			}
+			await CleanupLingeringHooks();
 			AuthenticationSuccess?.Invoke();
 		} catch (Exception e) {
 			print(e);
 			AuthenticationFailure?.Invoke();
 		}
+
 	}
+
+	async Task CleanupLingeringHooks() {
+		for (int i = 0; i < lobbyEventsToCleanup.Count;) {
+			try {
+				await TaskTimeout.AddTimeout(lobbyEventsToCleanup[i].UnsubscribeAsync());
+				lobbyEventsToCleanup.RemoveAt(i);
+				print("cleanedup lobby event link");
+			} catch (Exception e) {
+				print(e);
+				i++;
+			}
+		}
+		for (int i = 0; i < lobbiesToCleanup.Count;) {
+			try {
+				await LobbyService.Instance.RemovePlayerAsync(lobbiesToCleanup[i], authenticationID);
+				lobbiesToCleanup.RemoveAt(i);
+				print("cleaned up lobby link");
+			} catch (Exception e) {
+				print(e);
+				i++;
+			}
+		}
+	}
+
 
 	bool conn = true;
 
@@ -52,6 +82,9 @@ public class LobbyManager : MonoBehaviour {
 			Authenticate();
 		}
 		conn = connected;
+	}
+	void TransportFail() {
+		ConnectionChanged(false);
 	}
 
 
@@ -189,8 +222,10 @@ public class LobbyManager : MonoBehaviour {
 			throw e;
 		}
 	}
+	List<ILobbyEvents> lobbyEventsToCleanup = new List<ILobbyEvents>();
 	async Task UnsubscribeFromLobbyEvents() {
 		try {
+			if (!InternetConnectivityCheck.connected && LobbyEvents != null && !lobbyEventsToCleanup.Contains(LobbyEvents)) lobbyEventsToCleanup.Add(LobbyEvents);
 			ILobbyEvents temp = LobbyEvents;
 			if (temp == null) return;
 			lobbyCallback = null;
@@ -365,6 +400,7 @@ public class LobbyManager : MonoBehaviour {
 	public void LeaveLobby(bool SendEvents = true) {
 		LeaveLobby(authenticationID, SendEvents);
 	}
+	List<string> lobbiesToCleanup = new List<string>();
 	public async void LeaveLobby(string authenticationID, bool SendEvents = true) {
 		if (SendEvents) LeaveLobbyBegin?.Invoke();
 		try {
@@ -383,6 +419,7 @@ public class LobbyManager : MonoBehaviour {
 				print(e);
 			}
 		}
+		if (!InternetConnectivityCheck.connected && joinedLobby != null && !lobbiesToCleanup.Contains(joinedLobby.Id)) lobbiesToCleanup.Add(joinedLobby.Id);
 		joinedLobby = null;
 		hostLobby = null;
 		if (SendEvents) LeaveLobbyComplete?.Invoke();
@@ -452,6 +489,7 @@ public class LobbyManager : MonoBehaviour {
 
 	void OnDestroy() {
 		InternetConnectivityCheck.ConnectedStateEvent -= ConnectionChanged;
+		LobbyNetcodeManager.TransportFailureEvent -= TransportFail;
 		Instance = null;
 		DeleteLobby();
 		if (MyLobby.LoadingSceneBool.Value != true) LeaveLobby();

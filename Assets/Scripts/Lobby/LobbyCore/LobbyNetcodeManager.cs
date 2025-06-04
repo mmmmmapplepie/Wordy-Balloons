@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class LobbyNetcodeManager : NetworkBehaviour {
-	public static event Action ServerStartSuccess, ServerStartFail, ServerStoppedEvent, ShuttingDownNetwork;
+	public static event Action ServerStartSuccess, ServerStartFail, ServerStoppedEvent, ShuttingDownNetwork, TransportFailureEvent;
 	public static event Action ClientStartSuccess, ClientStartFail;
 	public static event Action<ulong> ClientConnected, ClientDisconnected;
 	public static event Action<bool> ClientStoppedEvent;
@@ -25,6 +25,7 @@ public class LobbyNetcodeManager : NetworkBehaviour {
 		NetworkManager.Singleton.OnClientConnectedCallback += ClientConnectedToNGO;
 		NetworkManager.Singleton.OnServerStarted += ServerStarted;
 		NetworkManager.Singleton.OnServerStopped += ServerStopped;
+		NetworkManager.Singleton.OnTransportFailure += TransportFailure;
 
 		//a client that is disconnecting also gets this callback (as if the still connected are disconnecting... as opposed to client stopped)
 		NetworkManager.Singleton.OnClientDisconnectCallback += ClientDisconnectedFromNGO;
@@ -42,6 +43,7 @@ public class LobbyNetcodeManager : NetworkBehaviour {
 			NetworkManager.Singleton.OnClientConnectedCallback -= ClientConnectedToNGO;
 			NetworkManager.Singleton.OnServerStarted -= ServerStarted;
 			NetworkManager.Singleton.OnServerStopped -= ServerStopped;
+			NetworkManager.Singleton.OnTransportFailure -= TransportFailure;
 			NetworkManager.Singleton.OnClientDisconnectCallback -= ClientDisconnectedFromNGO;
 			NetworkManager.Singleton.OnClientStopped -= ClientStopped;
 		}
@@ -81,6 +83,9 @@ public class LobbyNetcodeManager : NetworkBehaviour {
 	}
 	void ClientStopped(bool wasHost) {
 		ClientStoppedEvent?.Invoke(wasHost);
+	}
+	void TransportFailure() {
+		TransportFailureEvent?.Invoke();
 	}
 
 
