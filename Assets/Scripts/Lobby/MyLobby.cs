@@ -12,8 +12,7 @@ public class MyLobby : NetworkBehaviour {
 	public static MyLobby Instance;
 
 	#region Events
-	public static event Action LobbyCreatedEvent, LobbyJoined;
-	//  LobbyLeft, LobbyDeleted, LobbyJoinFail;
+	public static event Action LobbyCreatedEvent;
 
 	#endregion
 
@@ -144,7 +143,6 @@ public class MyLobby : NetworkBehaviour {
 
 	#region  LobbyJoining
 	void JoinedLobby() {
-		LobbyJoined?.Invoke();
 		LobbyNetcodeManager.Instance.StartClient();
 	}
 	List<(string id, Coroutine timeout)> tempJoinedList = new List<(string id, Coroutine timeout)>();
@@ -524,9 +522,7 @@ public class MyLobby : NetworkBehaviour {
 
 	public void StopSceneLoading() {
 		if (loadingSceneRoutine != null) StopCoroutine(loadingSceneRoutine);
-		LoadingCountdown.Value = sceneLoadTimer;
 		loadingSceneRoutine = null;
-		LoadingSceneBool.Value = false;
 
 		if (loadTimeoutRoutine != null) StopCoroutine(loadTimeoutRoutine);
 		loadTimeoutRoutine = null;

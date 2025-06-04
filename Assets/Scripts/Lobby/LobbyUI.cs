@@ -237,6 +237,7 @@ public class LobbyUI : MonoBehaviour {
 		lobbyPanel.interactable = interactable;
 		lobbyPanel.blocksRaycasts = interactable;
 		lobbyPanel.alpha = interactable ? 1 : 0;
+		//reset the btn overlay for quit loading scene
 	}
 
 	void LobbyCreationFail() {
@@ -255,6 +256,7 @@ public class LobbyUI : MonoBehaviour {
 		lobbyCodeTxt.transform.parent.gameObject.SetActive(NetworkManager.Singleton.IsServer);
 		HidePanelsExceptChosen();
 		startGameBtn.interactable = false;
+		stopGameLoadBtn.SetActive(false);
 		LobbyUpdate(LobbyManager.Instance.joinedLobby);
 		ToggleLobby(true);
 	}

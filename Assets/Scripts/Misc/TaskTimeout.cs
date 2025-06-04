@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class TaskTimeout : MonoBehaviour {
 	static TimeSpan myTimeout = TimeSpan.FromSeconds(10);
-	public static async Task<T> AddTimeout<T>(Task<T> task) {
-		Task delayTask = Task.Delay(myTimeout);
+	public static async Task<T> AddTimeout<T>(Task<T> task, TimeSpan? time = null) {
+		Task delayTask = Task.Delay(time == null ? myTimeout : (TimeSpan)time);
 		Task completedTask = await Task.WhenAny(task, delayTask);
 
 		if (completedTask == delayTask)
@@ -14,8 +14,8 @@ public class TaskTimeout : MonoBehaviour {
 
 		return await task;
 	}
-	public static async Task AddTimeout(Task task) {
-		Task delayTask = Task.Delay(myTimeout);
+	public static async Task AddTimeout(Task task, TimeSpan? time = null) {
+		Task delayTask = Task.Delay(time == null ? myTimeout : (TimeSpan)time);
 		Task completedTask = await Task.WhenAny(task, delayTask);
 
 		if (completedTask == delayTask)

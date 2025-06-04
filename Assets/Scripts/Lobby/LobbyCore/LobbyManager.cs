@@ -33,7 +33,7 @@ public class LobbyManager : MonoBehaviour {
 			playerName = (name == null) ? "Player" + UnityEngine.Random.Range(0, 10000) : name;
 			options.SetProfile(playerName);
 			await UnityServices.InitializeAsync(options);
-			if (AuthenticationService.Instance.IsSignedIn) AuthenticationService.Instance.SignOut(true);
+			if (AuthenticationService.Instance.IsSignedIn) { AuthenticationService.Instance.SignOut(true); print("singing out"); } else { AuthenticationService.Instance.ClearSessionToken(); print("cleared token"); }
 			if (!AuthenticationService.Instance.IsSignedIn) {
 				await AuthenticationService.Instance.SignInAnonymouslyAsync();
 				if (AuthenticationService.Instance != null) authenticationID = AuthenticationService.Instance.PlayerId;
@@ -146,21 +146,21 @@ public class LobbyManager : MonoBehaviour {
 					{RelayCode, new DataObject(DataObject.VisibilityOptions.Member, RelayCode)}
 				}
 			};
-			hostLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, lobbyMaxPlayerNumber, lobbyDetails);
+			hostLobby = await TaskTimeout.AddTimeout<Lobby>(LobbyService.Instance.CreateLobbyAsync(lobbyName, lobbyMaxPlayerNumber, lobbyDetails));
 
 			//assign relay
-			Allocation relayAlloc = await AllocateRelay(lobbyMaxPlayerNumber);
+			Allocation relayAlloc = await TaskTimeout.AddTimeout<Allocation>(AllocateRelay(lobbyMaxPlayerNumber), TimeSpan.FromSeconds(5));
 			NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(relayAlloc, "dtls"));
-			string relayCode = await GetRelayCode(relayAlloc);
+			string relayCode = await TaskTimeout.AddTimeout<String>(GetRelayCode(relayAlloc), TimeSpan.FromSeconds(5));
 
 			//update lobby with relay
-			hostLobby = await LobbyService.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions {
+			hostLobby = await TaskTimeout.AddTimeout<Lobby>(LobbyService.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions {
 				Data = new Dictionary<string, DataObject> {
 					{RelayCode, new DataObject(DataObject.VisibilityOptions.Member, relayCode)}
 				}
-			});
+			}), TimeSpan.FromSeconds(5));
 			joinedLobby = hostLobby;
-			await TaskTimeout.AddTimeout(SubscribeToLobbyEvents());
+			await TaskTimeout.AddTimeout(SubscribeToLobbyEvents(), TimeSpan.FromSeconds(5));
 			CreatedLobbyEvent?.Invoke();
 		} catch (Exception e) {
 			print(e);
@@ -279,7 +279,7 @@ public class LobbyManager : MonoBehaviour {
 			};
 
 			joinedLobby = await TaskTimeout.AddTimeout<Lobby>(Lobbies.Instance.JoinLobbyByIdAsync(lobbyID, options));
-			await JoinLobby();
+			await TaskTimeout.AddTimeout(JoinLobby());
 		} catch (Exception e) {
 			print(e);
 			LeaveLobby();
@@ -300,7 +300,7 @@ public class LobbyManager : MonoBehaviour {
 
 			joinedLobby = await TaskTimeout.AddTimeout<Lobby>(Lobbies.Instance.JoinLobbyByCodeAsync(code, options));
 
-			await JoinLobby();
+			await TaskTimeout.AddTimeout(JoinLobby());
 		} catch (Exception e) {
 			print(e);
 			LeaveLobby();
@@ -319,7 +319,7 @@ public class LobbyManager : MonoBehaviour {
 				Player = GetNewPlayer(playerName)
 			};
 			joinedLobby = await TaskTimeout.AddTimeout<Lobby>(LobbyService.Instance.QuickJoinLobbyAsync(options));
-			await JoinLobby();
+			await TaskTimeout.AddTimeout(JoinLobby());
 		} catch (Exception e) {
 			print(e);
 			LeaveLobby();
@@ -330,7 +330,7 @@ public class LobbyManager : MonoBehaviour {
 		string relayCode = joinedLobby.Data[RelayCode].Value;
 		try {
 			JoinAllocation joinRelayAlloc = await JoinRelay(relayCode);
-			await TaskTimeout.AddTimeout(SubscribeToLobbyEvents());
+			await SubscribeToLobbyEvents();
 			NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinRelayAlloc, "dtls"));
 			JoinedLobby?.Invoke();
 		} catch (Exception e) {
