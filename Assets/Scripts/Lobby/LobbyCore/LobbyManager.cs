@@ -14,6 +14,7 @@ using Unity.Networking.Transport.Relay;
 
 public class LobbyManager : MonoBehaviour {
 	public const string RelayCode = "RelayCode";
+	public const string Dictionary = "Dictionary";
 	public const string LobbyID = "LobbyID";
 	public const string GameMode = "GameMode";
 	public const string PlayerName = "PlayerName";
@@ -161,7 +162,7 @@ public class LobbyManager : MonoBehaviour {
 
 
 	#region  lobbyCreation
-	public async void CreateLobby(string lobbyName, string mode, int lobbyMaxPlayerNumber) {
+	public async void CreateLobby(string lobbyName, string mode, int lobbyMaxPlayerNumber, DictionaryMode dictionary) {
 		if (hostLobby != null) return;
 		LobbyCreationBegin?.Invoke();
 		if (NGOConnected()) {
@@ -176,7 +177,8 @@ public class LobbyManager : MonoBehaviour {
 				Player = GetNewPlayer(playerName),
 				Data = new Dictionary<string, DataObject> {
 					{GameMode, new DataObject(DataObject.VisibilityOptions.Public, mode)},
-					{RelayCode, new DataObject(DataObject.VisibilityOptions.Member, RelayCode)}
+					{RelayCode, new DataObject(DataObject.VisibilityOptions.Member, RelayCode)},
+					{Dictionary, new DataObject(DataObject.VisibilityOptions.Public, dictionary.ToString())}
 				}
 			};
 			hostLobby = await TaskTimeout.AddTimeout<Lobby>(LobbyService.Instance.CreateLobbyAsync(lobbyName, lobbyMaxPlayerNumber, lobbyDetails));

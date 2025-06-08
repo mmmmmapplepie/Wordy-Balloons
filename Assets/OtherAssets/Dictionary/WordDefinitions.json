@@ -1,0 +1,494 @@
+{
+  "words": [
+    {
+      "word": "Activist",
+      "type": "noun",
+      "description": "A person who takes action to support a political or social cause."
+    },
+    {
+      "word": "Aide",
+      "type": "noun",
+      "description": "A person who acts as an assistant to an important person."
+    },
+    {
+      "word": "AIDS",
+      "type": "noun",
+      "description": "A disease caused by HIV that weakens the immune system."
+    },
+    {
+      "word": "Aircraft",
+      "type": "noun",
+      "description": "A vehicle that can fly, such as an airplane or helicopter."
+    },
+    {
+      "word": "Airline",
+      "type": "noun",
+      "description": "A company that provides regular flights for passengers or cargo."
+    },
+    {
+      "word": "Airport",
+      "type": "noun",
+      "description": "A place where aircraft regularly take off and land."
+    },
+    {
+      "word": "Anymore",
+      "type": "adverb",
+      "description": "Used to refer to something that used to happen but no longer does."
+    },
+    {
+      "word": "Awareness",
+      "type": "noun",
+      "description": "Knowledge or perception of a situation or fact."
+    },
+    {
+      "word": "Basically",
+      "type": "adverb",
+      "description": "Used to emphasize the most important reason or fact about something."
+    },
+    {
+      "word": "Basketball",
+      "type": "noun",
+      "description": "A sport where teams of five players try to score by putting a ball through a hoop."
+    },
+    {
+      "word": "Basketball",
+      "type": "noun",
+      "description": "The ball used in the sport of basketball."
+    },
+    {
+      "word": "Bathroom",
+      "type": "noun",
+      "description": "A room containing a toilet and typically also a sink and a shower or bathtub."
+    },
+    {
+      "word": "Bombing",
+      "type": "noun",
+      "description": "An attack using bombs."
+    },
+    {
+      "word": "Boyfriend",
+      "type": "noun",
+      "description": "A male partner in a romantic relationship."
+    },
+    {
+      "word": "CEO",
+      "type": "noun",
+      "description": "Chief Executive Officer, the highest-ranking person in a company."
+    },
+    {
+      "word": "Cholesterol",
+      "type": "noun",
+      "description": "A type of fat found in your blood that is necessary in small amounts."
+    },
+    {
+      "word": "Classroom",
+      "type": "noun",
+      "description": "A room where teaching or learning takes place."
+    },
+    {
+      "word": "Consultant",
+      "type": "noun",
+      "description": "A person who provides expert advice professionally."
+    },
+    {
+      "word": "Coverage",
+      "type": "noun",
+      "description": "The extent to which something is covered, such as in insurance or news reporting."
+    },
+    {
+      "word": "Criticize",
+      "type": "verb",
+      "description": "To express disapproval of someone or something."
+    },
+    {
+      "word": "DNA",
+      "type": "noun",
+      "description": "The molecule that carries genetic instructions in living things."
+    },
+    {
+      "word": "Downtown",
+      "type": "noun",
+      "description": "The central part of a city."
+    },
+    {
+      "word": "Downtown",
+      "type": "adverb",
+      "description": "Toward or in the central part of a city."
+    },
+		{
+      "word": "Electronic",
+      "type": "(adjective)",
+      "description": "Relating to devices, systems, or circuits that operate using the flow of electrons (electric current), such as computers or TVs."
+    },
+    {
+      "word": "E-mail",
+      "type": "(noun)",
+      "description": "A system for sending written messages electronically from one computer or device to another."
+    },
+    {
+      "word": "E-mail",
+      "type": "(verb)",
+      "description": "To send a message electronically via email."
+    },
+    {
+      "word": "Environmental",
+      "type": "(adjective)",
+      "description": "Relating to the natural world and the impact of human activity on its condition."
+    },
+    {
+      "word": "Essentially",
+      "type": "(adverb)",
+      "description": "Used to emphasize the basic or fundamental nature of something; basically or fundamentally."
+    },
+    {
+      "word": "Etc",
+      "type": "(abbreviation)",
+      "description": "Short for 'et cetera', meaning 'and other similar things' or 'and so on'."
+    },
+    {
+      "word": "Fewer",
+      "type": "(adjective)",
+      "description": "A smaller number of; used with countable nouns."
+    },
+    {
+      "word": "Garage",
+      "type": "(noun)",
+      "description": "A building or indoor area for parking or storing vehicles."
+    },
+    {
+      "word": "Garage",
+      "type": "(noun)",
+      "description": "A place where vehicles are repaired and maintained."
+    },
+    {
+      "word": "Gene",
+      "type": "(noun)",
+      "description": "A unit of heredity that is transferred from a parent to offspring and determines some characteristic of the offspring."
+    },
+    {
+      "word": "Girlfriend",
+      "type": "(noun)",
+      "description": "A woman or girl who someone is dating or in a romantic relationship with."
+    },
+    {
+      "word": "Global",
+      "type": "(adjective)",
+      "description": "Relating to or encompassing the entire world."
+    },
+    {
+      "word": "Greatest",
+      "type": "(adjective)",
+      "description": "Of the most outstanding or highest rank, quality, or degree."
+    },
+    {
+      "word": "Guideline",
+      "type": "(noun)",
+      "description": "A general rule, principle, or piece of advice."
+    },
+    {
+      "word": "Helicopter",
+      "type": "(noun)",
+      "description": "A type of aircraft that derives lift and propulsion from one or more sets of horizontally revolving overhead rotors."
+    },
+    {
+      "word": "Hi",
+      "type": "(interjection)",
+      "description": "A friendly greeting or way to say hello."
+    },
+    {
+      "word": "Highlight",
+      "type": "(noun)",
+      "description": "An outstanding part of an event or period of time."
+    },
+    {
+      "word": "Highlight",
+      "type": "(verb)",
+      "description": "To emphasize or make something stand out."
+    },
+    {
+      "word": "ie",
+      "type": "(abbreviation)",
+      "description": "Stands for 'id est' in Latin, meaning 'that is to say' or 'in other words'."
+    },
+    {
+      "word": "Internet",
+      "type": "(noun)",
+      "description": "A global computer network providing a variety of information and communication facilities."
+    },
+    {
+      "word": "Iraqi",
+      "type": "(adjective)",
+      "description": "Relating to Iraq or its people."
+    },
+    {
+      "word": "Islamic",
+      "type": "(adjective)",
+      "description": "Relating to Islam, its teachings, or its culture."
+    },
+    {
+      "word": "Israeli",
+      "type": "(adjective)",
+      "description": "Relating to Israel or its people."
+    },
+    {
+      "word": "Lifestyle",
+      "type": "(noun)",
+      "description": "The way in which a person or group lives, including habits, attitudes, and values."
+    },
+    {
+      "word": "Long-term",
+      "type": "(adjective)",
+      "description": "Extending over or involving a relatively long period of time."
+    },
+    {
+      "word": "Lots",
+      "type": "(noun)",
+      "description": "A large number or amount of something."
+    },
+    {
+      "word": "Makeup",
+      "type": "(noun)",
+      "description": "Cosmetics such as lipstick or powder applied to the face."
+    },
+    {
+      "word": "Makeup",
+      "type": "(noun)",
+      "description": "The combination of qualities that form a person's character or an object's structure."
+    },
+    {
+      "word": "Mm-hmm",
+      "type": "(interjection)",
+      "description": "A vocal sound expressing agreement or confirmation."
+    },
+    {
+      "word": "Mom",
+      "type": "(noun)",
+      "description": "Informal term for mother."
+    },
+    {
+      "word": "Motivation",
+      "type": "(noun)",
+      "description": "The reason or reasons one has for acting or behaving in a particular way."
+    },
+    {
+      "word": "Movie",
+      "type": "(noun)",
+      "description": "A motion picture; a story or event recorded on film or video to be shown in a theater or on television."
+    },
+    {
+      "word": "Mr",
+      "type": "(title)",
+      "description": "A title used before a surname or full name to address or refer to a man without stating whether he is married."
+    },
+    {
+      "word": "Mrs",
+      "type": "(title)",
+      "description": "A title used before a surname or full name to address or refer to a married woman."
+    },
+    {
+      "word": "Ms",
+      "type": "(title)",
+      "description": "A title used before a surname or full name to address or refer to a woman without indicating her marital status."
+    },
+		{
+      "word": "Nearby",
+      "type": "(adjective/adverb)",
+      "description": "Close at hand; not far away."
+    },
+    {
+      "word": "Nonetheless",
+      "type": "(adverb)",
+      "description": "In spite of that; nevertheless."
+    },
+    {
+      "word": "Obviously",
+      "type": "(adverb)",
+      "description": "In a way that is easily perceived or understood; clearly."
+    },
+    {
+      "word": "Ok",
+      "type": "(adjective/interjection)",
+      "description": "Acceptable or satisfactory; used to express agreement or assent."
+    },
+    {
+      "word": "Okay",
+      "type": "(adjective/interjection)",
+      "description": "Same as 'Ok'; acceptable or agreed upon."
+    },
+    {
+      "word": "Online",
+      "type": "(adjective/adverb)",
+      "description": "Connected to or available through the internet."
+    },
+    {
+      "word": "Others",
+      "type": "(pronoun)",
+      "description": "People or things that are different or remaining."
+    },
+    {
+      "word": "PC",
+      "type": "(noun)",
+      "description": "Personal computer; a computer designed for use by one person at a time."
+    },
+    {
+      "word": "Phone",
+      "type": "(noun)",
+      "description": "A device used for voice communication over long distances."
+    },
+    {
+      "word": "PM",
+      "type": "(abbreviation)",
+      "description": "Post meridiem; referring to the time from noon to midnight."
+    },
+    {
+      "word": "PM",
+      "type": "(noun)",
+      "description": "Prime Minister; the head of government in some countries."
+    },
+    {
+      "word": "Precisely",
+      "type": "(adverb)",
+      "description": "Exactly or sharply defined or stated."
+    },
+    {
+      "word": "Quarterback",
+      "type": "(noun)",
+      "description": "In American football, the player who directs the team's offensive play."
+    },
+    {
+      "word": "Radio",
+      "type": "(noun)",
+      "description": "The transmission and reception of electromagnetic waves of radio frequency."
+    },
+    {
+      "word": "Sales",
+      "type": "(noun)",
+      "description": "The exchange of goods or services for money."
+    },
+    {
+      "word": "Seriously",
+      "type": "(adverb)",
+      "description": "In a solemn or thoughtful manner; genuinely or sincerely."
+    },
+    {
+      "word": "Shit",
+      "type": "(noun)",
+      "description": "Vulgar term for feces; also used as an exclamation expressing anger or frustration."
+    },
+    {
+      "word": "Ski",
+      "type": "(noun)",
+      "description": "A long, narrow piece of equipment worn on the feet to glide over snow."
+    },
+    {
+      "word": "Ski",
+      "type": "(verb)",
+      "description": "To move over snow on skis."
+    },
+    {
+      "word": "Soccer",
+      "type": "(noun)",
+      "description": "A sport played by two teams of eleven players with a round ball that may not be touched with the hands or arms during play, except by the goalkeepers."
+    },
+    {
+      "word": "Software",
+      "type": "(noun)",
+      "description": "Programs and other operating information used by a computer."
+    },
+    {
+      "word": "Someone",
+      "type": "(pronoun)",
+      "description": "An unspecified person."
+    },
+    {
+      "word": "Soviet",
+      "type": "(adjective)",
+      "description": "Relating to the former Soviet Union or its government."
+    },
+    {
+      "word": "Successfully",
+      "type": "(adverb)",
+      "description": "In a way that achieves the desired result."
+    },
+    {
+      "word": "Suddenly",
+      "type": "(adverb)",
+      "description": "Quickly and unexpectedly."
+    },
+    {
+      "word": "Surprisingly",
+      "type": "(adverb)",
+      "description": "In a way that causes surprise; unexpectedly."
+    },
+    {
+      "word": "Teenager",
+      "type": "(noun)",
+      "description": "A person aged between 13 and 19 years old."
+    },
+    {
+      "word": "Television",
+      "type": "(noun)",
+      "description": "A system for transmitting visual images and sound that are reproduced on screens, primarily used to broadcast programs for entertainment, information, and education."
+    },
+    {
+      "word": "Terms",
+      "type": "(noun)",
+      "description": "Conditions or stipulations in an agreement or contract."
+    },
+    {
+      "word": "Today",
+      "type": "(noun/adverb)",
+      "description": "The present day."
+    },
+    {
+      "word": "TV",
+      "type": "(noun)",
+      "description": "Short for television."
+    },
+    {
+      "word": "Typically",
+      "type": "(adverb)",
+      "description": "In a way that is characteristic or usual."
+    },
+    {
+      "word": "Unfortunately",
+      "type": "(adverb)",
+      "description": "Used to express regret or disappointment about a situation."
+    },
+    {
+      "word": "Usually",
+      "type": "(adverb)",
+      "description": "Under normal conditions; generally."
+    },
+    {
+      "word": "Video",
+      "type": "(noun)",
+      "description": "The recording, reproducing, or broadcasting of moving visual images."
+    },
+    {
+      "word": "Vs",
+      "type": "(abbreviation)",
+      "description": "Short for 'versus', meaning 'against' in contests or comparisons."
+    },
+    {
+      "word": "Weekend",
+      "type": "(noun)",
+      "description": "The end of the week, typically Saturday and Sunday, when people do not work."
+    },
+    {
+      "word": "Works",
+      "type": "(noun)",
+      "description": "Things produced, especially in art or literature."
+    },
+    {
+      "word": "Works",
+      "type": "(verb)",
+      "description": "Performs a job or function."
+    },
+    {
+      "word": "Yeah",
+      "type": "(interjection)",
+      "description": "Informal yes; used to express agreement."
+    }
+  ]
+}

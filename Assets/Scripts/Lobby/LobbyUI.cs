@@ -46,9 +46,6 @@ public class LobbyUI : MonoBehaviour {
 
 		LobbyManager.ListLobbySuccess += LobbyListFound;
 		LobbyManager.ListLobbyFailure += ListLobbiesFail;
-
-		// GoToCreateLobby();
-		// CreateLobby();
 	}
 	void OnDestroy() {
 		MyLobby.LobbyFull -= LobbyFull;
@@ -124,10 +121,10 @@ public class LobbyUI : MonoBehaviour {
 		Enum.TryParse(gameModeOptions[index], out GameMode mode);
 		return mode;
 	}
-
+	public SliderToggle dictionaryToggle;
 	public void CreateLobby() {
 		if (!CheckInternetConnected()) return;
-		LobbyManager.Instance.CreateLobby(lobbyName.text, ConvertDropDownValueToGameModeString(lobbyModeDropDown.value), lobbyPlayerNumDropDown.value + 2);
+		LobbyManager.Instance.CreateLobby(lobbyName.text, ConvertDropDownValueToGameModeString(lobbyModeDropDown.value), lobbyPlayerNumDropDown.value + 2, GameData.Dictionary = dictionaryToggle.onRightSide ? DictionaryMode.Complete : DictionaryMode.Beginner);
 	}
 	public void QuickJoin() {
 		if (!CheckInternetConnected()) return;
@@ -260,13 +257,18 @@ public class LobbyUI : MonoBehaviour {
 		LobbyUpdate(LobbyManager.Instance.joinedLobby);
 		ToggleLobby(true);
 	}
-	[SerializeField] TextMeshProUGUI lobbyModeTxt, lobbyCodeTxt;
+	[SerializeField] TextMeshProUGUI lobbyModeTxt, dictionaryModeTxt, lobbyCodeTxt;
 	void LobbyUpdate(Lobby lobby) {
 		if (lobby == null) return;
 		lobbyModeTxt.text = lobby.Data[LobbyManager.GameMode].Value;
+		string dictionaryMode = lobby.Data[LobbyManager.Dictionary].Value;
+		dictionaryModeTxt.text = dictionaryMode;
+		Enum.TryParse<DictionaryMode>(dictionaryMode, out GameData.Dictionary);
 		if (LobbyManager.Instance.hostLobby != null) {
 			lobbyCodeTxt.text = lobby.LobbyCode;
 		}
+
+
 	}
 
 	void HearbeatFail() {

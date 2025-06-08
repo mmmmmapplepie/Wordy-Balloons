@@ -66,11 +66,6 @@ public class EnglishDictionary : MonoBehaviour {
 
 
 
-			//remove empty space from description.
-
-
-
-
 		}
 		// 	  string source = "abc    \t def\r\n789";
 		// string result = string.Concat(source.Where(c => !char.IsWhiteSpace(c)));
@@ -89,16 +84,6 @@ public class DictionaryEntryListFromJson {
 }
 [Serializable]
 public class DictionaryEntry {
-	//the word
 	public string word;
-	//longest word/explanation phrase
-	// public int maxLength;
-	// //where to find the longest one
-	// public int maxPos;
-	// //shortest word/explanation phrase
-	// public int minLength;
-	// //where to find the shortest one
-	// public int minPos;
-	//parent list contains individual descriptions for words
 	public List<string> description = new List<string>();
 }

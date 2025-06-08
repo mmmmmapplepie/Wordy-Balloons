@@ -34,6 +34,7 @@ public class SinglePlayerSetup : NetworkBehaviour {
 
 	}
 
+	public SliderToggle dictionaryToggle;
 	void ShutdownNetwork() {
 		if (NetworkManager.IsConnectedClient && !NetworkManager.ShutdownInProgress)
 			NetworkManager.Shutdown();
@@ -59,6 +60,8 @@ public class SinglePlayerSetup : NetworkBehaviour {
 		GameData.ClientID_KEY_LobbyID_VAL.Clear();
 		GameData.ClientID_KEY_ColorIndex_VAL.Add(selfID, 0);
 		GameData.ClientID_KEY_ColorIndex_VAL.Add(computerID, 1);
+
+		GameData.Dictionary = dictionaryToggle.onRightSide ? DictionaryMode.Complete : DictionaryMode.Beginner;
 
 		GameData.team1.Clear();
 		GameData.team1.Add(selfID);

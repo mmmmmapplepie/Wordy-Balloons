@@ -248,7 +248,7 @@ public class InputManager : MonoBehaviour {
 	List<DictionaryEntry> DictionaryList = null;
 	public static event Action<DictionaryEntry> NewWordChosen;
 	string PickRandomText() {
-		if (DictionaryList == null) DictionaryList = EnglishDictionary.Instance.GetDictionaryList();
+		if (DictionaryList == null) DictionaryList = GameData.Dictionary == DictionaryMode.Complete ? EnglishDictionary.Instance.GetDictionaryList() : EnglishDictionaryReduced.Instance.GetDictionaryList(); ;
 		if (DictionaryList == null) return "Random text has been set bruh!";
 		int ranWord = UnityEngine.Random.Range(0, DictionaryList.Count);
 		NewWordChosen?.Invoke(DictionaryList[ranWord]);
