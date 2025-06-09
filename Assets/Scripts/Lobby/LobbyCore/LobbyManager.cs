@@ -433,9 +433,7 @@ public class LobbyManager : MonoBehaviour {
 			print(e);
 		}
 		try {
-			Debug.LogError("deleting lobby");
 			await LobbyService.Instance.DeleteLobbyAsync(joinedLobby.Id);
-			Debug.LogError("done stuff");
 		} catch (Exception e) {
 			print(e);
 		}

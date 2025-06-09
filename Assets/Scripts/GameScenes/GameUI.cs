@@ -4,10 +4,13 @@ using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using WebSocketSharp;
 
 public class GameUI : MonoBehaviour {
 
-
+	void Start() {
+		SetupChangeSceneOption();
+	}
 
 	void OnEnable() {
 		GameStateManager.countDownChanged += ChangeCountDown;
@@ -54,14 +57,22 @@ public class GameUI : MonoBehaviour {
 
 
 	#region Menus btn
+	void SetupChangeSceneOption() {
+		if (GameData.PlayMode == PlayModeEnum.Multiplayer) return;
+		moveSceneBtnTxt.text = "Single Player Menu";
+		targetSceneName = "SinglePlayer";
+	}
 
+	string targetSceneName = "LobbyScene";
+
+	public TextMeshProUGUI moveSceneBtnTxt;
 	[Header("Menu")] public GameObject menusPanel;
 	public GameObject guidePanel, gameNotPausedTxt;
 	public void ToggleMenu() {
 		menusPanel.SetActive(!menusPanel.activeInHierarchy);
 		guidePanel.SetActive(false);
 
-		if (GameData.InSinglePlayerMode) {
+		if (GameData.PlayMode != PlayModeEnum.Multiplayer) {
 			Time.timeScale = menusPanel.activeInHierarchy ? 0 : 1f;
 			gameNotPausedTxt.SetActive(false);
 		}
@@ -74,7 +85,7 @@ public class GameUI : MonoBehaviour {
 			SaveData?.Invoke();
 		}
 		NetworkManager.Singleton.Shutdown();
-		SceneManager.LoadScene(s, LoadSceneMode.Single);
+		SceneManager.LoadScene(s.IsNullOrEmpty() == true ? targetSceneName : s, LoadSceneMode.Single);
 	}
 	public static event System.Action SaveData;
 

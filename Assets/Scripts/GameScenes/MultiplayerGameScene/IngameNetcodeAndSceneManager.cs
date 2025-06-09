@@ -111,7 +111,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	float pingRate = 4f;
 	float pingWaitTime;
 	void Update() {
-		if (GameData.InSinglePlayerMode) return;
+		if (GameData.PlayMode != PlayModeEnum.Multiplayer) return;
 		if (GameStateManager.CurrGameResult != GameStateManager.GameResult.Undecided) return;
 
 		if (NetworkManager.Singleton.IsHost) {

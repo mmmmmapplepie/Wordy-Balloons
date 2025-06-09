@@ -19,6 +19,7 @@ public class MyLobby : NetworkBehaviour {
 	void Awake() {
 		Instance = this;
 		SetupColoredLists();
+		GameData.PlayMode = PlayModeEnum.Multiplayer;
 	}
 	public override void OnNetworkSpawn() {
 		base.OnNetworkSpawn();
@@ -444,7 +445,6 @@ public class MyLobby : NetworkBehaviour {
 			StopSceneLoading();
 		} else {
 			//set game data
-			GameData.InSinglePlayerMode = false;
 			GameData.allColorOptions = allColorOptions;
 			GameData.ClientID_KEY_ColorIndex_VAL = ClientID_KEY_ColorIndex_VAL;
 			GameData.ClientID_KEY_LobbyID_VAL = ClientID_KEY_LobbyID_VAL;
@@ -508,7 +508,6 @@ public class MyLobby : NetworkBehaviour {
 
 		GameData.ClientID_KEY_ColorIndex_VAL = DeserializeDictionary<ulong, int>(id_color);
 
-		GameData.InSinglePlayerMode = false;
 		GameData.allColorOptions = allColorOptions;
 		TeamUpdatedServerRpc(timeSent);
 	}

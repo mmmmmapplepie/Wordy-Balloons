@@ -68,7 +68,7 @@ public class SinglePlayerSetup : NetworkBehaviour {
 		GameData.team2.Clear();
 		GameData.team2.Add(computerID);
 
-		GameData.InSinglePlayerMode = true;
+		GameData.PlayMode = PlayModeEnum.BasicPVE;
 
 		NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
 	}

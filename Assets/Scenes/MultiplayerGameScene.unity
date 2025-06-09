@@ -1141,6 +1141,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac16aa079c432164da40d279d5b31f34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AIRunning: 1
   balloonManager: {fileID: 1813721897}
 --- !u!4 &310222790
 Transform:
@@ -1942,6 +1943,7 @@ MonoBehaviour:
   tickAudio: {fileID: 8300000, guid: 68eef3021e57d6f4ea8c1dc4c053a3d8, type: 3}
   startAudio: {fileID: 8300000, guid: 4d70aac043d9c51409867061196b1f22, type: 3}
   wordExplanationTxt: {fileID: 1573232566}
+  moveSceneBtnTxt: {fileID: 625003070}
   menusPanel: {fileID: 1600918678}
   guidePanel: {fileID: 663986497}
   gameNotPausedTxt: {fileID: 534621251}
@@ -2958,7 +2960,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: LobbyScene
+          m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &640485363
@@ -8837,7 +8839,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1600918679
 RectTransform:
   m_ObjectHideFlags: 0

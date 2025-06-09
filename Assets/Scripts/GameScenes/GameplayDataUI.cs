@@ -58,7 +58,7 @@ public class GameplayDataUI : NetworkBehaviour {
 	public TextMeshProUGUI playerCountTxt;
 	NetworkVariable<int> playerCount = new NetworkVariable<int>();
 	void UpdatePlayerCount() {
-		if (GameData.InSinglePlayerMode) {
+		if (GameData.PlayMode != PlayModeEnum.Multiplayer) {
 			playerCountTxt.text = "";
 		} else {
 			if (NetworkManager.Singleton.IsServer) {
@@ -252,12 +252,16 @@ public class GameplayDataUI : NetworkBehaviour {
 	void UpdateStats(GameStateManager.GameResult r) {
 		if (dataUpdated) return;
 		dataUpdated = true;
+		if (GameData.PlayMode == PlayModeEnum.Tutorial) {
+			PlayerPrefs.SetInt("TutorialCleared", 1);
+			return;
+		}
 		int result = GetWinDrawLossResult(r);
 		Stats.totalGames++;
 		if (result == 0) Stats.draws++;
 		else if (result == 1) Stats.wins++;
 		else Stats.losses++;
-		if (GameData.InSinglePlayerMode) {
+		if (GameData.PlayMode != PlayModeEnum.Multiplayer) {
 			Stats.singlePlayerGames++;
 			if (result == 1 && SinglePlayerAI.AISpeed > Stats.highestComputerSpeedDefeated) Stats.highestComputerSpeedDefeated = SinglePlayerAI.AISpeed;
 		} else Stats.multiPlayerGames++;

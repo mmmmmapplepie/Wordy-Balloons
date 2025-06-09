@@ -12,12 +12,12 @@ public class SliderToggle : MonoBehaviour {
 	public Color rightSideColor, leftSideColor;
 	public float slideTime = 0.5f;
 	public bool onRightSide = true;
-
+#if UNITY_EDITOR
 	void OnValidate() {
 		if (!gameObject.activeInHierarchy) return;
 		StartCoroutine(SlideAnim(0));
 	}
-
+#endif
 	public void SliderToggleClicked() {
 		if (!gameObject.activeInHierarchy) return;
 		if (anim != null) StopCoroutine(anim);

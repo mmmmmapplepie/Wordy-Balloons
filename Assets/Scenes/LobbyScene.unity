@@ -3212,7 +3212,7 @@ MonoBehaviour:
   lobbyCode: {fileID: 1907567682}
   lobbyModeDropDown: {fileID: 2006303935}
   lobbyPlayerNumDropDown: {fileID: 216862974}
-  dictionaryToggle: {fileID: 0}
+  dictionaryToggle: {fileID: 1528754546}
   LoadingPanel: {fileID: 1829391616}
   ErrorPanel: {fileID: 1985152171}
   RetryAuthenticationBtn: {fileID: 2055444042}
