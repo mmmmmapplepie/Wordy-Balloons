@@ -9,6 +9,13 @@
       },
       "hash": "b63f3c8233e9a58a480f4e2d353c83c08a584a88"
     },
+    "com.gilzoide.sqlite-net": {
+      "version": "https://github.com/gilzoide/unity-sqlite-net.git#1.2.4",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "cf7ea3756d7b425cb151b7070084e6a80d62c7f8"
+    },
     "com.unity.2d.animation": {
       "version": "9.1.1",
       "depth": 1,
