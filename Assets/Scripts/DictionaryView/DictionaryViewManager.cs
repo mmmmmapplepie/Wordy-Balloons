@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using WebSocketSharp;
@@ -30,6 +31,7 @@ public class DictionaryViewManager : MonoBehaviour {
 
 	public void ClearInputField() {
 		searchInput.Set("");
+		EventSystem.current.SetSelectedGameObject(searchInput.gameObject);
 	}
 	public dragTest resultScroller;
 	public void QueryForString(string s) {

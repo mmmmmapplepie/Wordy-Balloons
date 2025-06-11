@@ -18,6 +18,10 @@ public class dragTest : MonoBehaviour {
 		int count = words.Count;
 		scroller.SetTotalCount(count);
 		scroller.Position = 0;
+		scrollbar.size = Mathf.Clamp(12 / Mathf.Max(words.Count, 1), 0.05f, 1f);
+		if (words.Count <= 12) {
+			SetupBtnsWithGivenScroll(0f);
+		}
 	}
 
 	public void ScrollBarMoved(float s) {
@@ -25,7 +29,6 @@ public class dragTest : MonoBehaviour {
 	}
 
 	void ScrollValChanged(float f) {
-		print(f);
 		if (words == null || words.Count <= 12) return;
 		while (f < 0) f += words.Count;
 		f %= words.Count;
@@ -38,23 +41,35 @@ public class dragTest : MonoBehaviour {
 	public float yGap = -70f, startingPos = -40f;
 
 	void SetupBtnsWithGivenScroll(float f) {
+		if (words.Count == 0) {
+			scrollbar.interactable = false;
+			for (int i = 0; i < buttons.Count; i++) {
+				WordOptionBtn btn = buttons[i];
+				btn.gameObject.SetActive(false);
+			}
+			return;
+		}
+
+		float deltaShift = 10f;
+
 		if (words.Count <= 12) {
-			scrollbar.enabled = false;
+			scrollbar.interactable = false;
 			for (int i = 0; i < buttons.Count; i++) {
 				WordOptionBtn btn = buttons[i];
 				if (i < words.Count) {
 					btn.gameObject.SetActive(true);
 					btn.SetData(words[i]);
-					btn.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, i * yGap + startingPos);
+					btn.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, i * yGap + startingPos - deltaShift);
 				} else {
 					btn.gameObject.SetActive(false);
 				}
 			}
 			return;
 		}
-		scrollbar.enabled = true;
 
-		float deltaShift = GetSignedDecimal(f);
+		scrollbar.interactable = true;
+		deltaShift = GetSignedDecimal(f);
+
 		for (int i = 0; i < buttons.Count; i++) {
 			WordOptionBtn btn = buttons[i];
 			int btnPosI = i - 1;
