@@ -6,12 +6,14 @@ using UnityEngine.UI;
 public class DisplayWordAndMeaning : MonoBehaviour {
 	public TextMeshProUGUI word, meaning;
 	public RectTransform scrollHolder;
+	
 
 	// void Start() {
 	// 	Set("new word", "asdfadfasdfasdfasdf");
 	// }
 
 	public void Set(WordHolder data) {
+		if (data == null) return;
 		word.text = data.Word;
 		meaning.text = data.Meanings;
 		// print(meaning.GetPreferredValues());

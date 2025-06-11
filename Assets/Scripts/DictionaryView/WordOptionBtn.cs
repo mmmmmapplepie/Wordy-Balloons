@@ -8,7 +8,7 @@ public class WordOptionBtn : MonoBehaviour {
 	public static event System.Action<WordHolder> btnClicked;
 	public AudioClip clip;
 	public void SetData(WordHolder data) {
-		if (wordData == null) return;
+		if (data == null) return;
 		wordData = data;
 		wordTxt.text = wordData.Word;
 	}

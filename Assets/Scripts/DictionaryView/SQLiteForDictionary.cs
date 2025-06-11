@@ -11,7 +11,7 @@ public class SQLiteForDictionary : MonoBehaviour {
 	void Start() {
 		conn = new SQLiteConnection(Application.streamingAssetsPath + "/" + DBName);
 		conn.CreateTable<WordHolder>();
-		print(conn.Table<WordHolder>().Count());
+		// print(conn.Table<WordHolder>().Count());
 	}
 
 	public List<WordHolder> GetWordStartingWithString(string queryString) {

@@ -12,18 +12,12 @@ public class DictionaryViewManager : MonoBehaviour {
 
 
 	public SQLiteForDictionary db;
-	public GameObject btnPrefab;
-	Queue<GameObject> availableBtn = new Queue<GameObject>();
-	List<GameObject> btnsInUse = new List<GameObject>();
 	string previousQuery = "";
 
 	public Transform alphabetBtnHolder;
 
 	void Start() {
 		WordOptionBtn.btnClicked += WordClicked;
-		for (int i = 0; i < 200; i++) {
-			CreateBtn();
-		}
 
 		char currentChar = 'a';
 		foreach (Transform t in alphabetBtnHolder) {
@@ -32,38 +26,16 @@ public class DictionaryViewManager : MonoBehaviour {
 			currentChar++;
 		}
 	}
-	void CreateBtn() {
-		GameObject g = Instantiate(btnPrefab, wordResultHolder);
-		g.SetActive(false);
-		availableBtn.Enqueue(g);
-	}
+
 
 	public void ClearInputField() {
 		searchInput.Set("");
 	}
-
+	public dragTest resultScroller;
 	public void QueryForString(string s) {
 		if (previousQuery.ToLower() == s.ToLower()) return;
 		List<WordHolder> matches = db.GetWordStartingWithString(s);
-
-		foreach (GameObject g in btnsInUse) {
-			g.SetActive(false);
-			availableBtn.Enqueue(g);
-		}
-
-		foreach (WordHolder word in matches) {
-			GameObject newObj = null;
-			if (availableBtn.Count <= 0) {
-				CreateBtn();
-			}
-			newObj = availableBtn.Dequeue();
-			btnsInUse.Add(newObj);
-			newObj.GetComponent<WordOptionBtn>().SetData(word);
-			newObj.SetActive(true);
-			newObj.transform.SetAsLastSibling();
-		}
-
-		wordResultHolder.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+		resultScroller.SetScroller(matches);
 
 		previousQuery = s;
 	}

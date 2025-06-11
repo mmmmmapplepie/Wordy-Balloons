@@ -10,6 +10,7 @@ public class UIImageWobble : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 		img = GetComponent<Image>();
 		newMat = new Material(mat);
 		img.material = newMat;
+		initialColor = img.color;
 		Update();
 	}
 	public float Rate, Magnitude;
@@ -22,8 +23,9 @@ public class UIImageWobble : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
 	}
 
-	Color highlightColor = new Color(1f, 1f, 150f / 255f, 1f);
-	Color clickColor = new Color(1f, 150f / 255f, 100f / 255f, 1f);
+	public Color highlightColor = new Color(1f, 1f, 150f / 255f, 1f);
+	public Color clickColor = new Color(1f, 150f / 255f, 100f / 255f, 1f);
+	Color initialColor;
 	Color enteredColor;
 
 	public bool IncreaseSizeOnEnter = false;
@@ -41,7 +43,7 @@ public class UIImageWobble : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 		if (IncreaseSizeOnEnter) {
 			transform.localScale = Vector3.one;
 		}
-		enteredColor = Color.white;
+		enteredColor = initialColor;
 		if (!Interactable() || clicked) return;
 		img.color = enteredColor;
 	}
