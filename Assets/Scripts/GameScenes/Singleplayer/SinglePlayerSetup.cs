@@ -36,8 +36,8 @@ public class SinglePlayerSetup : NetworkBehaviour {
 
 	public SliderToggle dictionaryToggle;
 	void ShutdownNetwork() {
-		if (NetworkManager.IsConnectedClient && !NetworkManager.ShutdownInProgress)
-			NetworkManager.Shutdown();
+		if (NetworkManager.Singleton.IsConnectedClient && !NetworkManager.Singleton.ShutdownInProgress)
+			NetworkManager.Singleton.Shutdown();
 	}
 
 	IEnumerator StartGameRoutine() {

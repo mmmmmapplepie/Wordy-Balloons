@@ -29,19 +29,19 @@ public class SliderToggle : MonoBehaviour {
 	IEnumerator SlideAnim(float p) {
 		Color sColor = sliderObj.color;
 		Color tarColor = onRightSide ? rightSideColor : leftSideColor;
-		Vector3 sPos = sliderObj.transform.position;
-		Vector3 tarPos = onRightSide ? rightPoint.position : leftPoint.position;
+		Vector3 sPos = sliderObj.transform.localPosition;
+		Vector3 tarPos = onRightSide ? rightPoint.localPosition : leftPoint.localPosition;
 		text.text = onRightSide ? rightText : leftText;
 
 		float t = 0;
 		while (t <= p) {
 			t += Time.unscaledDeltaTime;
 			float r = Mathf.SmoothStep(0, 1f, t / p);
-			sliderObj.transform.position = Vector3.Lerp(sPos, tarPos, r);
+			sliderObj.transform.localPosition = Vector3.Lerp(sPos, tarPos, r);
 			sliderObj.color = Color.Lerp(sColor, tarColor, r);
 			yield return null;
 		}
-		sliderObj.transform.position = Vector3.Lerp(sPos, tarPos, 1);
+		sliderObj.transform.localPosition = Vector3.Lerp(sPos, tarPos, 1);
 		sliderObj.color = Color.Lerp(sColor, tarColor, 1);
 	}
 }

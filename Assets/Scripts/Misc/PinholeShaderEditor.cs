@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
-
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 public class PinholeShaderEditor : MonoBehaviour {
 	public enum Shape { Ellipse, Rectangle }
 
@@ -22,6 +23,7 @@ public class PinholeShaderEditor : MonoBehaviour {
 	}
 	const int MaxShapesForShader = 8;
 	void SetMatValues() {
+		if (maskShapes == null) maskShapes = new List<PinholeShape>();
 		if (maskShapes.Count > MaxShapesForShader) {
 			maskShapes.RemoveRange(MaxShapesForShader, maskShapes.Count - MaxShapesForShader);
 		}
@@ -43,11 +45,13 @@ public class PinholeShaderEditor : MonoBehaviour {
 		List<Vector4> shapeData = new List<Vector4>();
 		// float4 data1 = _Shapes[shapeIndex * 2];     // x, y, width, height -- all in UV coordinates
 		// float4 data2 = _Shapes[shapeIndex * 2 + 1]; // rotation, fade(0 - no fade, 1 - maximum fade with fade distance = minimum among width/height), shapeType (0 is ellipse, 1 is rectangle), weightMask (clamped to 0, 1)
-		foreach (PinholeShape shape in maskShapes) {
-			Vector4 data1 = new Vector4(shape.center.x, shape.center.y, shape.dimension.x, shape.dimension.y);
-			Vector4 data2 = new Vector4(shape.rotation, shape.fade, (int)shape.shape, shape.maskWeight);
-			shapeData.Add(data1);
-			shapeData.Add(data2);
+		if (maskShapes != null) {
+			foreach (PinholeShape shape in maskShapes) {
+				Vector4 data1 = new Vector4(shape.center.x, shape.center.y, shape.dimension.x, shape.dimension.y);
+				Vector4 data2 = new Vector4(shape.rotation, shape.fade, (int)shape.shape, shape.maskWeight);
+				shapeData.Add(data1);
+				shapeData.Add(data2);
+			}
 		}
 
 		if (maskShapes.Count > 0) newMat.SetVectorArray("_Shapes", shapeData);
@@ -71,13 +75,23 @@ public struct PinholeShape {
 	[Range(0, 1)]
 	public float maskWeight;
 
+	public PinholeShape(Vector2 center, Vector2 dimension, float fade, PinholeShaderEditor.Shape shape, float maskWeight = 1, float rotation = 0) {
+		this.center = center;
+		this.dimension = dimension;
+		this.rotation = rotation;
+		this.fade = fade;
+		this.shape = shape;
+		this.maskWeight = maskWeight;
+	}
+
 }
 
 
 
+#if UNITY_EDITOR
 
 [CustomEditor(typeof(PinholeShaderEditor))]
-public class PinholeShderEditorInspector : Editor {
+public class PinholeShaderEditorInspector : Editor {
 	public override void OnInspectorGUI() {
 		// Draw default fields
 		DrawDefaultInspector();
@@ -89,3 +103,5 @@ public class PinholeShderEditorInspector : Editor {
 		}
 	}
 }
+
+#endif

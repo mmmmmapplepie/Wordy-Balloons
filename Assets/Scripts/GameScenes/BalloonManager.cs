@@ -39,6 +39,10 @@ public class BalloonManager : NetworkBehaviour {
 		if (!GameStateManager.IsGameRunning()) yield break;
 		SpawnBalloonServerRpc(teamID, count);
 	}
+	public void SpawnBalloonWithNoDelay(int count, ulong teamID) {
+		if (!GameStateManager.IsGameRunning()) return;
+		SpawnBalloonServerRpc(teamID, count);
+	}
 
 	public GameObject balloonPrefab;
 	public Transform BalloonHolder;

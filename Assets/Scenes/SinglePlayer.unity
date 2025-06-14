@@ -477,7 +477,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -250, y: 250}
+  m_AnchoredPosition: {x: -250, y: 300}
   m_SizeDelta: {x: 1200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &149009997
@@ -916,7 +916,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 650, y: 250}
+  m_AnchoredPosition: {x: 650, y: 300}
   m_SizeDelta: {x: 400, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &659449379
@@ -1398,6 +1398,8 @@ MonoBehaviour:
   Rate: 90
   Magnitude: 0.5
   bumps: 5
+  highlightColor: {r: 1, g: 1, b: 0.5882353, a: 1}
+  clickColor: {r: 1, g: 0.5882353, b: 0.39215687, a: 1}
   IncreaseSizeOnEnter: 1
   sizeFactor: 1.1
 --- !u!114 &996971038
@@ -1483,7 +1485,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_RaycastPadding: {x: 20, y: 30, z: 20, w: 30}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -2338,6 +2340,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c476f529ea297964aa985edc4d9bc9c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dictionaryToggle: {fileID: 0}
 --- !u!114 &1320709159
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2613,7 +2616,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 92.49994, y: -0.000015258789}
+  m_AnchoredPosition: {x: 92.5, y: 0}
   m_SizeDelta: {x: 200, y: -14}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1351965529
@@ -3465,7 +3468,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_RaycastPadding: {x: 20, y: 30, z: 20, w: 30}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -3504,6 +3507,8 @@ MonoBehaviour:
   Rate: 90
   Magnitude: 0.5
   bumps: 5
+  highlightColor: {r: 1, g: 1, b: 0.5882353, a: 1}
+  clickColor: {r: 1, g: 0.5882353, b: 0.39215687, a: 1}
   IncreaseSizeOnEnter: 1
   sizeFactor: 1.1
 --- !u!1 &1915181152
@@ -3630,7 +3635,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_RaycastPadding: {x: 20, y: 30, z: 20, w: 30}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -3669,6 +3674,8 @@ MonoBehaviour:
   Rate: 90
   Magnitude: 0.5
   bumps: 5
+  highlightColor: {r: 1, g: 1, b: 0.5882353, a: 1}
+  clickColor: {r: 1, g: 0.5882353, b: 0.39215687, a: 1}
   IncreaseSizeOnEnter: 1
   sizeFactor: 1.1
 --- !u!1 &2038978237

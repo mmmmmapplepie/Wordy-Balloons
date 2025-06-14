@@ -59,6 +59,10 @@ public class GameUI : MonoBehaviour {
 	#region Menus btn
 	void SetupChangeSceneOption() {
 		if (GameData.PlayMode == PlayModeEnum.Multiplayer) return;
+		if (GameData.PlayMode == PlayModeEnum.Tutorial) {
+			moveSceneBtnTxt.transform.parent.gameObject.SetActive(false);
+			return;
+		}
 		moveSceneBtnTxt.text = "Single Player Menu";
 		targetSceneName = "SinglePlayer";
 	}

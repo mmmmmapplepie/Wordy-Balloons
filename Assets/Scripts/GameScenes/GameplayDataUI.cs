@@ -9,7 +9,7 @@ using UnityEngine.UI;
 public class GameplayDataUI : NetworkBehaviour {
 
 
-	void Start() {
+	void Awake() {
 		startTime = Time.time;
 
 		UpdateGameMode();
@@ -20,6 +20,7 @@ public class GameplayDataUI : NetworkBehaviour {
 		InputManager.CorrectEntryProcess += CorrectEntry;
 
 		BaseManager.BaseTakenDamage += BaseTakesDamageClientRpc;
+		BaseManager.BaseHPSet += BaseHPSetClientRpc;
 
 		BalloonManager.BalloonSpawned += BalloonFired;
 
@@ -34,6 +35,7 @@ public class GameplayDataUI : NetworkBehaviour {
 		InputManager.CorrectEntryProcess -= CorrectEntry;
 
 		BaseManager.BaseTakenDamage -= BaseTakesDamageClientRpc;
+		BaseManager.BaseHPSet -= BaseHPSetClientRpc;
 
 		BalloonManager.BalloonSpawned -= BalloonFired;
 
@@ -204,27 +206,40 @@ public class GameplayDataUI : NetworkBehaviour {
 
 	#region  BaseDamage
 	[ClientRpc]
-	void BaseTakesDamageClientRpc(Team damageTeam, float ratio) {
-		BaseTakesDamage(damageTeam, ratio);
+	void BaseTakesDamageClientRpc(Team damageTeam, int remainingHP) {
+		BaseTakesDamage(damageTeam, remainingHP);
+	}
+
+	[ClientRpc]
+	void BaseHPSetClientRpc() {
+		BaseTakesDamage(Team.t1, BaseManager.team1MaxHP.Value);
+		BaseTakesDamage(Team.t2, BaseManager.team2MaxHP.Value);
 	}
 
 	public Slider homeHPSlider, oppHPSlider;
-	void BaseTakesDamage(Team damagedTeam, float hpRatio) {
+	public TextMeshProUGUI homeHPTxt, awayHPTxt;
+
+	void BaseTakesDamage(Team damagedTeam, int remainingHP) {
+		float hpRatio = (float)remainingHP / (float)(damagedTeam == Team.t1 ? BaseManager.team1MaxHP.Value : BaseManager.team2MaxHP.Value);
 		Slider main;
+		TextMeshProUGUI hpTxt = homeHPTxt;
 		if (damagedTeam == BalloonManager.team) {
 			main = homeHPSlider;
+			hpTxt = homeHPTxt;
 		} else {
 			main = oppHPSlider;
+			hpTxt = awayHPTxt;
 		}
 		main.value = hpRatio;
+		hpTxt.text = remainingHP.ToString();
 	}
+
 
 
 
 
 
 	#endregion
-
 
 
 	#region gameEnd stats
@@ -252,10 +267,7 @@ public class GameplayDataUI : NetworkBehaviour {
 	void UpdateStats(GameStateManager.GameResult r) {
 		if (dataUpdated) return;
 		dataUpdated = true;
-		if (GameData.PlayMode == PlayModeEnum.Tutorial) {
-			PlayerPrefs.SetInt("TutorialCleared", 1);
-			return;
-		}
+		if (GameData.PlayMode == PlayModeEnum.Tutorial) return;
 		int result = GetWinDrawLossResult(r);
 		Stats.totalGames++;
 		if (result == 0) Stats.draws++;
@@ -284,8 +296,8 @@ public class GameplayDataUI : NetworkBehaviour {
 	}
 
 
+
 	#endregion
 
-
-
 }
+

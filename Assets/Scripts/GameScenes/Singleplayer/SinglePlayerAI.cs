@@ -72,17 +72,17 @@ public class SinglePlayerAI : MonoBehaviour {
 	}
 	float tutorialSpeed = 20f;
 	void TutorialAI() {
-		if (wordLength < 1) {
-			if (DictionaryList == null) DictionaryList = EnglishDictionary.Instance.GetDictionaryList();
-			if (DictionaryList == null) return;
-			wordLength = DictionaryList[UnityEngine.Random.Range(0, DictionaryList.Count)].word.Length;
-		}
-		cumulativePower += Time.deltaTime * tutorialSpeed / 60f;
-		if (cumulativePower >= wordLength && wordLength > 0) {
-			cumulativePower -= wordLength;
-			this.balloonManager.SpawnBalloon((wordLength), 1);
-			wordLength = 0;
-		}
+		// if (wordLength < 1) {
+		// 	if (DictionaryList == null) DictionaryList = EnglishDictionary.Instance.GetDictionaryList();
+		// 	if (DictionaryList == null) return;
+		// 	wordLength = DictionaryList[UnityEngine.Random.Range(0, DictionaryList.Count)].word.Length;
+		// }
+		// cumulativePower += Time.deltaTime * tutorialSpeed / 60f;
+		// if (cumulativePower >= wordLength && wordLength > 0) {
+		// 	cumulativePower -= wordLength;
+		// 	this.balloonManager.SpawnBalloon((wordLength), 1);
+		// 	wordLength = 0;
+		// }
 	}
 
 

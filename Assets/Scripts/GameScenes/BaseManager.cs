@@ -6,8 +6,8 @@ using UnityEngine;
 public class BaseManager : NetworkBehaviour {
 
 	const int DefaultMaxHP = 50;
-	public static NetworkVariable<int> team1BaseHP = new NetworkVariable<int>(DefaultMaxHP);
-	public static NetworkVariable<int> team2BaseHP = new NetworkVariable<int>
+	public static NetworkVariable<int> team1HP = new NetworkVariable<int>(DefaultMaxHP);
+	public static NetworkVariable<int> team2HP = new NetworkVariable<int>
 	(DefaultMaxHP);
 	public static NetworkVariable<int> team1MaxHP = new NetworkVariable<int>(DefaultMaxHP);
 	public static NetworkVariable<int> team2MaxHP = new NetworkVariable<int>
@@ -28,24 +28,27 @@ public class BaseManager : NetworkBehaviour {
 	public static event Action BaseHPSet;
 	public override void OnNetworkSpawn() {
 		base.OnNetworkSpawn();
-		if (NetworkManager.Singleton.IsServer) SetBaseHP(DefaultMaxHP, DefaultMaxHP);
-		team1BaseHP.OnValueChanged += BaseHP1Changed;
-		team2BaseHP.OnValueChanged += BaseHP2Changed;
+		if (NetworkManager.Singleton.IsServer) {
+			int targetHP = GameData.PlayMode == PlayModeEnum.Tutorial ? 15 : DefaultMaxHP;
+			SetBaseHP(targetHP, targetHP);
+		}
+		team1HP.OnValueChanged += BaseHP1Changed;
+		team2HP.OnValueChanged += BaseHP2Changed;
 	}
 	public override void OnNetworkDespawn() {
-		team1BaseHP.OnValueChanged += BaseHP1Changed;
-		team2BaseHP.OnValueChanged += BaseHP2Changed;
+		team1HP.OnValueChanged += BaseHP1Changed;
+		team2HP.OnValueChanged += BaseHP2Changed;
 		base.OnNetworkDespawn();
 	}
 	public static void SetBaseHP(int team1HP, int team2HP) {
-		team1BaseHP.Value = team1HP;
-		team2BaseHP.Value = team2HP;
+		BaseManager.team1HP.Value = team1HP;
+		BaseManager.team2HP.Value = team2HP;
 		team1MaxHP.Value = team1HP;
 		team2MaxHP.Value = team2HP;
 		BaseHPSet?.Invoke();
 	}
 	public static event Action<Team> TeamLose;
-	public static event Action<Team, float> BaseTakenDamage;
+	public static event Action<Team, int> BaseTakenDamage;
 
 	[ServerRpc(RequireOwnership = false)]
 	public void DamageBaseServerRpc(Team team, int dmg) {
@@ -53,16 +56,13 @@ public class BaseManager : NetworkBehaviour {
 	}
 	public static void DamageBase(Team teamBaseToDamage, int dmg) {
 		NetworkVariable<int> target;
-		NetworkVariable<int> max;
 		if (teamBaseToDamage == Team.t1) {
-			target = team1BaseHP;
-			max = team1MaxHP;
+			target = team1HP;
 		} else {
-			target = team2BaseHP;
-			max = team2MaxHP;
+			target = team2HP;
 		}
 		target.Value -= dmg;
-		BaseTakenDamage?.Invoke(teamBaseToDamage, (float)target.Value / (float)max.Value);
+		BaseTakenDamage?.Invoke(teamBaseToDamage, target.Value);
 		if (target.Value <= 0) {
 			TeamLose?.Invoke(teamBaseToDamage);
 		}
@@ -90,7 +90,7 @@ public class BaseManager : NetworkBehaviour {
 
 	public Transform homeBase, awayBase;
 
-	void BallonCreated(Team t) {
+	void BallonCreated(Team t, Balloon balloon) {
 		Transform target = awayBase;
 		if (t == BalloonManager.team) {
 			target = homeBase;

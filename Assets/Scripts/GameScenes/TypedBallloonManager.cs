@@ -6,7 +6,7 @@ public class TypedBallloonManager : MonoBehaviour {
 	public GameObject typedBalloonPrefab, waterLeakEffect, balloonPopEffect, starEffect;
 	public Transform typedBalloonTarget;
 	TypedBalloonAnimations balloonInControl;
-	void Start() {
+	void Awake() {
 		InputManager.InputProcessFinished += InputChanged;
 		InputManager.WrongEntryFinished += WrongEntry;
 		InputManager.CorrectEntryFinished += CorrectEntry;
@@ -50,6 +50,7 @@ public class TypedBallloonManager : MonoBehaviour {
 		balloonInControl = null;
 	}
 	void NewTextSet(string txt) {
+		print("text set " + txt);
 		if (balloonInControl != null) {
 			Instantiate(balloonPopEffect, balloonInControl.transform.position, Quaternion.identity);
 			Destroy(balloonInControl.gameObject);

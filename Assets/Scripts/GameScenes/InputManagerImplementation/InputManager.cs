@@ -5,6 +5,8 @@ using Unity.Netcode;
 
 public class InputManager : MonoBehaviour {
 	[HideInInspector] public bool canTakeInput = false;
+	[HideInInspector] public bool canAttemptFire = true;
+	[HideInInspector] public bool canUseSkip = true;
 	public static InputManager Instance;
 	void Awake() {
 		Instance = this;
@@ -18,6 +20,7 @@ public class InputManager : MonoBehaviour {
 		GameStateManager.GameResultSetEvent -= GameResultSet;
 	}
 	void CheckGameStart() {
+		if (GameData.PlayMode == PlayModeEnum.Tutorial) return;
 		SetNewTargetText();
 		canTakeInput = true;
 	}
@@ -26,9 +29,11 @@ public class InputManager : MonoBehaviour {
 	}
 	public static event Action InputProcessFinished;
 	void Update() {
-		if (!canTakeInput || Time.timeScale == 0) return;
-		ProcessInput();
+		if (canTakeInput && Time.timeScale != 0) ProcessInput();
 		InputProcessFinished?.Invoke();
+		// if (!canTakeInput || Time.timeScale == 0) {return;}
+		// ProcessInput();
+		// InputProcessFinished?.Invoke();
 	}
 
 
@@ -51,6 +56,7 @@ public class InputManager : MonoBehaviour {
 
 	#region InputSubmit
 	public void EntrySubmitted() {
+		if (!canAttemptFire) return;
 		if (typedString == targetString) {
 			ProcessCorrectEntry();
 		} else {
@@ -106,7 +112,7 @@ public class InputManager : MonoBehaviour {
 	public static event Func<Action<string>> FindIncrementInputProcess;
 	public static event Action<string> IncrementInputFinished;
 	void IncrementInput(string input) {
-		bool skip = IncrementSkip(input);
+		bool skip = canUseSkip ? IncrementSkip(input) : false;
 		if (skip) return;
 
 		Action<string> incrementAction = FindIncrementInputProcess?.Invoke();
@@ -228,6 +234,7 @@ public class InputManager : MonoBehaviour {
 
 
 	void SetNewTargetText() {
+		if (GameData.PlayMode == PlayModeEnum.Tutorial) return;
 		Func<string> RandomizerMethod = FindTextTargetMethod?.Invoke();
 		if (RandomizerMethod == null) RandomizerMethod = PickRandomText;
 
@@ -241,9 +248,12 @@ public class InputManager : MonoBehaviour {
 			if (filter(ranTxt)) txtPassed = true;
 		}
 
-		targetString = ranTxt;
+		SetNewTargetText(ranTxt);
+	}
+	public void SetNewTargetText(string text) {
+		targetString = text;
 		ResetTypedText();
-		NewTextSet?.Invoke(ranTxt);
+		NewTextSet?.Invoke(text);
 	}
 	List<DictionaryEntry> DictionaryList = null;
 	public static event Action<DictionaryEntry> NewWordChosen;

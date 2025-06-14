@@ -20,7 +20,8 @@ public class Balloon : NetworkBehaviour {
 
 	TextMeshPro powerTxt;
 	public BalloonAnimation anim;
-	public static event System.Action<Team> BalloonCreated;
+	public static event System.Action<Team, Balloon> BalloonCreated;
+	public static event System.Action<bool, Balloon> BalloonDestroyed;
 	public override void OnNetworkSpawn() {
 		base.OnNetworkSpawn();
 		power.OnValueChanged += PowerChanged;
@@ -37,7 +38,7 @@ public class Balloon : NetworkBehaviour {
 
 		ProgressChanged(0f, 0f);
 		UpdateScale();
-		BalloonCreated?.Invoke(balloonTeam.Value);
+		BalloonCreated?.Invoke(balloonTeam.Value, this);
 		anim.InitilizeAnimations(balloonColor.Value);
 	}
 	public override void OnNetworkDespawn() {
@@ -126,6 +127,7 @@ public class Balloon : NetworkBehaviour {
 	void DestroyEffectClientRpc(bool onBase = false) {
 		if (onBase) anim.BaseCollisionEffect();
 		else anim.CollisionEffect();
+		BalloonDestroyed?.Invoke(onBase, this);
 	}
 
 	void HitBase() {

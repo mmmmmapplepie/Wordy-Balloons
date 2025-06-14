@@ -3,31 +3,24 @@ using TMPro;
 using UnityEngine;
 
 public class Tester : MonoBehaviour {
-	public TextMeshProUGUI txt;
-	string t = "1\n\"\\";
-	//   1
-	//   "\
-
-	public static event System.Func<System.Func<bool>> ee;
-	void Start() {
-		print(t);
-		txt.text = t;
-		ee += GetFunc;
+	public Transform t;
+	public RectTransform overlay;
+	void Update() {
+		GetWorldPointToCanvasPoint(t.position);
 	}
 
-	public void Change(string s) {
-		System.Func<bool> ftn = ee.Invoke();
-		print(ftn());
-	}
-	int i = 0;
-	System.Func<bool> GetFunc() {
-		i++;
-		return i % 2 == 1 ? T : F;
-	}
-	bool T() {
-		return true;
-	}
-	bool F() {
-		return false;
+
+	public Vector2 GetWorldPointToCanvasPoint(Vector2 worldPoint) {
+		Vector2 screenPt;
+		print(worldPoint);
+		print(Camera.main.WorldToViewportPoint(worldPoint));
+
+		print(screenPt = Camera.main.WorldToScreenPoint(worldPoint));
+		RectTransformUtility.ScreenPointToWorldPointInRectangle(overlay, screenPt, Camera.main, out Vector3 rectPt);
+		print(rectPt);
+		print(RectTransformUtility.WorldToScreenPoint(Camera.main, worldPoint));
+		print("===========");
+
+		return default;
 	}
 }
