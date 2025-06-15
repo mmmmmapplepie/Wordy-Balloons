@@ -4210,15 +4210,14 @@ MonoBehaviour:
   menuBtn: {fileID: 1542971309}
   inputManager: {fileID: 1691777470}
   inputRect: {fileID: 1510385516}
+  inputfont: {fileID: 11400000, guid: 5302535af1044152a457ed104f1f4b91, type: 2}
   balloonManager: {fileID: 1813721897}
   team1HP: {fileID: 2091185988}
   team2HP: {fileID: 1232035979}
   skipChargeUI: {fileID: 1836973757}
   statsRect: {fileID: 1970910750}
   meaningRect: {fileID: 901935089}
-  backgroundDefaultColor: {r: 0, g: 0, b: 0, a: 0.5882353}
   highlightDefaultColor: {r: 0, g: 0, b: 0, a: 0}
-  lightBackgroundColor: {r: 0, g: 0, b: 0, a: 0.19607843}
   darkBackgroundColor: {r: 0, g: 0, b: 0, a: 0.8627451}
 --- !u!1 &747327705
 GameObject:
@@ -4747,6 +4746,39 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!21 &791990449
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Custom_PinholeExtra
+  m_Shader: {fileID: 4800000, guid: a2abfecbecff42d45a07d6c37f7a3ac9, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats: []
+    m_Colors:
+    - _BackgroundColor: {r: 0, g: 0, b: 0, a: 0.78431374}
+    - _MaskColor: {r: 0, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []
 --- !u!1 &808505086
 GameObject:
   m_ObjectHideFlags: 0
@@ -5426,7 +5458,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Guide txt
+  m_text: Guide text
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -8744,7 +8776,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1392504250
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8854,7 +8886,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 1756352939}
+  m_Material: {fileID: 791990449}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -8895,14 +8927,8 @@ MonoBehaviour:
   pinholeShaderMat: {fileID: 2100000, guid: 21568051ed753254a8379d6569fb6c4c, type: 2}
   targetImg: {fileID: 1427488332}
   maskColor: {r: 0, g: 0, b: 0, a: 0}
-  backgroundColor: {r: 0, g: 0, b: 0, a: 0.5882353}
-  maskShapes:
-  - center: {x: 820, y: 0}
-    dimension: {x: 600, y: 1000}
-    rotation: 0
-    fade: 100
-    shape: 0
-    maskWeight: 1
+  backgroundColor: {r: 0, g: 0, b: 0, a: 0.78431374}
+  maskShapes: []
 --- !u!1 &1444139540
 GameObject:
   m_ObjectHideFlags: 0
@@ -9322,6 +9348,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 493678118}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1533371772
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9375,9 +9413,11 @@ MonoBehaviour:
   mat: {fileID: 2100000, guid: a0b9dd300625c3743a11f1792f710507, type: 2}
   Rate: 90
   Magnitude: 0.3
+  maxMultiplier: 1.5
   bumps: 3
-  highlightColor: {r: 0.9098532, g: 1, b: 0.9535181, a: 1}
-  clickColor: {r: 0.8113208, g: 0.8113208, b: 0.8113208, a: 1}
+  increaseSize: 1
+  highlightColor: {r: 0.9882353, g: 1, b: 0.46666667, a: 1}
+  clickColor: {r: 0.5137255, g: 1, b: 0.5137255, a: 1}
   IncreaseSizeOnEnter: 0
   sizeFactor: 1.1
 --- !u!1 &1542971309
@@ -10793,39 +10833,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1744436885}
   m_CullTransparentMesh: 1
---- !u!21 &1756352939
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Custom_PinholeExtra
-  m_Shader: {fileID: 4800000, guid: a2abfecbecff42d45a07d6c37f7a3ac9, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats: []
-    m_Colors:
-    - _BackgroundColor: {r: 0, g: 0, b: 0, a: 0.5882353}
-    - _MaskColor: {r: 0, g: 0, b: 0, a: 0}
-  m_BuildTextureStacks: []
 --- !u!1 &1797232049
 GameObject:
   m_ObjectHideFlags: 0
@@ -10912,6 +10919,18 @@ MonoBehaviour:
       - m_Target: {fileID: 729861194}
         m_TargetAssemblyTypeName: TutorialManager, Assembly-CSharp
         m_MethodName: SkipTutorial
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 493678118}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

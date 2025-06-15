@@ -6,21 +6,46 @@ public class UIImageWobble : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 	public Material mat;
 	Material newMat;
 	Image img;
-	void Start() {
+	void Awake() {
 		img = GetComponent<Image>();
 		newMat = new Material(mat);
 		img.material = newMat;
 		initialColor = img.color;
 		Update();
+		latestSizeResetTime = Time.unscaledTime;
 	}
-	public float Rate, Magnitude;
+	public float Rate, Magnitude, maxMultiplier;
 	public int bumps;
+	bool resetCalled = false;
 	void Update() {
+		if (!resetCalled) {
+			resetCalled = true;
+			ResetMagnitude();
+		}
 		newMat.SetFloat("_Bumps", bumps);
-		newMat.SetFloat("_MaxDistortion", Magnitude);
+		newMat.SetFloat("_MaxDistortion", Mathf.Sin((Rate / (2f * Mathf.PI)) * Time.unscaledTime) * Magnitude);
 		newMat.SetColor("_Color", img.color);
-		newMat.SetFloat("_Rotation", (Rate * Time.time % 360f));
+		newMat.SetFloat("_Rotation", (Rate * Time.unscaledTime % 360f));
+		if (increaseSize && resetCalled) IncreaseMagnitude();
+	}
 
+	void OnEnable() {
+		ResetMagnitude();
+		img.color = initialColor;
+		Update();
+	}
+	public bool increaseSize = false;
+	float increaseTime = 5f, latestSizeResetTime, delay = 5f, runtimeMag = 1;
+	void IncreaseMagnitude() {
+		float elapsed = Time.unscaledTime - latestSizeResetTime;
+		float ratio = elapsed > delay ? (elapsed - delay) / increaseTime : 0;
+		runtimeMag = Mathf.Lerp(1, maxMultiplier, Mathf.Min(1, ratio));
+		transform.localScale = Vector3.one * runtimeMag;
+	}
+	public void ResetMagnitude() {
+		runtimeMag = 1;
+		transform.localScale = Vector3.one;
+		latestSizeResetTime = Time.unscaledTime;
 	}
 
 	public Color highlightColor = new Color(1f, 1f, 150f / 255f, 1f);

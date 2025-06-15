@@ -1397,7 +1397,9 @@ MonoBehaviour:
   mat: {fileID: 2100000, guid: a0b9dd300625c3743a11f1792f710507, type: 2}
   Rate: 90
   Magnitude: 0.5
+  maxMultiplier: 0
   bumps: 5
+  increaseSize: 0
   highlightColor: {r: 1, g: 1, b: 0.5882353, a: 1}
   clickColor: {r: 1, g: 0.5882353, b: 0.39215687, a: 1}
   IncreaseSizeOnEnter: 1
@@ -3506,7 +3508,9 @@ MonoBehaviour:
   mat: {fileID: 2100000, guid: a0b9dd300625c3743a11f1792f710507, type: 2}
   Rate: 90
   Magnitude: 0.5
+  maxMultiplier: 0
   bumps: 5
+  increaseSize: 0
   highlightColor: {r: 1, g: 1, b: 0.5882353, a: 1}
   clickColor: {r: 1, g: 0.5882353, b: 0.39215687, a: 1}
   IncreaseSizeOnEnter: 1
@@ -3673,7 +3677,9 @@ MonoBehaviour:
   mat: {fileID: 2100000, guid: a0b9dd300625c3743a11f1792f710507, type: 2}
   Rate: 90
   Magnitude: 0.5
+  maxMultiplier: 0
   bumps: 5
+  increaseSize: 0
   highlightColor: {r: 1, g: 1, b: 0.5882353, a: 1}
   clickColor: {r: 1, g: 0.5882353, b: 0.39215687, a: 1}
   IncreaseSizeOnEnter: 1
