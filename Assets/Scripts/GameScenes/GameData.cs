@@ -10,6 +10,7 @@ public class GameData : NetworkBehaviour {
 	public static Dictionary<ulong, string> ClientID_KEY_LobbyID_VAL = new Dictionary<ulong, string>();
 	public static HashSet<ulong> team1 = new HashSet<ulong>(), team2 = new HashSet<ulong>();
 	public static DictionaryMode Dictionary = DictionaryMode.Complete;
+	public static bool GamePaused = false;
 
 	public static Team GetTeamFromClientID(ulong ID) {
 		if (team1.Contains(ID)) return Team.t1;

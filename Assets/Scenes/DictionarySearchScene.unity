@@ -2125,6 +2125,34 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 35
       objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1128693490}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: WordOptionBtn, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3762193018283507042, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -2205,6 +2233,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7325889207275228148, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: clip
+      value: 
+      objectReference: {fileID: 8300000, guid: d5160855b7a182243b29dbd07c850c25, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2389,6 +2421,34 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 35
       objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1128693490}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: WordOptionBtn, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3762193018283507042, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -2469,6 +2529,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7325889207275228148, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: clip
+      value: 
+      objectReference: {fileID: 8300000, guid: d5160855b7a182243b29dbd07c850c25, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2501,6 +2565,34 @@ PrefabInstance:
     - target: {fileID: 2458641851827670162, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
       propertyPath: m_fontSize
       value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1128693490}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: WordOptionBtn, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 3762193018283507042, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
       propertyPath: m_Pivot.x
@@ -2582,6 +2674,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7325889207275228148, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: clip
+      value: 
+      objectReference: {fileID: 8300000, guid: d5160855b7a182243b29dbd07c850c25, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3243,6 +3339,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1320709163}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_OnSubmit:
     m_PersistentCalls:
       m_Calls: []
@@ -3738,6 +3846,34 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 35
       objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1128693490}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: WordOptionBtn, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3762193018283507042, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -3818,6 +3954,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7325889207275228148, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: clip
+      value: 
+      objectReference: {fileID: 8300000, guid: d5160855b7a182243b29dbd07c850c25, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4612,6 +4752,34 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 35
       objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1128693490}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: WordOptionBtn, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3762193018283507042, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -4692,6 +4860,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7325889207275228148, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: clip
+      value: 
+      objectReference: {fileID: 8300000, guid: d5160855b7a182243b29dbd07c850c25, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5616,6 +5788,34 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 35
       objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1128693490}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: WordOptionBtn, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3762193018283507042, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -5696,6 +5896,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7325889207275228148, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: clip
+      value: 
+      objectReference: {fileID: 8300000, guid: d5160855b7a182243b29dbd07c850c25, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6174,6 +6378,34 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 35
       objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1128693490}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: WordOptionBtn, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3762193018283507042, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -6254,6 +6486,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7325889207275228148, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: clip
+      value: 
+      objectReference: {fileID: 8300000, guid: d5160855b7a182243b29dbd07c850c25, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6366,6 +6602,7 @@ GameObject:
   - component: {fileID: 967462565}
   - component: {fileID: 967462564}
   - component: {fileID: 967462563}
+  - component: {fileID: 967462566}
   m_Layer: 5
   m_Name: BacktoMainMenu
   m_TagString: Untagged
@@ -6437,9 +6674,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1320709163}
-        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
-        m_MethodName: PlayOneshotClip
+      - m_Target: {fileID: 1320709164}
+        m_TargetAssemblyTypeName: DictionaryViewManager, Assembly-CSharp
+        m_MethodName: ReturnToMainMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6449,9 +6686,9 @@ MonoBehaviour:
           m_StringArgument: MainMenu
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1320709164}
-        m_TargetAssemblyTypeName: DictionaryViewManager, Assembly-CSharp
-        m_MethodName: ReturnToMainMenu
+      - m_Target: {fileID: 967462566}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6499,6 +6736,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 967462561}
   m_CullTransparentMesh: 1
+--- !u!114 &967462566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 967462561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d4d3f7bf17a2c044a7712dff5cde611, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clip: {fileID: 8300000, guid: 5c77a9691eed37942bd5a55fb10d17ca, type: 3}
+  volume: 1
 --- !u!114 &972515692 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7325889207275228148, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
@@ -7226,6 +7477,7 @@ GameObject:
   - component: {fileID: 1128693491}
   - component: {fileID: 1128693493}
   - component: {fileID: 1128693492}
+  - component: {fileID: 1128693494}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -7290,6 +7542,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1128693490}
   m_CullTransparentMesh: 1
+--- !u!114 &1128693494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1128693490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d4d3f7bf17a2c044a7712dff5cde611, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clip: {fileID: 8300000, guid: d5160855b7a182243b29dbd07c850c25, type: 3}
+  volume: 0.3
 --- !u!1 &1138169280
 GameObject:
   m_ObjectHideFlags: 0
@@ -8701,6 +8967,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1128693494}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1317183346
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9371,6 +9649,34 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 35
       objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1128693490}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: WordOptionBtn, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3762193018283507042, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -9451,6 +9757,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7325889207275228148, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: clip
+      value: 
+      objectReference: {fileID: 8300000, guid: d5160855b7a182243b29dbd07c850c25, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10962,6 +11272,34 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 35
       objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1128693490}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: WordOptionBtn, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3762193018283507042, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -11042,6 +11380,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7325889207275228148, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: clip
+      value: 
+      objectReference: {fileID: 8300000, guid: d5160855b7a182243b29dbd07c850c25, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -11240,6 +11582,34 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 35
       objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1128693490}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: WordOptionBtn, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3762193018283507042, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -11320,6 +11690,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7325889207275228148, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: clip
+      value: 
+      objectReference: {fileID: 8300000, guid: d5160855b7a182243b29dbd07c850c25, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -11923,6 +12297,34 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 35
       objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1128693490}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: WordOptionBtn, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3762193018283507042, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -12003,6 +12405,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7325889207275228148, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: clip
+      value: 
+      objectReference: {fileID: 8300000, guid: d5160855b7a182243b29dbd07c850c25, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -12046,6 +12452,34 @@ PrefabInstance:
     - target: {fileID: 2458641851827670162, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
       propertyPath: m_fontSize
       value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1128693490}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: WordOptionBtn, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 3762193018283507042, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
       propertyPath: m_Pivot.x
@@ -12127,6 +12561,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7325889207275228148, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: clip
+      value: 
+      objectReference: {fileID: 8300000, guid: d5160855b7a182243b29dbd07c850c25, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -12530,6 +12968,34 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 35
       objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1128693490}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: WordOptionBtn, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3762193018283507042, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -12610,6 +13076,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7325889207275228148, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: clip
+      value: 
+      objectReference: {fileID: 8300000, guid: d5160855b7a182243b29dbd07c850c25, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -12973,9 +13443,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1320709163}
-        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
-        m_MethodName: PlayOneshotClip
+      - m_Target: {fileID: 1320709164}
+        m_TargetAssemblyTypeName: DictionaryViewManager, Assembly-CSharp
+        m_MethodName: CopyData
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -12985,9 +13455,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1320709164}
-        m_TargetAssemblyTypeName: DictionaryViewManager, Assembly-CSharp
-        m_MethodName: CopyData
+      - m_Target: {fileID: 1128693494}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -13048,9 +13518,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat: {fileID: 2100000, guid: a0b9dd300625c3743a11f1792f710507, type: 2}
-  Rate: 90
+  Rate: 30
   Magnitude: 0.5
+  maxMultiplier: 0
   bumps: 3
+  increaseSize: 0
   highlightColor: {r: 0.8155136, g: 1, b: 0.96558094, a: 0.8627451}
   clickColor: {r: 0.4475891, g: 1, b: 0.47154176, a: 0.8627451}
   IncreaseSizeOnEnter: 0
@@ -13488,6 +13960,34 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 35
       objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1128693490}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: WordOptionBtn, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3762193018283507042, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -13568,6 +14068,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7325889207275228148, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: clip
+      value: 
+      objectReference: {fileID: 8300000, guid: d5160855b7a182243b29dbd07c850c25, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -13859,6 +14363,34 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 35
       objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1128693490}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: WordOptionBtn, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2911087681649158431, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3762193018283507042, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -13939,6 +14471,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7325889207275228148, guid: c4d54ff5f67fb2a4fbfc0af883ac1a1c, type: 3}
+      propertyPath: clip
+      value: 
+      objectReference: {fileID: 8300000, guid: d5160855b7a182243b29dbd07c850c25, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

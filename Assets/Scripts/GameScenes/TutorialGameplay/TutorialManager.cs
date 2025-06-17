@@ -19,9 +19,8 @@ public class TutorialManager : MonoBehaviour {
 		GameStateManager.GameStartEvent += GameStarted;
 		InputManager.IncrementInputFinished += InputTyped;
 		InputManager.CorrectEntryProcess += BalloonFired;
-		InputManager.CorrectEntryProcess += NewEntryNeeded;
 		InputManager.SkipAttemptResult += SkipAttempted;
-		InputManager.SkipAttemptResult += NewEntryNeeded;
+
 
 
 		Balloon.BalloonCreated += BalloonSpawned;
@@ -41,16 +40,20 @@ public class TutorialManager : MonoBehaviour {
 		Balloon.BalloonCreated -= BalloonSpawned;
 		Balloon.BalloonDestroyed -= BalloonDestroyed;
 
-		GameStateManager.GameResultSetEvent += GameSet;
-
+		GameStateManager.GameResultSetEvent -= GameSet;
+		OnDestroy();
 	}
 	void OnDestroy() {
 		StopAllCoroutines();
-		Time.timeScale = 1;
+		if (GameData.PlayMode == PlayModeEnum.Tutorial) Time.timeScale = 1;
 	}
 
 	void GameStarted() {
-		StartCoroutine(TutorialRoutine());
+		if (GameData.PlayMode == PlayModeEnum.Tutorial) {
+			StartCoroutine(TutorialRoutine());
+		} else {
+			gameObject.SetActive(false);
+		}
 	}
 
 
@@ -64,13 +67,14 @@ public class TutorialManager : MonoBehaviour {
 
 
 	#region Opening-GamePurpose
-	public GameObject menuBtn;
+	public GameObject menuBtn, timer;
 	// <color=#FE25DF><b><i></color></b></i>
 	// <color=#FF4100><b></color></b>
 	// #FE25DF - pink,  #FF4100 - orange
 
 	IEnumerator IntroRoutine() {
 		menuBtn.SetActive(false);
+		timer.SetActive(false);
 		skipBtn.SetActive(true);
 		inputManager.canUseSkip = false;
 		SetupHighlights(null);
@@ -78,7 +82,7 @@ public class TutorialManager : MonoBehaviour {
 		yield return StartCoroutine(WaitForNext());
 		ShowPanelWithText("this guide will provide you everything you need to play the game!", 30f, default, 900f);
 		yield return StartCoroutine(WaitForNext());
-		ShowPanelWithText("in the background there are two bases. <color=#FF4100><b>The one on your left is your home base.", 30f);
+		ShowPanelWithText("in the background there are two bases. <color=#FF4100><b>The one on your left is your base.", 30f);
 
 		shapeList.Clear();
 		shapeList.Add(new PinholeShape(GetWorldPointToCanvasPoint(new Vector2(7.5f, 0)), GetWorldSizeInCanvasRectSize(new Vector2(5f, 10f)), 50f, PinholeShaderEditor.Shape.Ellipse));
@@ -104,7 +108,7 @@ public class TutorialManager : MonoBehaviour {
 		inputManager.canTakeInput = true;
 		inputManager.SetNewTargetText(typeWordsList[0]);
 		inputManager.canTakeInput = false;
-		ShowPanelWithText("When the game starts, you will be given a <color=#FF4100><b>word</color></b>(shown below)!", 30f);
+		ShowPanelWithText("When the game starts, you will be given a <color=#FF4100><b>word</color></b>(shown below).", 30f);
 		shapeList.Clear();
 		shapeList.Add(new PinholeShape(GetCenterOfRect(inputRect), inputRect.rect.size, 20f, PinholeShaderEditor.Shape.Rectangle));
 		SetupHighlights(shapeList);
@@ -127,7 +131,7 @@ public class TutorialManager : MonoBehaviour {
 		ShowPanelWithText($"Good job! Correctly typed letters will show in <color=#00B8FF><font={inputfont.name}><b>blue</font></color> while wrong letters will appear in <color=#E50000><font={inputfont.name}><b>red</font></b></color>. Letters are also <color=#FF4100><b>case-sensitive</color></b>, so you will need to match capital letters where required.", 30f);//color fore letters case sensitive #E50000   #00B8FF
 		SetupHighlights(null);
 		yield return StartCoroutine(WaitForNext());
-		ShowPanelWithText("you can try to launch the balloon by pressing <color=#FF4100><b>Enter</color></b>. The launch will only be successful if your <color=#FF4100><b>input exactly matches the target word</color></b>. If there are any mistakes, the balloon launch will fail and may trigger side effects depending on the game mode.", 30f);//color enter
+		ShowPanelWithText("you can try to launch the balloon by pressing <color=#FF4100><b>Enter</color></b>.\n\nThe launch will only be successful if your <color=#FF4100><b>input exactly matches the target word</color></b>.\nIf there are any mistakes, the balloon launch will fail and may trigger side effects depending on the game mode.", 30f);//color enter
 		yield return StartCoroutine(WaitForNext());
 		ShowPanelWithText("if you type something wrong you can delete the last letter by pressing <color=#FF4100><b>backspace</color></b>\n\n<color=#FE25DF><b><i>Try typing the word and launching it.</color></b></i>\n(to launch, type out the full word correctly and hit <color=#FF4100><b>Enter</color></b>)", 30f);
 		//color backspaace. color instructions
@@ -202,11 +206,12 @@ public class TutorialManager : MonoBehaviour {
 
 		yield return new WaitForSecondsRealtime(0.25f);
 		Time.timeScale = 0;
-		ShowPanelWithText("The opposition have also launched a balloon!\n\nwhen opposing balloons collide, they will <color=#FF4100><b>reduce the power of each other by their own power and the balloons with 0 power or less are destroyed.", 30f, new Vector2(-300f, latestBalloon.transform.position.y));
+		ShowPanelWithText("The opposition have also launched a balloon!\n\nwhen opposing balloons collide, they will <color=#FF4100><b>damage the other equal to their own power and the balloons with 0 power or less are destroyed.", 30f, new Vector2(-300f, latestBalloon.transform.position.y));
 		shapeList.Clear();
 		shapeList.Add(new PinholeShape(GetWorldPointToCanvasPoint(latestBalloon.transform.position), GetWorldSizeInCanvasRectSize(new Vector2(1.5f, 1.5f)), 100f, PinholeShaderEditor.Shape.Ellipse));
 		SetupHighlights(shapeList);
 		yield return StartCoroutine(WaitForNext());
+		shadowEditor.gameObject.SetActive(false);
 		nxtBtn.SetActive(false);
 		Time.timeScale = 1;
 		destroyedWithBalloon = false;
@@ -218,7 +223,7 @@ public class TutorialManager : MonoBehaviour {
 		shapeList.Clear();
 		shapeList.Add(new PinholeShape(GetWorldPointToCanvasPoint(latestDestroyedBalloonPos), GetWorldSizeInCanvasRectSize(new Vector2(1.5f, 1.5f)), 100f, PinholeShaderEditor.Shape.Ellipse));
 		SetupHighlights(shapeList);
-		ShowPanelWithText("your balloon was stronger and survived! Now the balloon is about to hit and damage the opposing base. <color=#FF4100><b>The damage it does will be equal to its remaining power.", 30f, new Vector2(-300f, 0));
+		ShowPanelWithText("your balloon was stronger and survived! Now the balloon is about to hit and damage the opposing base. <color=#FF4100><b>The damage it does will equal its remaining power.", 30f, new Vector2(-300f, 0));
 		yield return StartCoroutine(WaitForNext());
 		nxtBtn.SetActive(false);
 		shadowEditor.gameObject.SetActive(false);
@@ -231,7 +236,7 @@ public class TutorialManager : MonoBehaviour {
 		shapeList.Add(new PinholeShape(GetCenterOfRect(team1HP), team1HP.rect.size, 50f, PinholeShaderEditor.Shape.Rectangle));
 		shapeList.Add(new PinholeShape(GetCenterOfRect(team2HP), team2HP.rect.size, 50f, PinholeShaderEditor.Shape.Rectangle));
 		SetupHighlights(shapeList);
-		ShowPanelWithText("The <color=#FF4100><b>HP</color></b> of the bases are shown in their respective HP bars.\n\nwhen this HP gets to 0, the team with 0hp will lose the game.", 30f);
+		ShowPanelWithText("The <color=#FF4100><b>health</color></b> of the bases are shown in their respective HP bars.\n\nwhen this HP gets to 0, the team with 0hp will lose the game.", 30f);
 		yield return StartCoroutine(WaitForNext());
 		shadowEditor.gameObject.SetActive(false);
 	}
@@ -252,12 +257,11 @@ public class TutorialManager : MonoBehaviour {
 	#region OtherInputActions
 	public RectTransform skipChargeUI;
 	IEnumerator OtherInputsActionsRoutine() {
-		ShowPanelWithText("There is one final trick you can use, but before that, go ahead and launch a few more balloons\n\n<color=#FE25DF><b><i>(type out and launch more balloons)", 30f);//instruction
+		ShowPanelWithText("There is one final trick you can use, but before that, go ahead and launch a few more balloons\n\n<color=#FE25DF><b><i>(type out and launch more balloons, be mindful of case and hit \"enter\" to launch.)", 30f);//instruction
 		Time.timeScale = 1;
 		nxtBtn.SetActive(false);
 		inputManager.canTakeInput = true;
 		newBalloonedFiredByPlayer = false;
-		inputManager.SetNewTargetText(typeWordsList[1]);
 		while (!newBalloonedFiredByPlayer) yield return null;
 		inputManager.SetNewTargetText(typeWordsList[2]);
 		newBalloonedFiredByPlayer = false;
@@ -266,7 +270,7 @@ public class TutorialManager : MonoBehaviour {
 		yield return new WaitForSecondsRealtime(1f);
 		Time.timeScale = 0;
 		inputManager.canTakeInput = false;
-		ShowPanelWithText("you may end up getting difficult words to type in a pinch. In those cases you can skip the word by typing <color=#FF4100><b>///</color></b>(three slashes in a row)! Performing a skip will use up a <color=#FF4100><b>skip charge</color></b>(shown below), and each time you type \"/\", a <color=#FF4100>!<b></color></b> will appear below the skip charge count matching the number of \"/\" typed in a row. ", 30f);//highlight
+		ShowPanelWithText("you may end up getting difficult words to type in a pinch. In those cases you can skip the word by typing <color=#FF4100><b>///</color></b>(three slashes in a row)!\n\nPerforming a skip will use up a <color=#FF4100><b>skip charge</color></b>(shown below), and each time you type \"/\", a <color=#FF4100>!<b></color></b> will appear below the skip charge count matching the number of \"/\" typed in a row. ", 30f);//highlight
 		shapeList.Clear();
 		shapeList.Add(new PinholeShape(GetCenterOfRect(skipChargeUI), skipChargeUI.rect.size, 50f, PinholeShaderEditor.Shape.Rectangle));
 		shapeList.Add(new PinholeShape(GetCenterOfRect(inputRect), inputRect.rect.size, 50f, PinholeShaderEditor.Shape.Rectangle));
@@ -275,7 +279,7 @@ public class TutorialManager : MonoBehaviour {
 		yield return StartCoroutine(WaitForNext());
 		nxtBtn.SetActive(false);
 		shadowEditor.gameObject.SetActive(false);
-		ShowPanelWithText("<color=#FE25DF><b><i>Try skipping this text by typing ///", 30f, new Vector2(0f, -100f));//instruction
+		ShowPanelWithText("<color=#FE25DF><b><i>Try skipping this text by typing ///(the key with \"?\" without holding shift)", 30f, new Vector2(0f, -100f));//instruction
 		Time.timeScale = 1;
 		inputManager.canUseSkip = true;
 		inputManager.canTakeInput = true;
@@ -302,30 +306,25 @@ public class TutorialManager : MonoBehaviour {
 	#region OtherMiscThings
 	public RectTransform statsRect, meaningRect;
 	IEnumerator MiscAndEndRoutine() {
-		// Time.timeScale = 1;
-		// inputManager.canTakeInput = true;
-		// txtHolder.gameObject.SetActive(false);
-		// yield return new WaitForSeconds(0);
-		// Time.timeScale = 0;
-		// inputManager.canTakeInput = false;
-		ShowPanelWithText("You can also see your <color=#FF4100><b>live game stats</color></b> down here. These display:\n•your average speed (based on successfully launched balloons)\n•total contributing balloon points (cumulative power of launched balloons)\n•your average typing accuracy!", 30f, new Vector2(350f, -100f));
+		ShowPanelWithText("You can also see your <color=#FF4100><b>live game stats</color></b> down here. These display your:<align=left>\n•average speed (based on successfully launched balloons)\n•total contributing balloon points (cumulative power of launched balloons)\n•your average typing accuracy!", 30f, new Vector2(350f, -100f));
 		shapeList.Clear();
 		shapeList.Add(new PinholeShape(GetCenterOfRect(statsRect), statsRect.rect.size, 50f, PinholeShaderEditor.Shape.Rectangle));
 		SetupHighlights(shapeList);
 		yield return StartCoroutine(WaitForNext());
-		ShowPanelWithText("One of the word's <color=#FF4100><b>dictionary meaning</color></b> will also be shown here so if you are curious.", 30f);
+		ShowPanelWithText("One of the word's <color=#FF4100><b>dictionary meaning</color></b> will also be shown here which you can read if curious.", 30f);
 		shapeList.Clear();
 		shapeList.Add(new PinholeShape(GetCenterOfRect(meaningRect), meaningRect.rect.size, 50f, PinholeShaderEditor.Shape.Rectangle));
 		SetupHighlights(shapeList);
 		yield return StartCoroutine(WaitForNext());
-		ShowPanelWithText("Alright, that is all I've got for you here! Happy typing!!!\n\n<color=#FE25DF><b><i>The tutorial has been cleared!</color></b></i>", 30f, Vector2.down * 150f);
+		ShowPanelWithText("Alright, that is all I've got for you here! Happy typing!!!\n\n<color=#FE25DF><b><i>The tutorial has been cleared!</color></b></i>", 30f, Vector2.down * 100f);
+		InputManager.CorrectEntryProcess += NewEntryNeeded;
+		InputManager.SkipAttemptResult += NewEntryNeeded;
 		PlayerPrefs.SetInt(TutorialManager.TutorialClearedPlayerPrefKey, 1);
 		nxtBtn.SetActive(false);
 		Time.timeScale = 1;
 		shadowEditor.gameObject.SetActive(false);
 		inputManager.canTakeInput = true;
 		inputManager.canAttemptFire = true;
-		tutorialDone = true;
 		float t = 0;
 		CanvasGroup g = txtHolder.AddComponent<CanvasGroup>();
 		skipBtn.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "FINISH TUTORIAL";
@@ -342,16 +341,22 @@ public class TutorialManager : MonoBehaviour {
 		txtHolder.gameObject.SetActive(false);
 	}
 	int currIndex = 4;
-	bool tutorialDone = false;
 	void NewEntryNeeded(bool skipped) {
-		if (!tutorialDone) return;
+		if (!gameObject.activeInHierarchy) return;
 		if (skipped) {
-			SetNewTargetContinuous();
+			needNew = true;
 		}
 	}
 	void NewEntryNeeded(string s, ulong id) {
-		if (!tutorialDone) return;
-		SetNewTargetContinuous();
+		if (!gameObject.activeInHierarchy) return;
+		needNew = true;
+	}
+	bool needNew = false;
+	void LateUpdate() {
+		if (needNew) {
+			SetNewTargetContinuous();
+			needNew = false;
+		}
 	}
 	void SetNewTargetContinuous() {
 		currIndex++;
@@ -423,7 +428,6 @@ public class TutorialManager : MonoBehaviour {
 
 	public void SkipTutorial() {
 		PlayerPrefs.SetInt(TutorialManager.TutorialClearedPlayerPrefKey, 1);
-
 		SceneManager.LoadScene("MainMenu");
 	}
 }

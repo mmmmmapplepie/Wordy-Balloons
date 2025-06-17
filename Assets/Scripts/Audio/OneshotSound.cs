@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
-
+[DefaultExecutionOrder(100)]
 public class OneshotSound : MonoBehaviour {
 	public AudioClip clip;
 	public float volume = 1;
-	void Start() {
+	void Awake() {
 		if (AudioPlayer.Instance == null) return;
 		AudioPlayer.SetOneshotClip(clip);
 	}

@@ -70,7 +70,7 @@ public class GameStateManager : NetworkBehaviour {
 		}
 	}
 	public static bool IsGameRunning() {
-		return CurrGameResult == GameResult.Undecided && Time.timeScale != 0;
+		return CurrGameResult == GameResult.Undecided && !GameData.GamePaused;
 	}
 
 	void TeamLoss(Team t) {

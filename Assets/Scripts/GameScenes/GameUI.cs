@@ -7,6 +7,9 @@ using UnityEngine.SceneManagement;
 using WebSocketSharp;
 
 public class GameUI : MonoBehaviour {
+	void Awake() {
+		GameData.GamePaused = false;
+	}
 
 	void Start() {
 		SetupChangeSceneOption();
@@ -79,6 +82,7 @@ public class GameUI : MonoBehaviour {
 		if (GameData.PlayMode != PlayModeEnum.Multiplayer) {
 			Time.timeScale = menusPanel.activeInHierarchy ? 0 : 1f;
 			gameNotPausedTxt.SetActive(false);
+			GameData.GamePaused = menusPanel.activeInHierarchy;
 		}
 	}
 	public void ToggleGuide() {

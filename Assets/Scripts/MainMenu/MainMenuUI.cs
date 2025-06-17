@@ -33,6 +33,10 @@ public class MainMenuUI : MonoBehaviour {
 	public void CloseGame() {
 		Application.Quit();
 	}
+	public GameObject creditPanel;
+	public void OpenCredits(bool open) {
+		creditPanel.SetActive(open);
+	}
 
 
 	public void LoadTutorial() {

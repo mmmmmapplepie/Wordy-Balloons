@@ -27,6 +27,7 @@ public class SliderToggle : MonoBehaviour {
 
 	Coroutine anim;
 	IEnumerator SlideAnim(float p) {
+		if (rightPoint == null || leftPoint == null || sliderObj == null) yield break;
 		Color sColor = sliderObj.color;
 		Color tarColor = onRightSide ? rightSideColor : leftSideColor;
 		Vector3 sPos = sliderObj.transform.localPosition;

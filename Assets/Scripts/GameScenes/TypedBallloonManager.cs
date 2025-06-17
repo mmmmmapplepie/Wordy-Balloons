@@ -21,7 +21,7 @@ public class TypedBallloonManager : MonoBehaviour {
 		InputManager.CorrectEntryFinished -= CorrectEntry;
 		InputManager.NewTextSet -= NewTextSet;
 
-		GameStateManager.GameResultSetEvent += StateChanged;
+		GameStateManager.GameResultSetEvent -= StateChanged;
 	}
 	float minScale = 0.5f, maxScale = 2f;
 	int prevTypedSize = -1;
@@ -50,7 +50,6 @@ public class TypedBallloonManager : MonoBehaviour {
 		balloonInControl = null;
 	}
 	void NewTextSet(string txt) {
-		print("text set " + txt);
 		if (balloonInControl != null) {
 			Instantiate(balloonPopEffect, balloonInControl.transform.position, Quaternion.identity);
 			Destroy(balloonInControl.gameObject);
