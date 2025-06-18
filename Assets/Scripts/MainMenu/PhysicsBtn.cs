@@ -31,4 +31,14 @@ public class PhysicsBtn : MonoBehaviour {
 	}
 
 
+	public static event System.Action<Vector3> CollisionEffect;
+	void OnCollisionEnter2D(Collision2D other) {
+		int val = Random.Range(0, 100);
+		if (val < 50) {
+			CollisionEffect?.Invoke(other.GetContact(0).point);
+		}
+	}
+
+
+
 }

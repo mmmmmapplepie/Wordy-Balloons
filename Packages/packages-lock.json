@@ -9,6 +9,16 @@
       },
       "hash": "b63f3c8233e9a58a480f4e2d353c83c08a584a88"
     },
+    "com.coffee.ui-particle": {
+      "version": "https://github.com/mob-sakai/ParticleEffectForUGUI.git#4.11.2",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.ugui": "1.0.0",
+        "com.unity.modules.particlesystem": "1.0.0"
+      },
+      "hash": "4b98abd7469b10d55c9c623830cb6e1518f72731"
+    },
     "com.gilzoide.sqlite-net": {
       "version": "https://github.com/gilzoide/unity-sqlite-net.git#1.2.4",
       "depth": 0,
