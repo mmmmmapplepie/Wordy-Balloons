@@ -10399,6 +10399,14 @@ PrefabInstance:
       propertyPath: volume
       value: 0.3
       objectReference: {fileID: 0}
+    - target: {fileID: 4994073698776725126, guid: 63c87b7a1c5da9e4ca5d7bb33a69d62a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392026519731565895, guid: 63c87b7a1c5da9e4ca5d7bb33a69d62a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8131353999613301352, guid: 63c87b7a1c5da9e4ca5d7bb33a69d62a, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

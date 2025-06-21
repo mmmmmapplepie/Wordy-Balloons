@@ -40,7 +40,7 @@ public class BalloonAnimation : MonoBehaviour {
 
 		GameObject newObj = Instantiate(fireEffect, transform.position, Quaternion.identity);
 		newObj.transform.localScale = transform.localScale;
-		AudioPlayer.PlayOneShot_Static(fireSound, 0.5f);
+		AudioPlayer.PlayOneShot_Static(fireSound, 0.5f * VolumeControl.GetEffectVol());
 	}
 
 	float wiggleProgress = 0;
@@ -63,7 +63,7 @@ public class BalloonAnimation : MonoBehaviour {
 	public GameObject collisionEffect, baseCollisionEffect, fireEffect;
 	public AudioClip collisionSound, fireSound;
 	public void CollisionEffect() {
-		AudioPlayer.PlayOneShot_Static(collisionSound, 1f);
+		AudioPlayer.PlayOneShot_Static(collisionSound, VolumeControl.GetEffectVol());
 		int ops = collisionEffect.transform.childCount;
 		GameObject newObj = Instantiate(collisionEffect, transform.position, Quaternion.identity);
 		newObj.transform.localScale = transform.localScale;

@@ -14,7 +14,7 @@ public class WordOptionBtn : MonoBehaviour {
 	}
 	public void BtnClick() {
 		btnClicked?.Invoke(wordData);
-		AudioPlayer.PlayOneShot_Static(clip);
+		AudioPlayer.PlayOneShot_Static(clip, VolumeControl.GetEffectVol());
 	}
 
 

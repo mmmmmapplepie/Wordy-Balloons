@@ -15,7 +15,7 @@ public class dragTest : MonoBehaviour {
 	}
 	public void SetScroller(List<WordHolder> data) {
 		words = data;
-		int count = words.Count;
+		int count = words != null ? words.Count : 0;
 		scroller.SetTotalCount(count);
 		scroller.Position = 0;
 		scrollbar.size = Mathf.Clamp(12 / Mathf.Max(words.Count, 1), 0.05f, 1f);

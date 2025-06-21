@@ -131,13 +131,13 @@ public class BaseManager : NetworkBehaviour {
 			GameObject obj = Instantiate(splashEffect, new Vector3(UnityEngine.Random.Range(xRange.x, xRange.y), UnityEngine.Random.Range(yRange.x, yRange.y), targetBase.position.z), Quaternion.identity);
 			obj.transform.localScale = Vector3.one * UnityEngine.Random.Range(1f, 3f);
 			created++;
-			if (created < 10) AudioPlayer.PlayOneShot_Static(popSound, (10 - created) / 10f);
+			if (created < 10) AudioPlayer.PlayOneShot_Static(popSound, VolumeControl.GetEffectVol() * (10 - created) / 10f);
 			if (created > 30) CancelInvoke();
 			yield return new WaitForSeconds(1.006f / created);//summed up gives about 5 seconds total
 		}
 		GameObject g = Instantiate(finalEffect, targetBase.position, Quaternion.identity);
 		g.transform.localScale = 2f * g.transform.localScale;
-		AudioPlayer.PlayOneShot_Static(finalDestroySound);
+		AudioPlayer.PlayOneShot_Static(finalDestroySound, VolumeControl.GetEffectVol());
 		Destroy(targetBase.GetComponent<Animator>());
 
 		sr.sprite = baseMain_Destroyed;
@@ -145,7 +145,7 @@ public class BaseManager : NetworkBehaviour {
 		targetBase.GetChild(1).GetComponent<SpriteRenderer>().sprite = baseCannon_Destroyed;
 	}
 	void PlaySound() {
-		AudioPlayer.PlayOneShot_Static(baseDestroySound);
+		AudioPlayer.PlayOneShot_Static(baseDestroySound, VolumeControl.GetEffectVol());
 	}
 
 }

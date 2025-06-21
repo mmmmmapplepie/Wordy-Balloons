@@ -433,7 +433,7 @@ public class MyLobby : NetworkBehaviour {
 		while (countDown > 0) {
 			LoadingCountdown.Value = countDown;
 			countDown--;
-			AudioPlayer.PlayOneShot_Static(countdownSound, 0.3f);
+			AudioPlayer.PlayOneShot_Static(countdownSound, 0.3f * VolumeControl.GetEffectVol());
 			yield return new WaitForSeconds(1f);
 		}
 		LoadingCountdown.Value = countDown;

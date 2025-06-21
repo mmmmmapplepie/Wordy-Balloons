@@ -98,7 +98,7 @@ public class GameplayDataUI : NetworkBehaviour {
 	//skips remaining, skip charges hit
 
 
-	#region AverageSpeed - in characters/permin & Points contributed
+	#region AverageSpeed  & Points contributed
 	int pointsContributedByMe = 0;
 	NetworkVariable<int> team1Points = new NetworkVariable<int>(0);
 	NetworkVariable<int> team2Points = new NetworkVariable<int>(0);

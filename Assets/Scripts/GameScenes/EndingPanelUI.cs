@@ -8,7 +8,7 @@ public class EndingPanelUI : MonoBehaviour {
 	}
 	public Sound victorySound, defeatSound;
 	public void PlaySound(bool victory) {
-		AudioPlayer.Instance.PlaySound(victory ? victorySound.Name : defeatSound.Name);
+		AudioPlayer.Instance.PlaySound(victory ? victorySound.Name : defeatSound.Name, VolumeControl.GetEffectVol());
 	}
 	public void PlayVictory() {
 		PlaySound(true);

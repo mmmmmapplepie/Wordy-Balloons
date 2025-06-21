@@ -43,11 +43,11 @@ public class GameUI : MonoBehaviour {
 	[Header("Game State")] public TextMeshProUGUI countdownTxt;
 	public AudioClip tickAudio, startAudio;
 	void ChangeCountDown(int val) {
-		if (val > 0) AudioPlayer.PlayOneShot_Static(tickAudio, 0.2f);
+		if (val > 0) AudioPlayer.PlayOneShot_Static(tickAudio, VolumeControl.GetEffectVol() * 0.2f);
 		countdownTxt.text = val.ToString();
 	}
 	void GameStart() {
-		AudioPlayer.PlayOneShot_Static(startAudio, 0.5f);
+		AudioPlayer.PlayOneShot_Static(startAudio, 0.5f * VolumeControl.GetEffectVol());
 		countdownTxt.transform.parent.gameObject.SetActive(false);
 	}
 

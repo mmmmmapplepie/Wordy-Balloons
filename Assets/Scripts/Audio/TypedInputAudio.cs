@@ -24,15 +24,15 @@ public class TypedInputAudio : MonoBehaviour {
 	}
 
 	void CorrectEntry() {
-		AudioPlayer.PlayOneShot_Static(correctWord);
+		AudioPlayer.PlayOneShot_Static(correctWord, VolumeControl.GetEffectVol());
 	}
 	void WrongEntry() {
-		AudioPlayer.PlayOneShot_Static(wrongWord);
+		AudioPlayer.PlayOneShot_Static(wrongWord, VolumeControl.GetEffectVol());
 	}
 	int prevtick = 0;
 	void SkipTickChange(int i) {
 		if (i <= prevtick) { prevtick = i; return; }
-		AudioPlayer.PlayOneShot_Static(skiptickIncrease);
+		AudioPlayer.PlayOneShot_Static(skiptickIncrease, VolumeControl.GetEffectVol());
 		prevtick = i;
 	}
 	void InputChanged(string s) {
@@ -41,8 +41,8 @@ public class TypedInputAudio : MonoBehaviour {
 		string typedString = InputManager.Instance.typedString;
 		string stringToCompare = target.Substring(typedString.Length - s.Length, s.Length);
 
-		if (stringToCompare == s) AudioPlayer.PlayOneShot_Static(correctInput, 0.5f);
-		else AudioPlayer.PlayOneShot_Static(wrongInput, 0.5f);
+		if (stringToCompare == s) AudioPlayer.PlayOneShot_Static(correctInput, VolumeControl.GetEffectVol() * 0.5f);
+		else AudioPlayer.PlayOneShot_Static(wrongInput, VolumeControl.GetEffectVol() * 0.5f);
 	}
 
 

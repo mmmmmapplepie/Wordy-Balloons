@@ -73,27 +73,27 @@ public class AudioPlayer : MonoBehaviour {
 	public Sound FindSound(string name) {
 		return sounds.Find(x => x.Name == name);
 	}
-	public bool CheckPlaying(string name) {
+	public bool IsPlaying(string name) {
 		return FindSound(name).audioSource.isPlaying;
 	}
-	public void ChangeLoop(string name, bool LoopIsTrue = true) {
+	public void SetLooping(string name, bool LoopIsTrue = true) {
 		FindSound(name).audioSource.loop = LoopIsTrue ? true : false;
 	}
 	List<FadeSound> fadeSounds = new List<FadeSound>();
-	public void PlaySound(string name, float fadeInTime = 0f, bool stopAllRoutines = false, float volume = 1f, bool scaleVolume = true, bool fadeInZero = true) {
+	public void PlaySound(string name, float finalVolume = 1f, float fadeInTime = 0f, bool scaleVolumeWithSoundVolume = true, bool stopAllRoutines = false) {
 		Sound sound = FindSound(name);
 		if (sound == null) return;
 		if (sound.audioSource == null) return;
 		StopFadeRoutines(name, stopAllRoutines);
 		float vol = sound.volume;
-		if (scaleVolume) {
-			volume *= vol;
+		if (scaleVolumeWithSoundVolume) {
+			finalVolume *= vol;
 		}
 		if (fadeInTime == 0) {
-			sound.audioSource.volume = volume;
+			sound.audioSource.volume = finalVolume;
 			sound.audioSource.Play();
 		} else {
-			FadeSound fadeSound = new FadeSound(StartCoroutine(FadeInRoutine(sound, fadeInTime, volume)), name);
+			FadeSound fadeSound = new FadeSound(StartCoroutine(FadeInRoutine(sound, fadeInTime, finalVolume)), name);
 			fadeSounds.Add(fadeSound);
 		}
 	}
@@ -158,7 +158,7 @@ public class AudioPlayer : MonoBehaviour {
 			this.Name = name;
 		}
 	}
-	public void ChangeVolume(string name, float targetVolume = 1f, float changeTime = 0f, bool stopAllRoutines = false, bool limitVolume = true, bool changeEvenIfNotPlaying = false) {
+	public void SetVolume(string name, float targetVolume = 1f, float changeTime = 0f, bool stopAllRoutines = false, bool limitVolume = true, bool changeEvenIfNotPlaying = false) {
 		Sound sound = FindSound(name);
 		if (sound == null || sound.audioSource == null) return;
 		if (!sound.audioSource.isPlaying && !changeEvenIfNotPlaying) return;
@@ -185,7 +185,7 @@ public class AudioPlayer : MonoBehaviour {
 		}
 		sound.audioSource.volume = FinalVol;
 	}
-	public void PauseOrResumeSound(string name, bool pause) {
+	public void PauseResumeSound(string name, bool pause) {
 		Sound sound = FindSound(name);
 		if (sound == null) return;
 		if (pause) { sound.audioSource.Pause(); } else {

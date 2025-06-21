@@ -9,6 +9,6 @@ public class OneshotSound : MonoBehaviour {
 		AudioPlayer.SetOneshotClip(clip);
 	}
 	public void PlayOneshotClip() {
-		AudioPlayer.PlayOneShot_Static(clip, volume);
+		AudioPlayer.PlayOneShot_Static(clip, volume * VolumeControl.GetEffectVol());
 	}
 }

@@ -30,7 +30,8 @@ public class BasicTextAnimation : MonoBehaviour, ITextAnimator {
 		for (int i = 0; i < charCount; i++) {
 			TMP_CharacterInfo charInfo = txtInfo.characterInfo[i];
 
-			charInfo.character = "_".ToCharArray()[0];
+			// charInfo.character = "_".ToCharArray()[0];
+			charInfo.character = '_';
 
 
 			if (!charInfo.isVisible || i >= animatingText.Count) continue;
