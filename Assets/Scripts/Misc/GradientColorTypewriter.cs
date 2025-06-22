@@ -16,7 +16,7 @@ public class GradientColorTypewriter : MonoBehaviour {
 
 	int curr = 0;
 	[ContextMenu("anim next")]
-	public void animateNext() {
+	public void AnimateNext() {
 		AnimateLetterAtIndex(curr);
 		curr++;
 	}

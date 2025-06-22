@@ -16,6 +16,7 @@ public class TutorialManager : MonoBehaviour {
 	List<string> typeWordsList = new List<string>() { "WordyBalloons", "Are", "Fun", "WOW This Word Is So Long!!!", "When", "Filled", "With", "Water" };
 	List<PinholeShape> shapeList = new List<PinholeShape>();
 	void Awake() {
+		if (GameData.PlayMode != PlayModeEnum.Tutorial) return;
 		GameStateManager.GameStartEvent += GameStarted;
 		InputManager.IncrementInputFinished += InputTyped;
 		InputManager.CorrectEntryProcess += BalloonFired;
@@ -27,6 +28,9 @@ public class TutorialManager : MonoBehaviour {
 		Balloon.BalloonDestroyed += BalloonDestroyed;
 
 		GameStateManager.GameResultSetEvent += GameSet;
+
+		menuBtn.SetActive(false);
+		timer.SetActive(false);
 	}
 	void OnDisable() {
 		GameStateManager.GameStartEvent -= GameStarted;
@@ -74,20 +78,21 @@ public class TutorialManager : MonoBehaviour {
 	// #FE25DF - pink,  #FF4100 - orange
 
 	IEnumerator IntroRoutine() {
-		menuBtn.SetActive(false);
-		timer.SetActive(false);
-		skipBtn.SetActive(true);
 		inputManager.canUseSkip = false;
+		// if (!PlayerPrefs.HasKey(TutorialManager.TutorialClearedPlayerPrefKey)) {
+		skipBtn.SetActive(false);
+		welcomeIntro.gameObject.SetActive(true);
+		yield return new WaitForSecondsRealtime(3f);
 		SetupHighlights(null);
-		if (!PlayerPrefs.HasKey(TutorialManager.TutorialClearedPlayerPrefKey)) {
-			skipBtn.SetActive(false);
-			welcomeIntro.gameObject.SetActive(true);
-			yield return new WaitUntil(() => welcomeIntro.AnimationFinished);
-			// ShowPanelWithText("<color=#FF4100>Welcome to wordy balloons!", 80f, default, 1000f);
-			skipBtn.SetActive(true);
-			yield return StartCoroutine(WaitForNext());
-		}
-		ShowPanelWithText("this guide will provide you everything you need to play the game!", 30f, default, 900f);
+		// yield return new WaitUntil(() => welcomeIntro.AnimationFinished);
+		// ShowPanelWithText("<color=#FF4100>Welcome to wordy balloons!", 80f, default, 1000f);
+		yield return StartCoroutine(WaitForNext(false));
+
+		// }
+		welcomeIntro.gameObject.SetActive(false);
+		skipBtn.SetActive(true);
+
+		ShowPanelWithText("Hello there!\n\nthis guide will provide you everything you need to play the game!", 30f, default, 900f);
 		yield return StartCoroutine(WaitForNext());
 		ShowPanelWithText("in the background you will see two bases. <color=#FF4100><b>The one on your left is your base.", 30f);
 
@@ -406,8 +411,8 @@ public class TutorialManager : MonoBehaviour {
 		LayoutRebuilder.ForceRebuildLayoutImmediate(txtHolder);
 	}
 	Coroutine waitingForNextRoutine = null;
-	IEnumerator WaitForNext() {
-		nxtBtn.SetActive(true);
+	IEnumerator WaitForNext(bool setBtnActive = true) {
+		nxtBtn.SetActive(setBtnActive);
 		waitingForNext = true;
 		while (waitingForNext) yield return null;
 	}

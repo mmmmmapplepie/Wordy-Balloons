@@ -14,9 +14,9 @@ public class MainMenuUI : MonoBehaviour {
 #endif
 
 	void Start() {
-		if (!PlayerPrefs.HasKey(TutorialManager.TutorialClearedPlayerPrefKey)) {
-			LoadTutorial();
-		}
+		// if (!PlayerPrefs.HasKey(TutorialManager.TutorialClearedPlayerPrefKey)) {
+		LoadTutorial();
+		// }
 	}
 	public void GoToScene(string name) {
 		if (SceneManager.GetSceneByName(name) == null) return;

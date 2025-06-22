@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class VolumeControl : MonoBehaviour {
-	public static float MasterVolume = 1, EffectVolume = 1, BGMVolume = 1;
+	static float MasterVolume = 1, EffectVolume = 1, BGMVolume = 1;
 
 	const string MasterVol = "MasterVol", EffectVol = "EffectVol", BGMVol = "BGMVol";
 

@@ -38,13 +38,13 @@ public class GameStateManager : NetworkBehaviour {
 	IEnumerator StartCountDown() {
 		if (GameStateManager.CurrGameResult != GameStateManager.GameResult.Undecided) yield break;
 		float t = countDownTime;
-		// countDown_NV.Value = Mathf.CeilToInt(t);
-		// while (t > 0f) {
-		// 	t -= Time.deltaTime;
-		// 	if (GameStateManager.CurrGameResult != GameStateManager.GameResult.Undecided) yield break;
-		// 	countDown_NV.Value = Mathf.CeilToInt(t);
-		// 	yield return null;
-		// }
+		countDown_NV.Value = Mathf.CeilToInt(t);
+		while (t > 0f) {
+			t -= Time.deltaTime;
+			if (GameStateManager.CurrGameResult != GameStateManager.GameResult.Undecided) yield break;
+			countDown_NV.Value = Mathf.CeilToInt(t);
+			yield return null;
+		}
 		countDown_NV.Value = 0;
 	}
 	public static event System.Action<int> countDownChanged;

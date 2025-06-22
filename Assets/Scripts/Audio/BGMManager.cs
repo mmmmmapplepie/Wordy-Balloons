@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 public class BGMManager : MonoBehaviour {
 	public Sound menuBGM, battleBGM;
-	static BGMManager instance;
+	public static BGMManager instance;
 	void Start() {
 
 		if (instance != null) {
@@ -15,7 +15,9 @@ public class BGMManager : MonoBehaviour {
 
 		SceneManager.sceneLoaded += SceneLoaded;
 		VolumeControl.VolumeChanged += VolumeChanged;
-		AudioPlayer.Instance.PlaySound(menuBGM.Name, VolumeControl.GetBGMVol());
+		if (PlayerPrefs.HasKey(TutorialManager.TutorialClearedPlayerPrefKey)) {
+			// AudioPlayer.Instance.PlaySound(menuBGM.Name, VolumeControl.GetBGMVol());
+		}
 		currBGM = menuBGM.Name;
 
 		if (instance == null) {
@@ -43,4 +45,10 @@ public class BGMManager : MonoBehaviour {
 			if (!AudioPlayer.Instance.IsPlaying(battleBGM.Name)) { AudioPlayer.Instance.PlaySound(battleBGM.Name, VolumeControl.GetBGMVol(), 1f); currBGM = battleBGM.Name; }
 		}
 	}
+
+	public void SetBGMVolume(float newMultiplier) {
+		newMultiplier = Mathf.Clamp01(newMultiplier);
+		AudioPlayer.Instance.SetVolume(currBGM, VolumeControl.GetBGMVol() * newMultiplier);
+	}
+
 }
