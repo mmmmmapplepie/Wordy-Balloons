@@ -67,7 +67,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: DefeatPanel
+    path: Defeat/DefeatPanel
   m_FloatCurves: []
   m_PPtrCurves: []
   m_SampleRate: 60
@@ -78,7 +78,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 2509652436
+      path: 3040280670
       attribute: 3
       script: {fileID: 0}
       typeID: 4
@@ -161,7 +161,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.x
-    path: DefeatPanel
+    path: Defeat/DefeatPanel
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -218,7 +218,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.y
-    path: DefeatPanel
+    path: Defeat/DefeatPanel
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -275,7 +275,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.z
-    path: DefeatPanel
+    path: Defeat/DefeatPanel
     classID: 224
     script: {fileID: 0}
     flags: 0

@@ -196,7 +196,7 @@ public class TutorialManager : MonoBehaviour {
 		Time.timeScale = 1;
 		inputManager.SetNewTargetText(typeWordsList[1]);
 		ShowPanelWithText("The balloon takes 5 seconds to go across the bases.", 30f, new Vector2(0f, -100f));
-		while (t < 2.75f) {
+		while (t < 2.5f) {
 			Color backgroundC = darkBackgroundColor;
 			if (t > 1f) {
 				backgroundC = Color.Lerp(darkBackgroundColor, Color.clear, (t - 1) / 1.5f);

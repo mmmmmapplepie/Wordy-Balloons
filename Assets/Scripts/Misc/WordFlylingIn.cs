@@ -51,7 +51,7 @@ public class WordFlylingIn : MonoBehaviour {
 		AudioPlayer.PlayOneShot_Static(whooshSFX, VolumeControl.GetEffectVol());
 	}
 	void PlaySplashSound() {
-		AudioPlayer.PlayOneShot_Static(splashSFX, VolumeControl.GetEffectVol() * 0.5f);
+		AudioPlayer.PlayOneShot_Static(splashSFX, VolumeControl.GetEffectVol() * 0.7f);
 	}
 
 

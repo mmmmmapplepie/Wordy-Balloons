@@ -58,7 +58,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: VictoryPanel
+    path: Victory/VictoryPanel
   m_FloatCurves: []
   m_PPtrCurves: []
   m_SampleRate: 60
@@ -69,7 +69,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 4023031966
+      path: 2897214384
       attribute: 3
       script: {fileID: 0}
       typeID: 4
@@ -143,7 +143,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.x
-    path: VictoryPanel
+    path: Victory/VictoryPanel
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -191,7 +191,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.y
-    path: VictoryPanel
+    path: Victory/VictoryPanel
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -239,7 +239,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.z
-    path: VictoryPanel
+    path: Victory/VictoryPanel
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -247,7 +247,7 @@ AnimationClip:
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
   m_Events:
-  - time: 0.38333333
+  - time: 0
     functionName: PlayVictory
     data: 
     objectReferenceParameter: {fileID: 0}

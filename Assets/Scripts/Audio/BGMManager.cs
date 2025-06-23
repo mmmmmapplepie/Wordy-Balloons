@@ -16,7 +16,7 @@ public class BGMManager : MonoBehaviour {
 		SceneManager.sceneLoaded += SceneLoaded;
 		VolumeControl.VolumeChanged += VolumeChanged;
 		if (PlayerPrefs.HasKey(TutorialManager.TutorialClearedPlayerPrefKey)) {
-			// AudioPlayer.Instance.PlaySound(menuBGM.Name, VolumeControl.GetBGMVol());
+			AudioPlayer.Instance.PlaySound(menuBGM.Name, VolumeControl.GetBGMVol());
 		}
 		currBGM = menuBGM.Name;
 

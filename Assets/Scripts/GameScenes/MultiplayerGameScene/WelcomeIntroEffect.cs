@@ -20,10 +20,9 @@ public class WelcomeIntroEffect : MonoBehaviour {
 	public Transform LettersHolder;
 	public Color titleExpandedColor;
 	public GameObject nxtBtnExtra;
-	public GameObject fireworksEffect;
+	public List<GameObject> fireworksEffect = new List<GameObject>();
 
 	IEnumerator StartOpeningAnimation() {
-		//blackout
 		float blackoutTime = 2f;
 		float t = 0f;
 		while (t < blackoutTime) {
@@ -56,7 +55,7 @@ public class WelcomeIntroEffect : MonoBehaviour {
 
 		for (int i = 0; i < 13; i++) {
 			LettersHolder.GetChild(i).gameObject.SetActive(true);
-			yield return new WaitForSecondsRealtime(0.3f);
+			yield return new WaitForSecondsRealtime(0.25f);
 		}
 		yield return new WaitForSecondsRealtime(2f);
 
@@ -95,8 +94,10 @@ public class WelcomeIntroEffect : MonoBehaviour {
 				tr.GetComponent<TextMeshProUGUI>().color = targetC;
 			}
 			typewriter.gameObject.GetComponent<TextMeshProUGUI>().color = Color.Lerp(Color.clear, Color.white, t / reduceTime);
+			BGMManager.instance.SetBGMVolume(t / reduceTime);
 			yield return null;
 		}
+		BGMManager.instance.SetBGMVolume(1f);
 		foreach (Transform tr in LettersHolder) {
 			tr.GetComponent<WordFlylingIn>().SetBetweenPoints(0);
 			tr.GetComponent<TextMeshProUGUI>().color = Color.white;
@@ -107,7 +108,6 @@ public class WelcomeIntroEffect : MonoBehaviour {
 		while (t < blackoutTime) {
 			t += Time.unscaledDeltaTime;
 			blackoutImg.color = Color.Lerp(Color.black, Color.clear, t / blackoutTime);
-			BGMManager.instance.SetBGMVolume(t / blackoutTime);
 			yield return null;
 		}
 		BGMManager.instance.SetBGMVolume(1f);
@@ -118,10 +118,45 @@ public class WelcomeIntroEffect : MonoBehaviour {
 	}
 
 	IEnumerator FirecrackerEffects() {
-		yield return new WaitForSeconds(1.5f);
-		AudioPlayer.PlayOneShot_Static(fireworkSound);
-		//create firecracker effects
+		yield return new WaitForSeconds(1f);
+		List<Vector2> poses = new List<Vector2>();
+		for (int i = -4; i <= 4; i++) {
+			poses.Add(GetArcPoint(GetComponent<RectTransform>().rect.height * 0.3f, 0.1f + (float)(i + 4) * 0.1f) - 300f * Vector2.up);
+		}
+		for (int i = 0; i < poses.Count; i++) {
+			StartCoroutine(CreateCracker(poses[i]));
+		}
+		yield return new WaitForSeconds(0.2f);
+		AudioPlayer.PlayOneShot_Static(fireworkSound, Random.Range(0.6f, 1f));
+		yield return new WaitForSeconds(0.1f);
+		AudioPlayer.PlayOneShot_Static(fireworkSound, Random.Range(0.6f, 1f));
+
 	}
+	IEnumerator CreateCracker(Vector2 pos) {
+		yield return new WaitForSeconds(Random.Range(0, 0.2f));
+		GameObject newEffectPrefab = fireworksEffect[Random.Range(0, fireworksEffect.Count - 1)];
+		GameObject g = Instantiate(newEffectPrefab, transform);
+		g.GetComponent<RectTransform>().anchoredPosition = pos;
+	}
+	public Vector2 GetArcPoint(float maxHeight, float t) {
+		t = Mathf.Clamp01(t); // Ensure t stays within [0,1]
+
+		float width = GetComponent<RectTransform>().rect.width;
+		// float centerY = GetComponent<RectTransform>().rect.height / 2f;
+		float halfWidth = width / 2f;
+
+		float x = Mathf.Lerp(-halfWidth, halfWidth, t);
+		float normalizedX = x / halfWidth; // Range: -1 to 1
+
+		// y = sqrt(1 - (x/a)^2) * b (top half of ellipse)
+		float yOffset = Mathf.Sqrt(1f - normalizedX * normalizedX) * maxHeight;
+		float y = yOffset;
+
+		return new Vector2(x, y);
+	}
+
+
+
 
 	IEnumerator BobbingTitle() {
 		while (true) {
