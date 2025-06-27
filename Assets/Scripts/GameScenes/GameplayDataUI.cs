@@ -268,12 +268,11 @@ public class GameplayDataUI : NetworkBehaviour {
 		dataUpdated = true;
 		if (GameData.PlayMode == PlayModeEnum.Tutorial) return;
 		int result = GetWinDrawLossResult(r);
-		print(Stats.totalGames);
+
 		Stats.totalGames++;
 		if (result == 0) Stats.draws++;
 		else if (result == 1) Stats.wins++;
 		else Stats.losses++;
-		print(Stats.wins);
 
 		if (GameData.PlayMode != PlayModeEnum.Multiplayer) {
 			Stats.singlePlayerGames++;

@@ -18,7 +18,6 @@ public class Stats : MonoBehaviour {
 	}
 
 	public static void SetData() {
-		print("setting the data for stats");
 		SetGamesPlayedData();
 		SetSpeedData();
 		SetAccuracyAndPoints();
