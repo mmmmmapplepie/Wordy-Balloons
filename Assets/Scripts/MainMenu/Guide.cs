@@ -92,7 +92,7 @@ public class Guide : MonoBehaviour {
 
 
 		while (elapsedTime < shiftDuration) {
-			elapsedTime += Time.deltaTime;
+			elapsedTime += Time.unscaledDeltaTime;
 			float t = elapsedTime / shiftDuration;
 			t = Mathf.SmoothStep(0, 1, t);
 

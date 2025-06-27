@@ -20,7 +20,7 @@ public class GameplayDataUI : NetworkBehaviour {
 		InputManager.CorrectEntryProcess += CorrectEntry;
 
 		BaseManager.BaseTakenDamage += BaseTakesDamageClientRpc;
-		BaseManager.BaseHPSet += BaseHPSetClientRpc;
+		BaseManager.BaseHPSet += BaseHPSet;
 
 		BalloonManager.BalloonSpawned += BalloonFired;
 
@@ -35,7 +35,7 @@ public class GameplayDataUI : NetworkBehaviour {
 		InputManager.CorrectEntryProcess -= CorrectEntry;
 
 		BaseManager.BaseTakenDamage -= BaseTakesDamageClientRpc;
-		BaseManager.BaseHPSet -= BaseHPSetClientRpc;
+		BaseManager.BaseHPSet -= BaseHPSet;
 
 		BalloonManager.BalloonSpawned -= BalloonFired;
 
@@ -210,8 +210,7 @@ public class GameplayDataUI : NetworkBehaviour {
 		BaseTakesDamage(damageTeam, remainingHP);
 	}
 
-	[ClientRpc]
-	void BaseHPSetClientRpc() {
+	void BaseHPSet() {
 		BaseTakesDamage(Team.t1, BaseManager.team1MaxHP.Value);
 		BaseTakesDamage(Team.t2, BaseManager.team2MaxHP.Value);
 	}
@@ -269,10 +268,13 @@ public class GameplayDataUI : NetworkBehaviour {
 		dataUpdated = true;
 		if (GameData.PlayMode == PlayModeEnum.Tutorial) return;
 		int result = GetWinDrawLossResult(r);
+		print(Stats.totalGames);
 		Stats.totalGames++;
 		if (result == 0) Stats.draws++;
 		else if (result == 1) Stats.wins++;
 		else Stats.losses++;
+		print(Stats.wins);
+
 		if (GameData.PlayMode != PlayModeEnum.Multiplayer) {
 			Stats.singlePlayerGames++;
 			if (result == 1 && SinglePlayerAI.AISpeed > Stats.highestComputerSpeedDefeated) Stats.highestComputerSpeedDefeated = SinglePlayerAI.AISpeed;

@@ -39,7 +39,7 @@ public class InputManager : MonoBehaviour {
 
 	public string targetString { get; set; } = "";
 	public string typedString { get; set; } = "";
-	public string displayString { get; set; } = "";
+	public string displayString { get; set; } = "WORD";
 	public static event Action TypedTextChanged;
 	void ProcessInput() {
 		string input = Input.inputString;

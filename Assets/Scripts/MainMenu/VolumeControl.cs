@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class VolumeControl : MonoBehaviour {
 	static float MasterVolume = 1, EffectVolume = 1, BGMVolume = 1;
 
-	const string MasterVol = "MasterVol", EffectVol = "EffectVol", BGMVol = "BGMVol";
+	public const string MasterVol = "MasterVol", EffectVol = "EffectVol", BGMVol = "BGMVol";
 
 	public Slider masterSlider, effectSlider, bgmSlider;
 	void Awake() {
@@ -46,10 +46,10 @@ public class VolumeControl : MonoBehaviour {
 
 
 	public static float GetBGMVol() {
-		return VolumeControl.BGMVolume * VolumeControl.MasterVolume;
+		return BGMVolume * MasterVolume;
 	}
 	public static float GetEffectVol() {
-		return VolumeControl.EffectVolume * VolumeControl.MasterVolume;
+		return EffectVolume * MasterVolume;
 	}
 
 }

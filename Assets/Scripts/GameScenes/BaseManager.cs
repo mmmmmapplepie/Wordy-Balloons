@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class BaseManager : NetworkBehaviour {
 
-	const int DefaultMaxHP = 50;
+	const int DefaultMaxHP = 50, TutorialMaxHP = 15;
 	public static NetworkVariable<int> team1HP = new NetworkVariable<int>(DefaultMaxHP);
 	public static NetworkVariable<int> team2HP = new NetworkVariable<int>
 	(DefaultMaxHP);
@@ -29,23 +29,24 @@ public class BaseManager : NetworkBehaviour {
 	public override void OnNetworkSpawn() {
 		base.OnNetworkSpawn();
 		if (NetworkManager.Singleton.IsServer) {
-			int targetHP = GameData.PlayMode == PlayModeEnum.Tutorial ? 15 : DefaultMaxHP;
+			int targetHP = GameData.PlayMode == PlayModeEnum.Tutorial ? TutorialMaxHP : DefaultMaxHP;
 			SetBaseHP(targetHP, targetHP);
 		}
+		BaseHPSet?.Invoke();
+
 		team1HP.OnValueChanged += BaseHP1Changed;
 		team2HP.OnValueChanged += BaseHP2Changed;
 	}
 	public override void OnNetworkDespawn() {
-		team1HP.OnValueChanged += BaseHP1Changed;
-		team2HP.OnValueChanged += BaseHP2Changed;
+		team1HP.OnValueChanged -= BaseHP1Changed;
+		team2HP.OnValueChanged -= BaseHP2Changed;
 		base.OnNetworkDespawn();
 	}
-	public static void SetBaseHP(int team1HP, int team2HP) {
-		BaseManager.team1HP.Value = team1HP;
-		BaseManager.team2HP.Value = team2HP;
-		team1MaxHP.Value = team1HP;
-		team2MaxHP.Value = team2HP;
-		BaseHPSet?.Invoke();
+	public static void SetBaseHP(int t1HP, int t2HP) {
+		team1MaxHP.Value = t1HP;
+		team2MaxHP.Value = t2HP;
+		team1HP.Value = t1HP;
+		team2HP.Value = t2HP;
 	}
 	public static event Action<Team> TeamLose;
 	public static event Action<Team, int> BaseTakenDamage;

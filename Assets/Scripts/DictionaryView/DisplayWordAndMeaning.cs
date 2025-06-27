@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class DisplayWordAndMeaning : MonoBehaviour {
 	public TextMeshProUGUI word, meaning;
 	public RectTransform scrollHolder;
-	
+
 
 	// void Start() {
 	// 	Set("new word", "asdfadfasdfasdfasdf");
@@ -15,7 +15,8 @@ public class DisplayWordAndMeaning : MonoBehaviour {
 	public void Set(WordHolder data) {
 		if (data == null) return;
 		word.text = data.Word;
-		meaning.text = data.Meanings;
+		string meaningTxt = data.Meanings;
+		meaning.text = meaningTxt.Replace("\n", "\n\n");
 		// print(meaning.GetPreferredValues());
 		Vector2 txtBxSizePref = meaning.GetPreferredValues(scrollHolder.rect.width, Mathf.Infinity);
 		// print(txtBxSizePref);

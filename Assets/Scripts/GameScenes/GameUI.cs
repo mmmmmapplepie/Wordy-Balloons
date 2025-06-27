@@ -33,7 +33,6 @@ public class GameUI : MonoBehaviour {
 		GameStateManager.GameResultSetEvent -= GameResultSet;
 
 		Time.timeScale = 1;
-
 	}
 
 
@@ -119,6 +118,7 @@ public class GameUI : MonoBehaviour {
 		yield return new WaitForSeconds(BaseManager.BaseDestroyAnimationTime);
 		endingPanel.SetActive(true);
 		menusPanel.SetActive(true);
+		gameNotPausedTxt.transform.parent.gameObject.SetActive(false);
 		DisplayTeamWinning(result == GameStateManager.GameResult.Team1Win ? Team.t1 : Team.t2);
 	}
 

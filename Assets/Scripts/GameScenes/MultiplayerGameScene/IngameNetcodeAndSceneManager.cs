@@ -68,7 +68,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		CheckTeamEmpty();
 	}
 	void CheckTeamEmpty() {
-		if (NetworkManager.Singleton.IsServer) Debug.LogWarning(NetworkManager.Singleton.ConnectedClients.Count);
+		// if (NetworkManager.Singleton.IsServer) Debug.LogWarning(NetworkManager.Singleton.ConnectedClients.Count);
 		int teamRemaining = 0;
 		if (GameData.team1.Count == 0) teamRemaining = 2;
 		if (GameData.team2.Count == 0) teamRemaining = 1;
@@ -144,10 +144,10 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		if (Time.unscaledTime - lastPingTime < pingRate) return;
 		CheckReplies();
 		idsWaitingForRepliesFrom = NetworkManager.Singleton.ConnectedClientsIds.ToList();
-		print(idsWaitingForRepliesFrom.Count);
+		// print(idsWaitingForRepliesFrom.Count);
 		lastPingTime = Time.unscaledTime;
 		pingIndex++;
-		print($"Pinging clinets {pingIndex}");
+		// print($"Pinging clinets {pingIndex}");
 		PingClientsForConnectionClientRpc(pingIndex);
 	}
 	void CheckReplies() {
@@ -171,14 +171,14 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	}
 	[ClientRpc]
 	void PingClientsForConnectionClientRpc(uint index) {
-		print($"ping receveid: {index}");
+		// print($"ping receveid: {index}");
 		noServerPing = false;
 		latestServerPingReceivedTime = Time.unscaledTime;
 		PingReceivedReplyServerRpc(NetworkManager.Singleton.LocalClientId, index);
 	}
 	[ServerRpc(RequireOwnership = false)]
 	void PingReceivedReplyServerRpc(ulong id, uint index) {
-		print($"Ping received from {id} with index {index}");
+		// print($"Ping received from {id} with index {index}");
 		if (index != pingIndex) return;
 		idsWaitingForRepliesFrom.Remove(id);
 		reconnectingClients.Remove(id);

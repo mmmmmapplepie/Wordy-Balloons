@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 public class BGMManager : MonoBehaviour {
 	public Sound menuBGM, battleBGM;
 	public static BGMManager instance;
-	void Start() {
+	void Awake() {
 
 		if (instance != null) {
 			Destroy(gameObject); return;

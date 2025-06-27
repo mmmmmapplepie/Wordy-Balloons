@@ -21,6 +21,7 @@ public class WelcomeIntroEffect : MonoBehaviour {
 	public Color titleExpandedColor;
 	public GameObject nxtBtnExtra;
 	public List<GameObject> fireworksEffect = new List<GameObject>();
+	public Gradient g;
 
 	IEnumerator StartOpeningAnimation() {
 		float blackoutTime = 2f;
@@ -51,7 +52,7 @@ public class WelcomeIntroEffect : MonoBehaviour {
 		}
 
 
-		yield return new WaitForSecondsRealtime(1f);
+		yield return new WaitForSecondsRealtime(0.4f);
 
 		for (int i = 0; i < 13; i++) {
 			LettersHolder.GetChild(i).gameObject.SetActive(true);
@@ -61,20 +62,21 @@ public class WelcomeIntroEffect : MonoBehaviour {
 
 		Camera.main.orthographic = false;
 
-		float expandTime = 4f;
+		float expandTime = 3f;
 		t = 0;
 		bool confettiFired = false;
 		typewriter.gameObject.SetActive(false);
 		while (t < expandTime) {
 			float r = 1f - Mathf.Pow((1f - t / expandTime), 5f);
 			t += Time.unscaledDeltaTime;
-			Color targetC = Color.Lerp(Color.white, titleExpandedColor, t / expandTime);
-			foreach (Transform tr in LettersHolder) {
-				tr.GetComponent<WordFlylingIn>().SetBetweenPoints(r);
-				tr.GetComponent<TextMeshProUGUI>().color = targetC;
+			// Color targetC = Color.Lerp(Color.white, titleExpandedColor, t / expandTime);
+			for (int i = 0; i < LettersHolder.childCount; i++) {
+				Color targetC = Color.Lerp(Color.white, g.Evaluate((float)i / LettersHolder.childCount), r);
+				LettersHolder.GetChild(i).GetComponent<WordFlylingIn>().SetBetweenPoints(r);
+				LettersHolder.GetChild(i).GetComponent<TextMeshProUGUI>().color = targetC;
 			}
 			if (!confettiFired && t > 0.1f) {
-				AudioPlayer.Instance.PlayOneShot(titleClip);
+				AudioPlayer.Instance.PlayOneShot(titleClip, VolumeControl.GetEffectVol());
 				confettiFired = true;
 				StartCoroutine(FirecrackerEffects());
 			}
@@ -88,19 +90,21 @@ public class WelcomeIntroEffect : MonoBehaviour {
 		while (t < reduceTime) {
 			float r = Mathf.Pow((1f - t / reduceTime), 3f);
 			t += Time.unscaledDeltaTime;
-			Color targetC = Color.Lerp(Color.white, titleExpandedColor, 1f - t / reduceTime);
-			foreach (Transform tr in LettersHolder) {
-				tr.GetComponent<WordFlylingIn>().SetBetweenPoints(r);
-				tr.GetComponent<TextMeshProUGUI>().color = targetC;
+
+			for (int i = 0; i < LettersHolder.childCount; i++) {
+				Color targetC = Color.Lerp(Color.white, g.Evaluate((float)i / LettersHolder.childCount), r / 2f + 0.5f);
+				LettersHolder.GetChild(i).GetComponent<WordFlylingIn>().SetBetweenPoints(r);
+				LettersHolder.GetChild(i).GetComponent<TextMeshProUGUI>().color = targetC;
 			}
 			typewriter.gameObject.GetComponent<TextMeshProUGUI>().color = Color.Lerp(Color.clear, Color.white, t / reduceTime);
 			BGMManager.instance.SetBGMVolume(t / reduceTime);
 			yield return null;
 		}
 		BGMManager.instance.SetBGMVolume(1f);
-		foreach (Transform tr in LettersHolder) {
-			tr.GetComponent<WordFlylingIn>().SetBetweenPoints(0);
-			tr.GetComponent<TextMeshProUGUI>().color = Color.white;
+		for (int i = 0; i < LettersHolder.childCount; i++) {
+			Color targetC = Color.Lerp(Color.white, g.Evaluate((float)i / LettersHolder.childCount), 0.5f);
+			LettersHolder.GetChild(i).GetComponent<WordFlylingIn>().SetBetweenPoints(0);
+			LettersHolder.GetChild(i).GetComponent<TextMeshProUGUI>().color = targetC;
 		}
 		StartCoroutine(BobbingTitle());
 		Camera.main.orthographic = true;
@@ -127,9 +131,9 @@ public class WelcomeIntroEffect : MonoBehaviour {
 			StartCoroutine(CreateCracker(poses[i]));
 		}
 		yield return new WaitForSeconds(0.2f);
-		AudioPlayer.PlayOneShot_Static(fireworkSound, Random.Range(0.6f, 1f));
+		AudioPlayer.PlayOneShot_Static(fireworkSound, VolumeControl.GetEffectVol() * Random.Range(0.6f, 1f));
 		yield return new WaitForSeconds(0.1f);
-		AudioPlayer.PlayOneShot_Static(fireworkSound, Random.Range(0.6f, 1f));
+		AudioPlayer.PlayOneShot_Static(fireworkSound, VolumeControl.GetEffectVol() * Random.Range(0.6f, 1f));
 
 	}
 	IEnumerator CreateCracker(Vector2 pos) {

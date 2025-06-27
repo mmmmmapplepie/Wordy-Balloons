@@ -12,10 +12,15 @@ public class MainMenuUI : MonoBehaviour {
 		SceneManager.LoadScene(scene.name);
 	}
 #endif
-
-	void Awake() {
+	public GameObject cover;
+	void Start() {
+		TutorialCheck();
+	}
+	void TutorialCheck() {
 		if (!PlayerPrefs.HasKey(TutorialManager.TutorialClearedPlayerPrefKey)) {
 			LoadTutorial();
+		} else {
+			if (cover != null) cover.SetActive(false);
 		}
 	}
 	public void GoToScene(string name) {

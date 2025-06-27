@@ -27,7 +27,7 @@ public class SQLiteForDictionary : MonoBehaviour {
 		int i = 1;
 		foreach (string s in entry.description) {
 			meanings.Append($"{i}. ").Append(s);
-			if (entry.description.Count > i) meanings.Append("\n");
+			if (entry.description.Count > i) meanings.Append("\n\n");
 			i++;
 		}
 		newWord.Meanings = meanings.ToString();

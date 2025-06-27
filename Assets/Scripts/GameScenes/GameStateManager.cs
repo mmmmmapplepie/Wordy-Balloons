@@ -37,13 +37,14 @@ public class GameStateManager : NetworkBehaviour {
 	NetworkVariable<int> countDown_NV = new NetworkVariable<int>(countDownTime + 1);
 	IEnumerator StartCountDown() {
 		if (GameStateManager.CurrGameResult != GameStateManager.GameResult.Undecided) yield break;
-		float t = countDownTime;
-		countDown_NV.Value = Mathf.CeilToInt(t);
-		while (t > 0f) {
-			t -= Time.deltaTime;
+		yield return new WaitForSeconds(0.3f);
+		int t = countDownTime;
+		// countDown_NV.Value = 0;
+		while (t > 0) {
 			if (GameStateManager.CurrGameResult != GameStateManager.GameResult.Undecided) yield break;
-			countDown_NV.Value = Mathf.CeilToInt(t);
-			yield return null;
+			countDown_NV.Value = t;
+			t--;
+			yield return new WaitForSeconds(1);
 		}
 		countDown_NV.Value = 0;
 	}

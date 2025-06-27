@@ -8,16 +8,16 @@ public class TextAnimator : MonoBehaviour {
 	InputManager inputManager;
 	void Start() {
 		inputManager = InputManager.Instance;
-		InputManager.NewTextSet += SetNewText;
+		// InputManager.NewTextSet += SetNewText;
 		InputManager.InputProcessFinished += AnimateText;
 		// Invoke(nameof(RemoveAnimator), 5f);
 	}
 	void OnDestroy() {
-		InputManager.NewTextSet -= SetNewText;
+		// InputManager.NewTextSet -= SetNewText;
 		InputManager.InputProcessFinished -= AnimateText;
 	}
-	void SetNewText(string newTxt) {
-	}
+	// void SetNewText(string newTxt) {
+	// }
 
 	void RemoveAnimator() {
 		if (TryGetComponent<ITextAnimator>(out ITextAnimator animScript)) {

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Rendering;
 using WebSocketSharp;
 
 public class Stats : MonoBehaviour {
@@ -17,6 +18,7 @@ public class Stats : MonoBehaviour {
 	}
 
 	public static void SetData() {
+		print("setting the data for stats");
 		SetGamesPlayedData();
 		SetSpeedData();
 		SetAccuracyAndPoints();
@@ -161,8 +163,18 @@ public class Stats : MonoBehaviour {
 		return false;
 	}
 	public void ClearAllData() {
+		bool tutorialClear = PlayerPrefs.HasKey(TutorialManager.TutorialClearedPlayerPrefKey);
+		float masterVol = PlayerPrefs.GetFloat(VolumeControl.MasterVol);
+		float effectVol = PlayerPrefs.GetFloat(VolumeControl.EffectVol);
+		float bgmVol = PlayerPrefs.GetFloat(VolumeControl.BGMVol);
+
 		PlayerPrefs.DeleteAll();
 		LoadData();
+
+		if (tutorialClear) PlayerPrefs.SetInt(TutorialManager.TutorialClearedPlayerPrefKey, 1);
+		PlayerPrefs.SetFloat(VolumeControl.MasterVol, masterVol);
+		PlayerPrefs.SetFloat(VolumeControl.EffectVol, effectVol);
+		PlayerPrefs.SetFloat(VolumeControl.BGMVol, bgmVol);
 	}
 
 }
