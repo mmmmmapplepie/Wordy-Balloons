@@ -3678,6 +3678,8 @@ GameObject:
   - component: {fileID: 612385844}
   - component: {fileID: 612385847}
   - component: {fileID: 612385848}
+  - component: {fileID: 612385850}
+  - component: {fileID: 612385849}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -3815,6 +3817,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccc2bd5293484054da29c82e20310c8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &612385849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 612385843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97bc2a7d5baf6874a9e56d1b2df5ca32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shakeController: {fileID: 612385850}
+--- !u!114 &612385850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 612385843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 052e866532775d74abba01fc866ddf42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shakeInX: 1
+  shakeInY: 1
+  shakeInZ: 0
+  magnitude: 0
+  period: 0
+  shake: 1
 --- !u!1 &620738353
 GameObject:
   m_ObjectHideFlags: 0
@@ -5384,7 +5417,7 @@ GameObject:
   - component: {fileID: 729861190}
   - component: {fileID: 729861194}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: TutorialCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13265,6 +13298,7 @@ MonoBehaviour:
   oppHPSlider: {fileID: 824048008}
   homeHPTxt: {fileID: 673567275}
   awayHPTxt: {fileID: 773468839}
+  camShaker: {fileID: 612385849}
   mySpeed: {fileID: 2029363610}
   myAccuracy: {fileID: 643354424}
   ourPoints: {fileID: 1324993271}
@@ -14391,6 +14425,8 @@ MonoBehaviour:
   baseDestroySound: {fileID: 8300000, guid: 8e623ef43b6bd3b4b853fde74e99d629, type: 3}
   popSound: {fileID: 8300000, guid: 734e83a09e47e064fb8125f1759e93d6, type: 3}
   finalDestroySound: {fileID: 8300000, guid: bfe6242269a09724ea828f1b44b195fc, type: 3}
+  camShaker: {fileID: 612385849}
+  camShake: {fileID: 612385850}
 --- !u!114 &1856230273
 MonoBehaviour:
   m_ObjectHideFlags: 0

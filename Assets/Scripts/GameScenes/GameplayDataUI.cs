@@ -217,6 +217,7 @@ public class GameplayDataUI : NetworkBehaviour {
 
 	public Slider homeHPSlider, oppHPSlider;
 	public TextMeshProUGUI homeHPTxt, awayHPTxt;
+	public CameraShaker camShaker;
 
 	void BaseTakesDamage(Team damagedTeam, int remainingHP) {
 		float hpRatio = (float)remainingHP / (float)(damagedTeam == Team.t1 ? BaseManager.team1MaxHP.Value : BaseManager.team2MaxHP.Value);
@@ -228,6 +229,12 @@ public class GameplayDataUI : NetworkBehaviour {
 		} else {
 			main = oppHPSlider;
 			hpTxt = awayHPTxt;
+		}
+		if (damagedTeam == BalloonManager.team) {
+			float diff = (main.value - hpRatio);
+			if (diff > 0) {
+				camShaker.StartShaker(Mathf.Lerp(0, 0.5f, diff / 0.4f), Mathf.Lerp(0, 0.5f, diff / 0.4f));
+			}
 		}
 		main.value = hpRatio;
 		hpTxt.text = remainingHP.ToString();

@@ -7,10 +7,12 @@ public class CameraShake : MonoBehaviour {
 	public float magnitude;
 	public float period;
 	Vector3 center;
-	public void SetPivot() {
-		center = transform.position;
+	void Awake() {
+		SetPivot();
 	}
-
+	public void SetPivot() {
+		center = transform.localPosition;
+	}
 	public bool shake = false;
 	float t = 0;
 	void Update() {
@@ -25,7 +27,7 @@ public class CameraShake : MonoBehaviour {
 			if (shakeInX) shakeDisplacement.x = magnitude * Random.Range(-1f, 1f);
 			if (shakeInY) shakeDisplacement.y = magnitude * Random.Range(-1f, 1f);
 			if (shakeInZ) shakeDisplacement.z = magnitude * Random.Range(-1f, 1f);
-			transform.localPosition = shakeDisplacement;
-		} else transform.position = center;
+			transform.localPosition = center + shakeDisplacement;
+		} else transform.localPosition = center;
 	}
 }

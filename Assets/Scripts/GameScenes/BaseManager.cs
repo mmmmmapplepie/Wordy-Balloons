@@ -118,7 +118,8 @@ public class BaseManager : NetworkBehaviour {
 		if (result == GameStateManager.GameResult.Team2Win && BalloonManager.team == Team.t2) losingBase = awayBase;
 		StartCoroutine(BaseDestroyAnimation(losingBase));
 	}
-
+	public CameraShaker camShaker;
+	public CameraShake camShake;
 	IEnumerator BaseDestroyAnimation(Transform targetBase) {
 		//disable damaged base overlay objects.
 		InvokeRepeating(nameof(PlaySound), 1f, 1f);
@@ -128,14 +129,17 @@ public class BaseManager : NetworkBehaviour {
 		Vector2 yRange = new Vector2(targetBounds.min.y, targetBounds.max.y);
 		int targetEffects = 80;
 		int created = 0;
+		camShaker.StopShake();
 		while (created < targetEffects) {
 			GameObject obj = Instantiate(splashEffect, new Vector3(UnityEngine.Random.Range(xRange.x, xRange.y), UnityEngine.Random.Range(yRange.x, yRange.y), targetBase.position.z), Quaternion.identity);
 			obj.transform.localScale = Vector3.one * UnityEngine.Random.Range(1f, 3f);
 			created++;
+			camShake.magnitude = (float)created / targetEffects;
 			if (created < 10) AudioPlayer.PlayOneShot_Static(popSound, VolumeControl.GetEffectVol() * (10 - created) / 10f);
 			if (created > 30) CancelInvoke();
 			yield return new WaitForSeconds(1.006f / created);//summed up gives about 5 seconds total
 		}
+		camShaker.StartShaker(0.5f, 1f);
 		GameObject g = Instantiate(finalEffect, targetBase.position, Quaternion.identity);
 		g.transform.localScale = 2f * g.transform.localScale;
 		AudioPlayer.PlayOneShot_Static(finalDestroySound, VolumeControl.GetEffectVol());
