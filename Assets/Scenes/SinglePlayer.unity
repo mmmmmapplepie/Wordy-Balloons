@@ -1003,7 +1003,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.19607843}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.50980395}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1407,7 +1407,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat: {fileID: 2100000, guid: a0b9dd300625c3743a11f1792f710507, type: 2}
-  Rate: 30
+  Rate: 40
   Magnitude: 0.5
   maxMultiplier: 0
   bumps: 5
@@ -1663,8 +1663,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4283111680
-  m_fontColor: {r: 0, g: 0.09803922, b: 0.29411766, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -2119,8 +2119,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4283111680
-  m_fontColor: {r: 0, g: 0.09803922, b: 0.29411766, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -2354,6 +2354,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c476f529ea297964aa985edc4d9bc9c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cover: {fileID: 0}
   creditPanel: {fileID: 0}
   dictionaryToggle: {fileID: 0}
 --- !u!114 &1320709159
@@ -3117,8 +3118,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4283111680
-  m_fontColor: {r: 0, g: 0.09803922, b: 0.29411766, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -3534,7 +3535,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat: {fileID: 2100000, guid: a0b9dd300625c3743a11f1792f710507, type: 2}
-  Rate: 30
+  Rate: 40
   Magnitude: 0.5
   maxMultiplier: 0
   bumps: 5
@@ -3703,7 +3704,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat: {fileID: 2100000, guid: a0b9dd300625c3743a11f1792f710507, type: 2}
-  Rate: 30
+  Rate: 40
   Magnitude: 0.5
   maxMultiplier: 0
   bumps: 5

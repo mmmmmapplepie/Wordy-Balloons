@@ -8,7 +8,7 @@ public class TextInCircle : MonoBehaviour {
 	public float radius;
 	public bool useRadiusAsRatioOfTextWidth = false;
 	public float gapRatio = 1f;
-	void Update() {
+	void LateUpdate() {
 		AnimateText();
 	}
 	void AnimateText() {

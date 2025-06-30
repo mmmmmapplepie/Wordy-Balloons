@@ -410,7 +410,6 @@ public class TutorialManager : MonoBehaviour {
 		txtHolder.anchoredPosition = pos;
 		LayoutRebuilder.ForceRebuildLayoutImmediate(txtHolder);
 	}
-	Coroutine waitingForNextRoutine = null;
 	IEnumerator WaitForNext(bool setBtnActive = true) {
 		nxtBtn.SetActive(setBtnActive);
 		waitingForNext = true;

@@ -11,7 +11,7 @@ public class SinglePlayerAI : MonoBehaviour {
 		} else if (GameData.PlayMode == PlayModeEnum.BasicPVE) {
 			SetBasicMethod();
 		} else if (GameData.PlayMode == PlayModeEnum.Tutorial) {
-			SetTutorialMethod();
+			UpdateMethod = null;
 		}
 	}
 	void OnDestroy() {
@@ -61,29 +61,4 @@ public class SinglePlayerAI : MonoBehaviour {
 			wordLength = 0;
 		}
 	}
-
-
-
-
-
-
-	void SetTutorialMethod() {
-		UpdateMethod = TutorialAI;
-	}
-	float tutorialSpeed = 20f;
-	void TutorialAI() {
-		// if (wordLength < 1) {
-		// 	if (DictionaryList == null) DictionaryList = EnglishDictionary.Instance.GetDictionaryList();
-		// 	if (DictionaryList == null) return;
-		// 	wordLength = DictionaryList[UnityEngine.Random.Range(0, DictionaryList.Count)].word.Length;
-		// }
-		// cumulativePower += Time.deltaTime * tutorialSpeed / 60f;
-		// if (cumulativePower >= wordLength && wordLength > 0) {
-		// 	cumulativePower -= wordLength;
-		// 	this.balloonManager.SpawnBalloon((wordLength), 1);
-		// 	wordLength = 0;
-		// }
-	}
-
-
 }

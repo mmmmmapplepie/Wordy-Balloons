@@ -46,6 +46,8 @@ public class LobbyUI : MonoBehaviour {
 
 		LobbyManager.ListLobbySuccess += LobbyListFound;
 		LobbyManager.ListLobbyFailure += ListLobbiesFail;
+
+		lobbyPublicBtn.ButtonStateChanged += LobbyPublicityChanged;
 	}
 	void OnDestroy() {
 		MyLobby.LobbyFull -= LobbyFull;
@@ -74,6 +76,8 @@ public class LobbyUI : MonoBehaviour {
 
 		LobbyManager.ListLobbySuccess -= LobbyListFound;
 		LobbyManager.ListLobbyFailure -= ListLobbiesFail;
+
+		lobbyPublicBtn.ButtonStateChanged -= LobbyPublicityChanged;
 	}
 
 
@@ -162,6 +166,18 @@ public class LobbyUI : MonoBehaviour {
 	}
 
 
+	public void CopyLobbyCode() {
+		GUIUtility.systemCopyBuffer = lobbyCodeTxt.text;
+	}
+
+	public FancyButton lobbyPublicBtn;
+	void LobbyPublicityChanged() {
+		//switch lobby to whatever is required.
+		bool makepublic = lobbyPublicBtn.publicVersion;
+		LobbyManager.Instance.MakeLobbyPublic(makepublic);
+	}
+
+
 	#endregion
 
 
@@ -185,7 +201,6 @@ public class LobbyUI : MonoBehaviour {
 		//disable non basic items
 		LoadingPanel.SetActive(false);
 		ErrorPanel.SetActive(false);
-
 
 		RetryAuthenticationBtn.SetActive(false);
 		CloseErrorPanelBtn.SetActive(true);
@@ -242,12 +257,11 @@ public class LobbyUI : MonoBehaviour {
 		HidePanelsExceptChosen(ErrorPanel);
 	}
 
-
-
-
-	public void CopyLobbyCode() {
-		GUIUtility.systemCopyBuffer = lobbyCodeTxt.text;
+	void SetButtonMode() {
+		if (!lobbyPublicBtn.publicVersion) lobbyPublicBtn.Clicked(0f, false);
 	}
+
+
 	void LobbyJoined() {
 		lobbyNameTxt.text = LobbyManager.Instance.joinedLobby.Name;
 		lobbyCodeTxt.transform.parent.gameObject.SetActive(NetworkManager.Singleton.IsServer);

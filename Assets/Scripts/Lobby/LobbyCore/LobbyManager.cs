@@ -25,11 +25,14 @@ public class LobbyManager : MonoBehaviour {
 		InternetConnectivityCheck.ConnectedStateEvent += ConnectionChanged;
 		LobbyNetcodeManager.TransportFailureEvent += TransportFail;
 	}
-	void Start() {
+	public void Start() {
 		Authenticate();
 	}
+	bool attemptingToAuthenticate = false;
 	public async void Authenticate(string name = null) {
+		if (attemptingToAuthenticate) return;
 		AuthenticationBegin?.Invoke();
+		attemptingToAuthenticate = true;
 		if (UnityServices.State == ServicesInitializationState.Initialized && AuthenticationService.Instance.IsSignedIn) {
 			await CleanupLingeringHooks();
 		}
@@ -49,6 +52,7 @@ public class LobbyManager : MonoBehaviour {
 			print(e);
 			AuthenticationFailure?.Invoke();
 		}
+		attemptingToAuthenticate = false;
 
 	}
 
