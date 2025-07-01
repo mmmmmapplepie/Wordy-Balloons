@@ -2333,7 +2333,6 @@ GameObject:
   - component: {fileID: 1320709161}
   - component: {fileID: 1320709160}
   - component: {fileID: 1320709159}
-  - component: {fileID: 1320709158}
   - component: {fileID: 1320709163}
   m_Layer: 5
   m_Name: Canvas
@@ -2342,21 +2341,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1320709158
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1320709157}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c476f529ea297964aa985edc4d9bc9c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cover: {fileID: 0}
-  creditPanel: {fileID: 0}
-  dictionaryToggle: {fileID: 0}
 --- !u!114 &1320709159
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2976,8 +2960,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1320709158}
-        m_TargetAssemblyTypeName: MainMenuUI, Assembly-CSharp
+      - m_Target: {fileID: 1299623976}
+        m_TargetAssemblyTypeName: SinglePlayerSetup, Assembly-CSharp
         m_MethodName: GoToScene
         m_Mode: 5
         m_Arguments:
@@ -3995,8 +3979,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1320709158}
-        m_TargetAssemblyTypeName: MainMenuUI, Assembly-CSharp
+      - m_Target: {fileID: 1299623976}
+        m_TargetAssemblyTypeName: SinglePlayerSetup, Assembly-CSharp
         m_MethodName: ActivateObject
         m_Mode: 2
         m_Arguments:

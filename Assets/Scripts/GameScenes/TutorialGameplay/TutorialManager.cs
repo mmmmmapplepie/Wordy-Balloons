@@ -92,7 +92,7 @@ public class TutorialManager : MonoBehaviour {
 		welcomeIntro.gameObject.SetActive(false);
 		skipBtn.SetActive(true);
 
-		ShowPanelWithText("Hello there!\n\nthis guide will provide you everything you need to play the game!", 30f, default, 900f);
+		ShowPanelWithText("Hello there!\n\nthis guide will provide you everything you need for the game!", 30f, default, 900f);
 		yield return StartCoroutine(WaitForNext());
 		ShowPanelWithText("in the background you will see two bases. <color=#FF4100><b>The one on your left is your base.", 30f);
 
@@ -141,7 +141,7 @@ public class TutorialManager : MonoBehaviour {
 		ShowPanelWithText($"Good job!\nCorrectly typed letters will show in <color=#00B8FF><font={inputfont.name}><b>blue</font></color> while wrong letters will appear in <color=#E50000><font={inputfont.name}><b>red</font></b></color>.\n\nLetters are <color=#FF4100><b>case-sensitive</color></b>, so you will need to match capital letters where required.", 30f);
 		SetupHighlights(null);
 		yield return StartCoroutine(WaitForNext());
-		ShowPanelWithText("you can try to launch the balloon by pressing <color=#FF4100><b>Enter</color></b>.\n\nThe launch will only be successful if your <color=#FF4100><b>input exactly matches the target word</color></b>.\n\nEven a single mistake when will cause the launch to fail and may trigger side effects depending on the game mode.", 30f);
+		ShowPanelWithText("you can try to launch the balloon by pressing <color=#FF4100><b>Enter</color></b>.\n\nThe launch will only be successful if your <color=#FF4100><b>input exactly matches the target word</color></b>.\n\nEven a single mistake will cause the launch to fail and may trigger side effects depending on the game mode.", 30f);
 		yield return StartCoroutine(WaitForNext());
 		ShowPanelWithText("if you type something wrong you can delete the last letter by pressing <color=#FF4100><b>backspace</color></b>.\n\n<color=#FE25DF><b><i>Try typing the word and launching it.</color></b></i>\n(to launch, type out the full word correctly and hit <color=#FF4100><b>Enter</color></b>)", 30f);
 		inputManager.canTakeInput = true;
@@ -233,7 +233,7 @@ public class TutorialManager : MonoBehaviour {
 		shapeList.Clear();
 		shapeList.Add(new PinholeShape(GetWorldPointToCanvasPoint(latestDestroyedBalloonPos), GetWorldSizeInCanvasRectSize(new Vector2(1.5f, 1.5f)), 100f, PinholeShaderEditor.Shape.Ellipse));
 		SetupHighlights(shapeList);
-		ShowPanelWithText("your balloon was stronger and survived! Now the balloon is about to hit and damage the opposing base. The damage it does will equal its <color=#FF4100><b>remaining power</color></b>.", 30f, new Vector2(-300f, 0));
+		ShowPanelWithText("your balloon was stronger and so survived! Now the balloon is about to hit and damage the opposing base. The damage it does will equal its <color=#FF4100><b>remaining power</color></b>.", 30f, new Vector2(-300f, 0));
 		yield return StartCoroutine(WaitForNext());
 		txtHolder.gameObject.SetActive(false);
 		nxtBtn.SetActive(false);
@@ -268,7 +268,7 @@ public class TutorialManager : MonoBehaviour {
 	#region OtherInputActions
 	public RectTransform skipChargeUI;
 	IEnumerator OtherInputsActionsRoutine() {
-		ShowPanelWithText("There is one final trick you can use, but before that, go ahead and launch a few more balloons.\n\n<color=#FE25DF><b><i>(type out and launch more balloons, be mindful of case and hit \"enter\" to launch.)", 30f);
+		ShowPanelWithText("There is one final trick you can use, but before that, go ahead and launch a few more balloons.\n\n<color=#FE25DF><b><i>(type out and launch more balloons, be mindful of letter-case and hit \"enter\" to launch.)", 30f);
 		Time.timeScale = 1;
 		nxtBtn.SetActive(false);
 		inputManager.canTakeInput = true;

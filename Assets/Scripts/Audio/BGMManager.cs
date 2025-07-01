@@ -15,9 +15,7 @@ public class BGMManager : MonoBehaviour {
 
 		SceneManager.sceneLoaded += SceneLoaded;
 		VolumeControl.VolumeChanged += VolumeChanged;
-		if (PlayerPrefs.HasKey(TutorialManager.TutorialClearedPlayerPrefKey)) {
-			AudioPlayer.Instance.PlaySound(menuBGM.Name, VolumeControl.GetBGMVol());
-		}
+
 		currBGM = menuBGM.Name;
 
 		if (instance == null) {
@@ -38,6 +36,7 @@ public class BGMManager : MonoBehaviour {
 
 	void SceneLoaded(Scene scene, LoadSceneMode mode) {
 		if (scene.name == "MainMenu" || scene.name == "LobbyScene" || scene.name == "SinglePlayer") {
+			if (!PlayerPrefs.HasKey(TutorialManager.TutorialClearedPlayerPrefKey)) return;
 			if (AudioPlayer.Instance.IsPlaying(battleBGM.Name)) AudioPlayer.Instance.StopSound(battleBGM.Name, 0.5f);
 			if (!AudioPlayer.Instance.IsPlaying(menuBGM.Name)) { AudioPlayer.Instance.PlaySound(menuBGM.Name, VolumeControl.GetBGMVol(), 1f); currBGM = menuBGM.Name; }
 		} else if (scene.name == "MultiplayerGameScene") {

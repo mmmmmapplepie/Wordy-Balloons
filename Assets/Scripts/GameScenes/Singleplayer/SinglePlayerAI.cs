@@ -43,7 +43,7 @@ public class SinglePlayerAI : MonoBehaviour {
 	}
 
 	List<DictionaryEntry> DictionaryList = null;
-	public static int AISpeed = 100;
+	public static int AISpeed = 80;
 	float cumulativePower = 0;
 	int wordLength = -1;
 	public BalloonManager balloonManager;

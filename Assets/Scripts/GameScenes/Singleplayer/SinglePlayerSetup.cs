@@ -5,6 +5,7 @@ using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class SinglePlayerSetup : NetworkBehaviour {
@@ -14,6 +15,8 @@ public class SinglePlayerSetup : NetworkBehaviour {
 		if (PlayerPrefs.HasKey(AISpeed)) {
 			SetAISpeed(PlayerPrefs.GetInt(AISpeed));
 			speedSlider.Set(PlayerPrefs.GetInt(AISpeed));
+		} else {
+			speedSlider.Set(SinglePlayerAI.AISpeed, true);
 		}
 	}
 
@@ -71,5 +74,20 @@ public class SinglePlayerSetup : NetworkBehaviour {
 		GameData.PlayMode = PlayModeEnum.BasicPVE;
 
 		NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
+	}
+
+
+
+
+
+	public void GoToScene(string name) {
+		if (SceneManager.GetSceneByName(name) == null) return;
+		SceneManager.LoadScene(name);
+	}
+	public void ActivateObject(GameObject o) {
+		o.SetActive(true);
+	}
+	public void DeactivateObject(GameObject o) {
+		o.SetActive(false);
 	}
 }

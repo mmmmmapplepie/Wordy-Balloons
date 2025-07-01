@@ -17,6 +17,7 @@ public class Guide : MonoBehaviour {
 	private bool isShifting = false;
 	int panelsInCenterAndRight = 0;
 	int centerIndex = 0;
+	public bool addDuplicatePanels = true;
 
 	public GameObject leftBtn, rightBtn;
 	private void Start() {
@@ -37,7 +38,7 @@ public class Guide : MonoBehaviour {
 
 	private void EnsureMinimumPanels() {
 		int count = panels.Count;
-		if (count < 5) {
+		if (addDuplicatePanels && count < 5) {
 			int multiplier = Mathf.CeilToInt(5f / (float)count) - 1;
 			int copiesNeeded = multiplier * count;
 			for (int i = 0; i < copiesNeeded; i++) {
@@ -80,9 +81,10 @@ public class Guide : MonoBehaviour {
 		if (isShifting) return;
 		StartCoroutine(ShiftPanelsCoroutine(right));
 	}
-
+	bool shiftingRight = true;
 	private IEnumerator ShiftPanelsCoroutine(bool right) {
 		isShifting = true;
+		shiftingRight = right;
 		float elapsedTime = 0f;
 		int direction = right ? 1 : -1;
 		Vector2 startPosition = panelContainer.anchoredPosition;
@@ -120,10 +122,19 @@ public class Guide : MonoBehaviour {
 		}
 	}
 
+	void OnDisable() {
+		if (isShifting) {
+			StopAllCoroutines();
+			RearrangePanels(shiftingRight);
+			CorrectPanelPositions();
+			isShifting = false;
+		}
+	}
 
 
 	public void CloseGuide() {
 		gameObject.SetActive(false);
+
 	}
 
 }

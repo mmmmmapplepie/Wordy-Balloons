@@ -62,7 +62,7 @@ public class LobbyNetcodeManager : NetworkBehaviour {
 
 
 	public void ShutDownNetwork() {
-		print("Shutdown NGO");
+		// print("Shutdown NGO");
 		ShuttingDownNetwork?.Invoke();
 		if (NetworkManager.Singleton == null) return;
 		if (!NetworkManager.Singleton.ShutdownInProgress) {

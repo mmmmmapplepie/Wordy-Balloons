@@ -7,11 +7,7 @@ using UnityEngine.SceneManagement;
 using Unity.Netcode.Transports.UTP;
 
 public class MainMenuUI : MonoBehaviour {
-#if UNITY_EDITOR
-	public void GoToScene(UnityEditor.SceneAsset scene) {
-		SceneManager.LoadScene(scene.name);
-	}
-#endif
+
 	public GameObject cover;
 	void Start() {
 		TutorialCheck();
