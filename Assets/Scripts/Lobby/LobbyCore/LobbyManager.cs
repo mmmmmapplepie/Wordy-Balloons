@@ -34,19 +34,27 @@ public class LobbyManager : MonoBehaviour {
 		AuthenticationBegin?.Invoke();
 		attemptingToAuthenticate = true;
 		if (UnityServices.State == ServicesInitializationState.Initialized && AuthenticationService.Instance.IsSignedIn) {
-			await CleanupLingeringHooks();
+			await CleanupLobbies();
 		}
 		try {
 			InitializationOptions options = new InitializationOptions();
 			playerName = (name == null) ? "Player" + UnityEngine.Random.Range(0, 10000) : name;
 			options.SetProfile(playerName);
 			await UnityServices.InitializeAsync(options);
-			if (AuthenticationService.Instance.IsSignedIn) { AuthenticationService.Instance.SignOut(true); print("singing out"); } else { AuthenticationService.Instance.ClearSessionToken(); print("cleared token"); }
+
+			if (AuthenticationService.Instance.IsSignedIn) {
+				AuthenticationService.Instance.SignOut(true);
+				print("singing out");
+			} else {
+				AuthenticationService.Instance.ClearSessionToken();
+				print("cleared token");
+			}
+
 			if (!AuthenticationService.Instance.IsSignedIn) {
 				await AuthenticationService.Instance.SignInAnonymouslyAsync();
 				if (AuthenticationService.Instance != null) authenticationID = AuthenticationService.Instance.PlayerId;
 			}
-			await CleanupLingeringHooks();
+			await CleanupLobbies();
 			AuthenticationSuccess?.Invoke();
 		} catch (Exception e) {
 			print(e);
@@ -56,7 +64,7 @@ public class LobbyManager : MonoBehaviour {
 
 	}
 
-	async Task CleanupLingeringHooks() {
+	async Task CleanupLobbies() {
 		for (int i = 0; i < lobbyEventsToCleanup.Count;) {
 			try {
 				await TaskTimeout.AddTimeout(lobbyEventsToCleanup[i].UnsubscribeAsync());
@@ -151,7 +159,7 @@ public class LobbyManager : MonoBehaviour {
 		}
 	}
 
-	float lobbyPollElapsed = 0, lobbyPollPeriod = 15f;
+	float lobbyPollElapsed = 0, lobbyPollPeriod = 10f;
 	void LobbyPoll() {
 		if (joinedLobby != null || hostLobby != null) { lobbyPollElapsed = lobbyPollPeriod - 1f; return; }
 		if (lobbyPollElapsed > lobbyPollPeriod) {
@@ -222,7 +230,7 @@ public class LobbyManager : MonoBehaviour {
 			lobbyCallback.LobbyChanged += LobbyChanged;
 			lobbyCallback.KickedFromLobby += KickedFromLobby;
 			lobbyCallback.LobbyDeleted += LobbyDeleted;
-			LobbyEvents = await Lobbies.Instance.SubscribeToLobbyEventsAsync(joinedLobby.Id, lobbyCallback);
+			LobbyEvents = await TaskTimeout.AddTimeout<ILobbyEvents>(Lobbies.Instance.SubscribeToLobbyEventsAsync(joinedLobby.Id, lobbyCallback));
 		} catch (Exception e) {
 			print(e);
 			throw e;
@@ -389,10 +397,9 @@ public class LobbyManager : MonoBehaviour {
 	#region Kick/LeavingLobby
 
 	public async void KickFromLobby(string id) {
-		if (hostLobby == null) return;
-		if (joinedLobby != null) {
+		if (hostLobby != null) {
 			try {
-				await LobbyService.Instance.RemovePlayerAsync(joinedLobby.Id, id);
+				await LobbyService.Instance.RemovePlayerAsync(hostLobby.Id, id);
 			} catch (LobbyServiceException e) {
 				print(e.Reason);
 			}
@@ -414,18 +421,16 @@ public class LobbyManager : MonoBehaviour {
 		} catch (Exception e) {
 			print(e);
 		}
-		if (joinedLobby != null) {
-			try {
-				if (authenticationID == joinedLobby.HostId) {
-					await LobbyService.Instance.DeleteLobbyAsync(joinedLobby.Id);
-				} else {
-					await LobbyService.Instance.RemovePlayerAsync(joinedLobby.Id, authenticationID);
-				}
-			} catch (Exception e) {
-				print(e);
+		if (!InternetConnectivityCheck.connected && hostLobby != null && !lobbiesToCleanup.Contains(hostLobby.Id)) lobbiesToCleanup.Add(hostLobby.Id);
+		try {
+			if (hostLobby != null) {
+				await TaskTimeout.AddTimeout(LobbyService.Instance.DeleteLobbyAsync(hostLobby.Id));
+			} else if (joinedLobby != null) {
+				await TaskTimeout.AddTimeout(LobbyService.Instance.RemovePlayerAsync(joinedLobby.Id, authenticationID));
 			}
+		} catch (Exception e) {
+			print(e);
 		}
-		if (!InternetConnectivityCheck.connected && joinedLobby != null && !lobbiesToCleanup.Contains(joinedLobby.Id)) lobbiesToCleanup.Add(joinedLobby.Id);
 		joinedLobby = null;
 		hostLobby = null;
 		if (SendEvents) LeaveLobbyComplete?.Invoke();
@@ -437,7 +442,7 @@ public class LobbyManager : MonoBehaviour {
 			print(e);
 		}
 		try {
-			await LobbyService.Instance.DeleteLobbyAsync(joinedLobby.Id);
+			await TaskTimeout.AddTimeout(LobbyService.Instance.DeleteLobbyAsync(joinedLobby.Id));
 		} catch (Exception e) {
 			print(e);
 		}
@@ -471,7 +476,7 @@ public class LobbyManager : MonoBehaviour {
 			ListLobbySuccess?.Invoke(response.Results);
 		} catch (LobbyServiceException e) {
 			print(e.Reason);
-			if (e.ErrorCode == 16429) return;
+			if (e.ErrorCode == (int)LobbyExceptionReason.RateLimited) return;
 			ListLobbyFailure?.Invoke(null);
 		}
 	}

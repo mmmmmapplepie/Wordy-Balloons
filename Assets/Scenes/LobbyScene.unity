@@ -15832,6 +15832,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2353348033134298427, guid: a7095d1a73473674783ac1baa3bc8d0d, type: 3}
+      propertyPath: heightDelta
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2353348033134298427, guid: a7095d1a73473674783ac1baa3bc8d0d, type: 3}
       propertyPath: backgroundSprite
       value: 
       objectReference: {fileID: 21300000, guid: 23c451c762a6b2e498ea2c09a361c91e, type: 3}

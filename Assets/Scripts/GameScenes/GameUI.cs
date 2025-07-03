@@ -105,8 +105,10 @@ public class GameUI : MonoBehaviour {
 	[Header("Game Finish")] public GameObject menuBtn;
 	public GameObject connectionLost, victoryPanel, defeatPanel, endingPanel, gameplayUI;
 	void GameResultSet(GameStateManager.GameResult result) {
+		gameNotPausedTxt.transform.parent.gameObject.SetActive(false);
 		menuBtn.SetActive(false);
 		gameplayUI.SetActive(false);
+		menusPanel.SetActive(false);
 		if (result == GameStateManager.GameResult.Draw) {
 			menusPanel.SetActive(true);
 			connectionLost.SetActive(true);

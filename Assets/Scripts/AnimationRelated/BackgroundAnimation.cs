@@ -6,6 +6,7 @@ public class BackgroundAnimation : MonoBehaviour {
 	public Sprite backgroundSprite;
 	public float scrollSpeed = 1f;
 	const string slide = "backgroundSlide";
+	public float heightDelta = 0f;
 	void Start() {
 		float height = Camera.main.orthographicSize * 2f;
 		float screenAspect = (float)Screen.width / Screen.height;
@@ -17,7 +18,8 @@ public class BackgroundAnimation : MonoBehaviour {
 		} else {
 			width = height * spriteAspect;
 		}
-		transform.localScale = new Vector3(width, height, 1);
+		Vector3 scale = new Vector3(width, height, 1) * (height + heightDelta) / height;
+		transform.localScale = scale;
 
 		if (animators.Count == 0) return;
 		float gap = 1f / animators.Count;

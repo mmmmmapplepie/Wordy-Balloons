@@ -171,7 +171,7 @@ public class MyLobby : NetworkBehaviour {
 		}
 		return false;
 	}
-	const float JoinConfirmationTimeoutTime = 10f;
+	const float JoinConfirmationTimeoutTime = 15f;
 	IEnumerator JoinConfirmationTimeout(string id) {
 		yield return new WaitForSeconds(JoinConfirmationTimeoutTime);
 		print("Kicking " + id + " from timeout.");

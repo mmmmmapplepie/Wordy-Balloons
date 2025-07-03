@@ -25,7 +25,8 @@ public class PhysicsBtn : MonoBehaviour {
 	static float maxSpeedDone;
 	void Update() {
 		if (rb == null) return;
-
+		Vector2 viewPt = Camera.main.WorldToViewportPoint(transform.position);
+		if (viewPt.x > 1f || viewPt.x < 0f || viewPt.y > 1f || viewPt.y < 0f) GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
 		if (rb.velocity.magnitude > maxSpeed) rb.velocity = rb.velocity.normalized * maxSpeed;
 		if (rb.velocity.magnitude < minSpeed) rb.AddForce((new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f))).normalized * impulseAmt);
 	}
