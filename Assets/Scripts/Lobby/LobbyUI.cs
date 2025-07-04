@@ -257,7 +257,7 @@ public class LobbyUI : MonoBehaviour {
 		HidePanelsExceptChosen(ErrorPanel);
 	}
 
-	void SetButtonMode() {
+	void ResetPublicLobbyBtn() {
 		if (!lobbyPublicBtn.publicVersion) lobbyPublicBtn.Clicked(0f, false);
 	}
 
@@ -265,9 +265,13 @@ public class LobbyUI : MonoBehaviour {
 	void LobbyJoined() {
 		lobbyNameTxt.text = LobbyManager.Instance.joinedLobby.Name;
 		lobbyCodeTxt.transform.parent.gameObject.SetActive(NetworkManager.Singleton.IsServer);
+		lobbyPublicBtn.gameObject.SetActive(NetworkManager.Singleton.IsServer);
 		HidePanelsExceptChosen();
 		startGameBtn.interactable = false;
 		stopGameLoadBtn.SetActive(false);
+		Button b = lobbyPublicBtn.transform.GetComponentInChildren<Button>();
+		ResetPublicLobbyBtn();
+		b.interactable = true;
 		LobbyUpdate(LobbyManager.Instance.joinedLobby);
 		ToggleLobby(true);
 	}
@@ -347,6 +351,8 @@ public class LobbyUI : MonoBehaviour {
 		if (NetworkManager.Singleton.IsServer) {
 			startGameBtn.interactable = !loadingScene;
 			stopGameLoadBtn.SetActive(loadingScene);
+			Button b = lobbyPublicBtn.transform.GetComponentInChildren<Button>();
+			b.interactable = !loadingScene;
 		}
 		loadCountdown.SetActive(loadingScene);
 		leaveBtn.interactable = !loadingScene;

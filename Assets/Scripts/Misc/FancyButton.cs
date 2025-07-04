@@ -10,8 +10,8 @@ public class FancyButton : MonoBehaviour {
 	public void Clicked() {
 		Clicked(-1);
 	}
-	public void Clicked(float animPeriod = -1, bool soundEvent = true) {
-		if (Time.unscaledTime - clickT < reclickTime) return;
+	public void Clicked(float animPeriod = -1, bool soundEvent = true, bool ignoreTime = false) {
+		if (!ignoreTime && Time.unscaledTime - clickT < reclickTime) return;
 		clickT = Time.unscaledTime;
 		publicVersion = !publicVersion;
 		if (soundEvent) ButtonStateChanged?.Invoke();

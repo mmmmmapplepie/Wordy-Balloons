@@ -23,11 +23,11 @@ public class MyLobby : NetworkBehaviour {
 	}
 	public override void OnNetworkSpawn() {
 		base.OnNetworkSpawn();
-		LoadingSceneBool.Value = false;
-		LoadingCountdown.Value = sceneLoadTimer;
+		if (NetworkManager.Singleton.IsServer) {
+			LoadingSceneBool.Value = false;
+			LoadingCountdown.Value = sceneLoadTimer;
+		}
 		LoadingSceneBool.OnValueChanged += LoadingSceneBoolChanged;
-
-
 	}
 
 	public override void OnNetworkDespawn() {
@@ -406,7 +406,7 @@ public class MyLobby : NetworkBehaviour {
 		if (loading) loadTimeoutRoutine = StartCoroutine(LoadTimeoutRoutine());
 	}
 	Coroutine loadingSceneRoutine = null, loadTimeoutRoutine = null;
-	const int sceneLoadTimer = 3, sceneLoadTimeout = 8;
+	const int sceneLoadTimer = 3, sceneLoadTimeout = 10;
 	public void CheckIfPlayersFilled() {
 		LobbyFull?.Invoke(team1.Count > 0 && team2.Count > 0);
 	}
@@ -527,8 +527,11 @@ public class MyLobby : NetworkBehaviour {
 
 		if (loadTimeoutRoutine != null) StopCoroutine(loadTimeoutRoutine);
 		loadTimeoutRoutine = null;
+		if (NetworkManager.Singleton.IsServer) LoadingSceneBool.Value = false;
 	}
-	float loadingSceneTimeoutTime = 10f;
+
+	//this one is in case the server crashes or just leaves unceremoniously and so client gets stuck in limbo without getting to leave the lobby as the leave lobby button is blacked out.
+	const float loadingSceneTimeoutTime = 12f;
 	IEnumerator LoadTimeoutRoutine() {
 		yield return new WaitForSecondsRealtime(loadingSceneTimeoutTime);
 		LeaveLobby();

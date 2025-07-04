@@ -38,7 +38,6 @@ public class Balloon : NetworkBehaviour {
 		PowerChanged(0, power.Value);
 		ProgressChanged(0f, 0f);
 		SetPosition(0);
-		latestProgressUpdateTime = Time.time - smoothingTime;
 		UpdateScale();
 		BalloonCreated?.Invoke(balloonTeam.Value, this);
 		anim.InitilizeAnimations(balloonColor.Value);
@@ -53,10 +52,8 @@ public class Balloon : NetworkBehaviour {
 		UpdateFlyProgress();
 	}
 	float localProgress = 0f;
-	float latestProgressUpdateTime = -100f;
-	float smoothingTime = 1f;
+	float smoothingTime = 0.2f;
 	float maxError = 0.05f;
-	float lerpSpeed = 1.2f;
 	float currSetProgress = 0f;
 
 	void UpdateFlyProgress() {
@@ -82,41 +79,31 @@ public class Balloon : NetworkBehaviour {
 			return;
 		}
 
-		Debug.LogError($"Progress Set{current}");
+		localProgress = current;
+		Debug.LogWarning("updated pos");
 		if (NetworkManager.Singleton.IsServer) return;
 		if (Mathf.Abs(currSetProgress - current) > maxError) {
 			if (interpolation != null) StopCoroutine(interpolation);
 			Debug.LogError("Snap===============================");
 			SetPosition(current);
-			interpolation = StartCoroutine(InterpolatePosition(currSetProgress, current));
 		} else {
 			if (interpolation != null) StopCoroutine(interpolation);
-			interpolation = StartCoroutine(InterpolatePosition(currSetProgress, current));
+			interpolation = StartCoroutine(InterpolatePosition());
 		}
 	}
 	Coroutine interpolation = null;
-	IEnumerator InterpolatePosition(float start, float target) {
+	IEnumerator InterpolatePosition() {
 		float t = 0;
-		float period = Mathf.Abs(target - start) * flyTime / lerpSpeed;
-		while (t < period) {
+		while (t < smoothingTime) {
+			yield return null;
 			t += Time.deltaTime;
-			SetPosition(Mathf.Lerp(start, target, t / period));
-			Debug.LogWarning($"going ot target : {currSetProgress}");
-			yield return null;
-		}
-
-		while (true) {
-			float newProgress = currSetProgress + Mathf.Sign(localProgress - currSetProgress) * Time.deltaTime * lerpSpeed / flyTime;
-			Debug.LogWarning($"to local: {newProgress}");
-			if (Mathf.Abs(localProgress - newProgress) <= Time.deltaTime * lerpSpeed / flyTime) { Debug.LogWarning("breaking"); break; }
-			SetPosition(newProgress);
-			yield return null;
+			SetPosition(Mathf.Lerp(currSetProgress, localProgress < currSetProgress ? (localProgress + currSetProgress) / 2f : localProgress, t / smoothingTime));
 		}
 		SetPosition(localProgress);
 		interpolation = null;
 	}
 	void SetPosition(float progress) {
-		Debug.LogAssertion($"currSET: {progress}");
+		progress = Mathf.Clamp01(progress);
 		currSetProgress = progress;
 		float realProgress = progress;
 		if (balloonTeam.Value != BalloonManager.team) realProgress = 1 - progress;
