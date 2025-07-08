@@ -33,28 +33,22 @@ public class LobbyManager : MonoBehaviour {
 		if (attemptingToAuthenticate) return;
 		AuthenticationBegin?.Invoke();
 		attemptingToAuthenticate = true;
-		if (UnityServices.State == ServicesInitializationState.Initialized && AuthenticationService.Instance.IsSignedIn) {
-			await CleanupLobbies();
-		}
 		try {
 			InitializationOptions options = new InitializationOptions();
 			playerName = (name == null) ? "Player" + UnityEngine.Random.Range(0, 10000) : name;
 			options.SetProfile(playerName);
-			await UnityServices.InitializeAsync(options);
+			if (UnityServices.State != ServicesInitializationState.Initialized) await TaskTimeout.AddTimeout(UnityServices.InitializeAsync(options));
 
 			if (AuthenticationService.Instance.IsSignedIn) {
+				await TaskTimeout.AddTimeout(CleanupLobbies());
 				AuthenticationService.Instance.SignOut(true);
 				print("singing out");
-			} else {
-				AuthenticationService.Instance.ClearSessionToken();
-				print("cleared token");
 			}
+			AuthenticationService.Instance.ClearSessionToken();
 
-			if (!AuthenticationService.Instance.IsSignedIn) {
-				await AuthenticationService.Instance.SignInAnonymouslyAsync();
-				if (AuthenticationService.Instance != null) authenticationID = AuthenticationService.Instance.PlayerId;
-			}
-			await CleanupLobbies();
+			await TaskTimeout.AddTimeout(AuthenticationService.Instance.SignInAnonymouslyAsync());
+			authenticationID = AuthenticationService.Instance.PlayerId;
+			await TaskTimeout.AddTimeout(CleanupLobbies(true));
 			AuthenticationSuccess?.Invoke();
 		} catch (Exception e) {
 			print(e);
@@ -64,7 +58,7 @@ public class LobbyManager : MonoBehaviour {
 
 	}
 
-	async Task CleanupLobbies() {
+	async Task CleanupLobbies(bool clearList = false) {
 		for (int i = 0; i < lobbyEventsToCleanup.Count;) {
 			try {
 				await TaskTimeout.AddTimeout(lobbyEventsToCleanup[i].UnsubscribeAsync());
@@ -84,6 +78,10 @@ public class LobbyManager : MonoBehaviour {
 				print(e);
 				i++;
 			}
+		}
+		if (clearList) {
+			lobbiesToCleanup.Clear();
+			lobbyEventsToCleanup.Clear();
 		}
 	}
 
@@ -178,8 +176,8 @@ public class LobbyManager : MonoBehaviour {
 		if (hostLobby != null) return;
 		LobbyCreationBegin?.Invoke();
 		if (NGOConnected()) {
-			LobbyCreationFailure?.Invoke();
 			LeaveLobby();
+			LobbyCreationFailure?.Invoke();
 			return;
 		}
 		try {

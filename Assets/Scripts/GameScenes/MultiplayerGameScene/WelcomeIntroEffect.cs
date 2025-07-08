@@ -10,7 +10,7 @@ public class WelcomeIntroEffect : MonoBehaviour {
 
 
 	void OnEnable() {
-		StartCoroutine(StartOpeningAnimation());
+		if (GameData.PlayMode == PlayModeEnum.Tutorial) StartCoroutine(StartOpeningAnimation());
 	}
 
 

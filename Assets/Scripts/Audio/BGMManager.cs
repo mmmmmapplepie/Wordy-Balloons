@@ -38,10 +38,14 @@ public class BGMManager : MonoBehaviour {
 		if (scene.name == "MainMenu" || scene.name == "LobbyScene" || scene.name == "SinglePlayer") {
 			if (!PlayerPrefs.HasKey(TutorialManager.TutorialClearedPlayerPrefKey)) return;
 			if (AudioPlayer.Instance.IsPlaying(battleBGM.Name)) AudioPlayer.Instance.StopSound(battleBGM.Name, 0.5f);
-			if (!AudioPlayer.Instance.IsPlaying(menuBGM.Name)) { AudioPlayer.Instance.PlaySound(menuBGM.Name, VolumeControl.GetBGMVol(), 1f); currBGM = menuBGM.Name; }
+			if (!AudioPlayer.Instance.IsPlaying(menuBGM.Name)) {
+				AudioPlayer.Instance.PlaySound(menuBGM.Name, VolumeControl.GetBGMVol(), 1f); currBGM = menuBGM.Name;
+			}
 		} else if (scene.name == "MultiplayerGameScene") {
-			if (AudioPlayer.Instance.IsPlaying(menuBGM.Name)) AudioPlayer.Instance.StopSound(menuBGM.Name);
-			if (!AudioPlayer.Instance.IsPlaying(battleBGM.Name)) { AudioPlayer.Instance.PlaySound(battleBGM.Name, VolumeControl.GetBGMVol(), 1f); currBGM = battleBGM.Name; }
+			if (AudioPlayer.Instance.IsPlaying(menuBGM.Name)) AudioPlayer.Instance.StopSound(menuBGM.Name, 0.5f);
+			if (!AudioPlayer.Instance.IsPlaying(battleBGM.Name)) {
+				AudioPlayer.Instance.PlaySound(battleBGM.Name, VolumeControl.GetBGMVol(), 100f); currBGM = battleBGM.Name;
+			}
 		}
 	}
 

@@ -98,13 +98,12 @@ public class AudioPlayer : MonoBehaviour {
 		}
 	}
 	IEnumerator FadeInRoutine(Sound sound, float fadeInTime, float volumeFinal) {
-		float InitialVol = sound.audioSource.volume;
-		float VolDiff = volumeFinal - InitialVol;
+		float VolDiff = volumeFinal;
 		float StartTime = Time.unscaledTime;
 		sound.audioSource.Play();
 		while (Time.unscaledTime < StartTime + fadeInTime) {
 			float ratio = ((Time.unscaledTime - StartTime - fadeInTime) / fadeInTime) + 1f;
-			sound.audioSource.volume = InitialVol + VolDiff * ratio;
+			sound.audioSource.volume = VolDiff * ratio;
 			yield return null;
 		}
 		sound.audioSource.volume = volumeFinal;

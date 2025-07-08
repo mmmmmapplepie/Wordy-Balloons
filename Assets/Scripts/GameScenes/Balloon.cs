@@ -52,16 +52,14 @@ public class Balloon : NetworkBehaviour {
 		UpdateFlyProgress();
 	}
 	float localProgress = 0f;
-	float smoothingTime = 0.2f;
-	float maxError = 0.05f;
+	float smoothingTime = 0.5f;
+	float maxError = 0.1f;
 	float currSetProgress = 0f;
-
 	void UpdateFlyProgress() {
 		if (NetworkManager.Singleton.IsServer) {
 			flyProgress.Value = Mathf.Clamp01(flyProgress.Value + Time.deltaTime / flyTime);
 			SetPosition(flyProgress.Value);
 		} else {
-			print(localProgress);
 			localProgress = Mathf.Clamp01(localProgress + Time.deltaTime / flyTime);
 			if (interpolation != null) return;
 			SetPosition(localProgress);
@@ -80,12 +78,13 @@ public class Balloon : NetworkBehaviour {
 		}
 
 		localProgress = current;
-		Debug.LogWarning("updated pos");
 		if (NetworkManager.Singleton.IsServer) return;
-		if (Mathf.Abs(currSetProgress - current) > maxError) {
+		if (Mathf.Abs(currSetProgress - current) > maxError && currSetProgress < current) {
 			if (interpolation != null) StopCoroutine(interpolation);
-			Debug.LogError("Snap===============================");
 			SetPosition(current);
+		} else if (currSetProgress > current) {
+			if (interpolation != null) StopCoroutine(interpolation);
+			localProgress = currSetProgress;
 		} else {
 			if (interpolation != null) StopCoroutine(interpolation);
 			interpolation = StartCoroutine(InterpolatePosition());

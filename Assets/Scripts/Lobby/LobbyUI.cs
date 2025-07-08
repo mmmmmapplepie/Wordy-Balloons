@@ -137,7 +137,6 @@ public class LobbyUI : MonoBehaviour {
 	public void JoinLobbyByCode() {
 		if (!CheckInternetConnected()) return;
 		LobbyManager.Instance.JoinLobbyByCode(lobbyCode.text);
-		lobbyCode.text = "";
 	}
 	public void JoinLobby(Lobby lobby) {
 		if (!CheckInternetConnected()) return;
