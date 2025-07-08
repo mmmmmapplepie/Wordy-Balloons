@@ -42,7 +42,6 @@ public class LobbyManager : MonoBehaviour {
 			if (AuthenticationService.Instance.IsSignedIn) {
 				await TaskTimeout.AddTimeout(CleanupLobbies());
 				AuthenticationService.Instance.SignOut(true);
-				print("singing out");
 			}
 			AuthenticationService.Instance.ClearSessionToken();
 

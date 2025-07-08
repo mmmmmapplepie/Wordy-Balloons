@@ -88,7 +88,7 @@ public class GameStateManager : NetworkBehaviour {
 		if (CurrGameResult != GameResult.Undecided) return;
 		CurrGameResult = r;
 		GameResultSetEvent?.Invoke(r);
-		IngameNetcodeAndSceneManager.ShutDownNetwork();
+		// IngameNetcodeAndSceneManager.ShutDownNetwork();
 	}
 
 

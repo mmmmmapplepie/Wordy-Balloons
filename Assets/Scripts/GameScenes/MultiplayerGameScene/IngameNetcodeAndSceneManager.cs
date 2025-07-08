@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	void Awake() {
 		shutdownNetworkEvent += StopChecksForConnection;
+		GameStateManager.GameResultSetEvent += GameResult;
 	}
 	public override void OnNetworkSpawn() {
 		base.OnNetworkSpawn();
@@ -30,10 +31,15 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	}
 	public override void OnDestroy() {
 		shutdownNetworkEvent -= StopChecksForConnection;
+		GameStateManager.GameResultSetEvent -= GameResult;
 		OnNetworkDespawn();
 		ShutDownNetwork();
 		base.OnDestroy();
 		Time.timeScale = 1f;
+	}
+	void GameResult(GameStateManager.GameResult r) {
+		if (r == GameStateManager.GameResult.Draw) return;
+		Invoke(nameof(ShutDownNetwork), BaseManager.BaseDestroyAnimationTime);
 	}
 	void ClientStopped(bool host) {
 		if (NetworkManager.Singleton.IsConnectedClient) OnClientDisconnectCallback(NetworkManager.Singleton.LocalClientId);
@@ -92,7 +98,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	}
 
 	public static event Action shutdownNetworkEvent;
-	public static void ShutDownNetwork() {
+	public void ShutDownNetwork() {
 		shutdownNetworkEvent?.Invoke();
 		if (NetworkManager.Singleton != null && !NetworkManager.Singleton.ShutdownInProgress) {
 			NetworkManager.Singleton.Shutdown();
