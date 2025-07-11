@@ -27,6 +27,7 @@ public class Balloon : NetworkBehaviour {
 		base.OnNetworkSpawn();
 		power.OnValueChanged += PowerChanged;
 		flyProgress.OnValueChanged += ProgressChanged;
+		GameStateManager.GameResultSetEvent += GameSet;
 		if (NetworkManager.Singleton.IsServer) {
 			realFlightHeight.Value = Random.Range(0.7f, 1.2f) * flightHeight;
 			power.Value = tempPower;
@@ -45,6 +46,7 @@ public class Balloon : NetworkBehaviour {
 	public override void OnNetworkDespawn() {
 		flyProgress.OnValueChanged -= ProgressChanged;
 		power.OnValueChanged -= PowerChanged;
+		GameStateManager.GameResultSetEvent -= GameSet;
 		base.OnNetworkDespawn();
 	}
 
@@ -155,11 +157,11 @@ public class Balloon : NetworkBehaviour {
 	}
 	void DestroyBalloon(bool onBase = false) {
 		DestroyEffectClientRpc(onBase);
-		if (NetworkManager.Singleton.IsServer) Destroy(gameObject);
+		if (NetworkManager.Singleton.IsServer) GetComponent<NetworkObject>().Despawn(true);
 	}
 
 	[ClientRpc]
-	void DestroyEffectClientRpc(bool onBase = false) {
+	void DestroyEffectClientRpc(bool onBase) {
 		if (onBase) anim.BaseCollisionEffect();
 		else anim.CollisionEffect();
 		BalloonDestroyed?.Invoke(onBase, this);
@@ -171,6 +173,12 @@ public class Balloon : NetworkBehaviour {
 			BaseManager.DamageBase(balloonTeam.Value == Team.t1 ? Team.t2 : Team.t1, power.Value);
 			power.Value = 0;
 		}
+	}
+
+
+	void GameSet(GameStateManager.GameResult r) {
+		if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer) return;
+		DestroyBalloon();
 	}
 
 

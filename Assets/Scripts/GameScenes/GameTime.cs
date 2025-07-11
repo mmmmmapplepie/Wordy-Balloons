@@ -6,14 +6,16 @@ public class GameTime : MonoBehaviour {
 	float startT = -1;
 	void Awake() {
 		GameStateManager.GameStartEvent += GameStart;
+		GameStateManager.GameResultSetEvent += GameResultSet;
 	}
 	void OnDestroy() {
 		GameStateManager.GameStartEvent -= GameStart;
+		GameStateManager.GameResultSetEvent -= GameResultSet;
 	}
 	void GameStart() {
 		startT = Time.time;
 	}
-	public TextMeshProUGUI txt;
+	public TextMeshProUGUI txt, endGameTime;
 	void Update() {
 		if (startT < 0) return;
 		float diff = Time.time - startT;
@@ -22,5 +24,10 @@ public class GameTime : MonoBehaviour {
 		string minsS = mins < 10 ? "0" + mins : mins.ToString();
 		string secsS = secs < 10 ? "0" + secs : secs.ToString();
 		txt.text = minsS + ":" + secsS;
+		endGameTime.text = txt.text;
+	}
+
+	void GameResultSet(GameStateManager.GameResult result) {
+		startT = -1;
 	}
 }

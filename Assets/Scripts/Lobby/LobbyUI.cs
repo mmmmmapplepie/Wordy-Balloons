@@ -340,7 +340,7 @@ public class LobbyUI : MonoBehaviour {
 		ChangeToLoadingSceneMode(false);
 	}
 	void LoadingCountdown(int old, int n) {
-		loadCountdown.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = n.ToString();
+		loadCountdown.GetComponent<TextMeshProUGUI>().text = n.ToString();
 		if (n == 0) { OpenLoadingPanel(); }
 	}
 	void LoadingSceneStateChange(bool old, bool loadingScene) {
@@ -349,11 +349,13 @@ public class LobbyUI : MonoBehaviour {
 	void ChangeToLoadingSceneMode(bool loadingScene) {
 		if (NetworkManager.Singleton.IsServer) {
 			startGameBtn.interactable = !loadingScene;
-			stopGameLoadBtn.SetActive(loadingScene);
 			Button b = lobbyPublicBtn.transform.GetComponentInChildren<Button>();
 			b.interactable = !loadingScene;
 		}
-		loadCountdown.SetActive(loadingScene);
+		stopGameLoadBtn.SetActive(loadingScene);
+		stopGameLoadBtn.GetComponent<Button>().interactable = NetworkManager.Singleton.IsServer;
+		stopGameLoadBtn.transform.GetChild(0).gameObject.SetActive(NetworkManager.Singleton.IsServer);
+		loadCountdown.GetComponent<TextMeshProUGUI>().text = "3";
 		leaveBtn.interactable = !loadingScene;
 	}
 	void LoadingNextScene() {
