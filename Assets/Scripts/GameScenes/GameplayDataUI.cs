@@ -220,7 +220,8 @@ public class GameplayDataUI : NetworkBehaviour {
 	public CameraShaker camShaker;
 
 	void BaseTakesDamage(Team damagedTeam, int remainingHP) {
-		float hpRatio = (float)remainingHP / (float)(damagedTeam == Team.t1 ? BaseManager.team1MaxHP.Value : BaseManager.team2MaxHP.Value);
+		remainingHP = Mathf.Max(0, remainingHP);
+		float hpRatio = (float)(remainingHP) / (float)(damagedTeam == Team.t1 ? BaseManager.team1MaxHP.Value : BaseManager.team2MaxHP.Value);
 		Slider main;
 		TextMeshProUGUI hpTxt = homeHPTxt;
 		if (damagedTeam == BalloonManager.team) {

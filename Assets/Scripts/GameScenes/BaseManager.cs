@@ -48,7 +48,7 @@ public class BaseManager : NetworkBehaviour {
 		team1HP.Value = t1HP;
 		team2HP.Value = t2HP;
 	}
-	public static event Action<Team> TeamLose;
+	public static event Action<Team?> TeamLose;
 	public static event Action<Team, int> BaseTakenDamage;
 
 	[ServerRpc(RequireOwnership = false)]
@@ -62,11 +62,12 @@ public class BaseManager : NetworkBehaviour {
 		} else {
 			target = team2HP;
 		}
-		target.Value -= dmg;
-		BaseTakenDamage?.Invoke(teamBaseToDamage, target.Value);
-		if (target.Value <= 0) {
-			TeamLose?.Invoke(teamBaseToDamage);
+		if (BalloonManager.BallonDamageMultiplier == int.MaxValue) {
+			target.Value = 0;
+		} else {
+			target.Value -= dmg * BalloonManager.BallonDamageMultiplier;
 		}
+		BaseTakenDamage?.Invoke(teamBaseToDamage, target.Value);
 	}
 
 	void BaseHP1Changed(int i, int curr) {
@@ -74,17 +75,21 @@ public class BaseManager : NetworkBehaviour {
 		if (BalloonManager.team != Team.t1) {
 			target = awayBase;
 		}
-		DamagedBaseEffect(target);
 	}
 	void BaseHP2Changed(int i, int curr) {
 		Transform target = homeBase;
 		if (BalloonManager.team != Team.t2) {
 			target = awayBase;
 		}
-		DamagedBaseEffect(target);
 	}
-	void DamagedBaseEffect(Transform tr) {
-		// tr.GetComponent<Animator>().Play("Blink");
+
+	void LateUpdate() {
+		CheckLoss();
+	}
+	void CheckLoss() {
+		if (team1HP.Value <= 0 && team2HP.Value <= 0) TeamLose?.Invoke(null);
+		else if (team1HP.Value <= 0) TeamLose?.Invoke(Team.t1);
+		else if (team2HP.Value <= 0) TeamLose?.Invoke(Team.t2);
 	}
 
 

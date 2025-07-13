@@ -12,6 +12,14 @@ public class BalloonManager : NetworkBehaviour {
 
 	public static Team team = Team.t1;
 	public static HashSet<ulong> teamIDs = new HashSet<ulong>();
+	public const float BaseFlytime = 5f;
+	public const float BaseFlightHeightMin = 1f;
+	public const float BaseFlightHeightMax = 4f;
+	public const int BaseBalloonDamageMultiplier = 1;
+
+	public static float Flytime = BaseFlytime;
+	public static float FlightHeightMin = BaseFlightHeightMin, FlightHeightMax = BaseFlightHeightMax;
+	public static int BallonDamageMultiplier = BaseBalloonDamageMultiplier;
 	public override void OnNetworkSpawn() {
 		base.OnNetworkSpawn();
 		team = GameData.GetTeamFromClientID(NetworkManager.Singleton.LocalClientId);
@@ -24,6 +32,10 @@ public class BalloonManager : NetworkBehaviour {
 
 	public override void OnDestroy() {
 		InputManager.CorrectEntryProcess -= SpawnBalloon;
+		Flytime = BaseFlytime;
+		FlightHeightMin = BaseFlightHeightMin;
+		FlightHeightMax = BaseFlightHeightMax;
+		BallonDamageMultiplier = BaseBalloonDamageMultiplier;
 		base.OnDestroy();
 	}
 
@@ -45,6 +57,7 @@ public class BalloonManager : NetworkBehaviour {
 	}
 
 	public GameObject balloonPrefab;
+
 	public Transform BalloonHolder;
 	[ServerRpc(RequireOwnership = false)]
 	void SpawnBalloonServerRpc(ulong teamID, int count) {

@@ -4,7 +4,6 @@ using Unity.Netcode;
 using UnityEngine;
 
 public class Balloon : NetworkBehaviour {
-	float flyTime = 5f;
 	[HideInInspector] public int tempPower;
 	[HideInInspector] public Team tempTeam;
 	[HideInInspector] public Color tempColor;
@@ -12,10 +11,12 @@ public class Balloon : NetworkBehaviour {
 	[HideInInspector] public NetworkVariable<int> power;
 	[HideInInspector] public NetworkVariable<Team> balloonTeam;
 	[HideInInspector] public NetworkVariable<Color> balloonColor;
+	Rigidbody2D rb;
 
-	float flightHeight = 4f;
 	NetworkVariable<float> realFlightHeight = new NetworkVariable<float>(4f);
+	NetworkVariable<float> flyTime = new NetworkVariable<float>(5f);
 	void Awake() {
+		rb = GetComponent<Rigidbody2D>();
 		powerTxt = transform.GetComponentInChildren<TextMeshPro>();
 	}
 
@@ -29,7 +30,7 @@ public class Balloon : NetworkBehaviour {
 		flyProgress.OnValueChanged += ProgressChanged;
 		GameStateManager.GameResultSetEvent += GameSet;
 		if (NetworkManager.Singleton.IsServer) {
-			realFlightHeight.Value = Random.Range(0.7f, 1.2f) * flightHeight;
+			realFlightHeight.Value = Random.Range(BalloonManager.FlightHeightMin, BalloonManager.FlightHeightMax);
 			power.Value = tempPower;
 			balloonTeam.Value = tempTeam;
 			balloonColor.Value = tempColor;
@@ -59,10 +60,11 @@ public class Balloon : NetworkBehaviour {
 	float currSetProgress = 0f;
 	void UpdateFlyProgress() {
 		if (NetworkManager.Singleton.IsServer) {
-			flyProgress.Value = Mathf.Clamp01(flyProgress.Value + Time.deltaTime / flyTime);
+			flyTime.Value = BalloonManager.Flytime;
+			flyProgress.Value = Mathf.Clamp01(flyProgress.Value + Time.deltaTime / flyTime.Value);
 			SetPosition(flyProgress.Value);
 		} else {
-			localProgress = Mathf.Clamp01(localProgress + Time.deltaTime / flyTime);
+			localProgress = Mathf.Clamp01(localProgress + Time.deltaTime / flyTime.Value);
 			if (interpolation != null) return;
 			SetPosition(localProgress);
 		}
@@ -86,7 +88,7 @@ public class Balloon : NetworkBehaviour {
 			SetPosition(current);
 		} else if (currSetProgress > current) {
 			if (interpolation != null) StopCoroutine(interpolation);
-			localProgress = currSetProgress;
+			localProgress = Mathf.Clamp01(currSetProgress - Time.deltaTime / flyTime.Value);
 		} else {
 			if (interpolation != null) StopCoroutine(interpolation);
 			interpolation = StartCoroutine(InterpolatePosition());
@@ -109,7 +111,11 @@ public class Balloon : NetworkBehaviour {
 		float realProgress = progress;
 		if (balloonTeam.Value != BalloonManager.team) realProgress = 1 - progress;
 		float p = ProgressBehaviour(realProgress);
-		transform.position = GetProgressPosition(startP.Value, endP.Value, p);
+		if (progress == 0) {
+			transform.position = GetProgressPosition(startP.Value, endP.Value, p);
+			return;
+		}
+		rb.MovePosition(GetProgressPosition(startP.Value, endP.Value, p));
 	}
 	void PowerChanged(int prev, int curr) {
 		powerTxt.text = curr.ToString();

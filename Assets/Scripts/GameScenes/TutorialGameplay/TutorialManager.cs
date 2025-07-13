@@ -30,7 +30,6 @@ public class TutorialManager : MonoBehaviour {
 		GameStateManager.GameResultSetEvent += GameSet;
 
 		menuBtn.SetActive(false);
-		timer.SetActive(false);
 	}
 	void OnDisable() {
 		GameStateManager.GameStartEvent -= GameStarted;
@@ -196,10 +195,10 @@ public class TutorialManager : MonoBehaviour {
 		Time.timeScale = 1;
 		inputManager.SetNewTargetText(typeWordsList[1]);
 		ShowPanelWithText("The balloon takes 5 seconds to go across the bases.", 30f, new Vector2(0f, -100f));
-		while (t < 2.5f) {
+		while (t < 1.5f) {
 			Color backgroundC = darkBackgroundColor;
 			if (t > 1f) {
-				backgroundC = Color.Lerp(darkBackgroundColor, Color.clear, (t - 1) / 1.5f);
+				backgroundC = Color.Lerp(darkBackgroundColor, Color.clear, (t - 1) / 0.5f);
 			}
 			Vector2 tempPos = GetWorldPointToCanvasPoint(latestBalloon.transform.position);
 			shapeList.Clear();
@@ -327,7 +326,7 @@ public class TutorialManager : MonoBehaviour {
 		shapeList.Add(new PinholeShape(GetCenterOfRect(meaningRect), meaningRect.rect.size, 50f, PinholeShaderEditor.Shape.Rectangle));
 		SetupHighlights(shapeList);
 		yield return StartCoroutine(WaitForNext());
-		ShowPanelWithText("Alright, you're ready! Happy typing!!!\n\n\n<color=#FE25DF><b><i>The tutorial has been cleared!</color></b></i>", 30f, Vector2.down * 100f);
+		ShowPanelWithText("Alright, you're ready! Happy typing!!!\n\n\n<color=#FE25DF><b><i>The tutorial has been cleared!</color></b></i>", 30f, Vector2.down * 150f);
 		InputManager.CorrectEntryProcess += NewEntryNeeded;
 		InputManager.SkipAttemptResult += NewEntryNeeded;
 		PlayerPrefs.SetInt(TutorialManager.TutorialClearedPlayerPrefKey, 1);

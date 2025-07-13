@@ -74,7 +74,8 @@ public class GameStateManager : NetworkBehaviour {
 		return CurrGameResult == GameResult.Undecided && !GameData.GamePaused;
 	}
 
-	void TeamLoss(Team t) {
+	void TeamLoss(Team? t) {
+		if (t == null) GameResultSetClientRpc(GameResult.Draw);
 		GameResult r = GameResult.Team1Win;
 		if (t == Team.t1) r = GameResult.Team2Win;
 		GameResultSetClientRpc(r);

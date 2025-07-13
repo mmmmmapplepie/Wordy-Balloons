@@ -80,6 +80,9 @@ public class MainMenuUI : MonoBehaviour {
 
 		GameData.PlayMode = PlayModeEnum.Tutorial;
 
+		BalloonManager.FlightHeightMin = 2.5f;
+		BalloonManager.FlightHeightMax = 2.5f;
+
 		NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
 	}
 }

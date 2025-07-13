@@ -11,6 +11,8 @@ public class GameData : NetworkBehaviour {
 	public static HashSet<ulong> team1 = new HashSet<ulong>(), team2 = new HashSet<ulong>();
 	public static DictionaryMode Dictionary = DictionaryMode.Complete;
 	public static bool GamePaused = false;
+	public static GameEndingMode GameEndingMode;
+	public static float GameEndingModulationTime = 1;
 
 	public static Team GetTeamFromClientID(ulong ID) {
 		if (team1.Contains(ID)) return Team.t1;
@@ -23,3 +25,5 @@ public enum Team { t1, t2 };
 public enum GameMode { Normal, Eraser, Own_Enemy }
 public enum DictionaryMode { Beginner, Complete }
 public enum PlayModeEnum { Multiplayer, Tutorial, BasicPVE }
+public enum GameEndingMode { Endurance, Drain, SuddenDeath, Speedup, Damageup }
+
