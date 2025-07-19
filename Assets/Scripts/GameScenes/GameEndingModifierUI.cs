@@ -21,46 +21,56 @@ public class GameEndingModifierUI : MonoBehaviour {
 	public Slider slider;
 	public GameEndingModifierManager endingManager;
 	void EndModeOn() {
+		started = true;
 		t = 0f;
 		endModeUI.SetActive(true);
 		period = endingManager.gameEndModeOn == false ? GameData.GameEndingModulationTime * 60f : endingManager.timerPeriod;
 		SetText();
 	}
+	bool started = false;
 	float period = 10f;
 	float t = 0;
 	void Update() {
+		if (!started) return;
 		t += Time.deltaTime;
 		slider.value = Mathf.Clamp01((period - t) / period);
 	}
 
 
 	public TextMeshProUGUI mainTxt, pulseTxt;
-	void SetText() {
+	void SetText(bool effectsOn = false) {
+		if (effectsOn) {
+			pulseTxt.GetComponent<PulseEffect>().endScale = 1.2f;
+		}
 		switch (GameData.GameEndingMode) {
 			case GameEndingMode.Drain:
-				mainTxt.text = "Draining HP";
-				pulseTxt.text = "Draining HP";
+				SetTexts(effectsOn ? "DRAINING HP" : "HP DRAIN INCOMING");
 				break;
 			case GameEndingMode.SuddenDeath:
-				slider.gameObject.SetActive(false);
-				mainTxt.text = "Sudden Death";
-				pulseTxt.text = "Sudden Death";
+				if (effectsOn) {
+					slider.gameObject.SetActive(false);
+					SetTexts("SUDDEN DEATH");
+					mainTxt.transform.parent.GetComponent<RectTransform>().anchoredPosition = Vector2.down * 50f;
+				} else { SetTexts("SUDDEN DEATH INCOMING"); }
 				break;
 			case GameEndingMode.Speedup:
-				mainTxt.text = $"Speed {100 + (10 * modulatedCalls)}%";
-				pulseTxt.text = $"Speed {100 + (10 * modulatedCalls)}%";
+				SetTexts(effectsOn ? $"SPEED {100 + (10 * modulatedCalls)}%" : "SPEED-UP INCOMING");
 				break;
 			case GameEndingMode.Damageup:
-				mainTxt.text = $"Damage X {modulatedCalls + 1}";
-				pulseTxt.text = $"Damage X {modulatedCalls + 1}";
+				SetTexts(effectsOn ? $"DAMAGE X {modulatedCalls + 1}" : "DAMAGE-UP INCOMING");
 				break;
 		}
+	}
+	void SetTexts(string txt) {
+		mainTxt.text = txt;
+		pulseTxt.text = txt;
 	}
 
 
 	void EndingModulated() {
 		modulatedCalls++;
-		SetText();
+		t = 0f;
+		SetText(true);
 	}
 
 

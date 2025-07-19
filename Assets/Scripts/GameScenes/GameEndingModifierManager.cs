@@ -23,6 +23,8 @@ public class GameEndingModifierManager : NetworkBehaviour {
 	public float timerPeriod = 10f;
 
 	void Awake() {
+		// GameData.GameEndingModulationTime = 0.05f;
+		// GameData.GameEndingMode = GameEndingMode.Endurance;
 		GameStateManager.GameStartEvent += GameStarted;
 	}
 	public override void OnDestroy() {
@@ -43,8 +45,8 @@ public class GameEndingModifierManager : NetworkBehaviour {
 		t += Time.deltaTime;
 		if (gameEndModeOn == false && t > GameData.GameEndingModulationTime * 60f) {
 			gameEndModeOn = true;
-			Modify();
 			GameModeOnClientRpc();
+			Modify();
 			t -= GameData.GameEndingModulationTime * 60f;
 		} else if (t > timerPeriod) {
 			t -= timerPeriod;
@@ -55,31 +57,34 @@ public class GameEndingModifierManager : NetworkBehaviour {
 	void SetUpdatePeriod() {
 		switch (GameData.GameEndingMode) {
 			case GameEndingMode.Drain:
-				timerPeriod = 10f;
+				// timerPeriod = 10f;
+				timerPeriod = 1f;
 				break;
 			case GameEndingMode.SuddenDeath:
 				timerPeriod = float.PositiveInfinity;
 				break;
 			case GameEndingMode.Speedup:
-				timerPeriod = 10f;
+				// timerPeriod = 10f;
+				timerPeriod = 1f;
 				break;
 			case GameEndingMode.Damageup:
-				timerPeriod = 20f;
+				// timerPeriod = 20f;
+				timerPeriod = 1f;
 				break;
 		}
 	}
 	int calls = 0;
 	void Modify() {
+		calls++;
 		switch (GameData.GameEndingMode) {
 			case GameEndingMode.Drain:
-				BaseManager.DamageBase(Team.t1, 5);
-				BaseManager.DamageBase(Team.t2, 5);
+				BaseManager.DamageBase(Team.t1, 1);
+				BaseManager.DamageBase(Team.t2, 1);
 				break;
 			case GameEndingMode.SuddenDeath:
 				BalloonManager.BallonDamageMultiplier = int.MaxValue;
 				break;
 			case GameEndingMode.Speedup:
-				calls++;
 				BalloonManager.Flytime = BalloonManager.BaseFlytime / (1f + (0.1f * calls));
 				if (BalloonManager.Flytime == 0) BalloonManager.Flytime = Mathf.Epsilon;
 				break;

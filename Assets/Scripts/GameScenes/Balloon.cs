@@ -58,6 +58,8 @@ public class Balloon : NetworkBehaviour {
 	float smoothingTime = 0.5f;
 	float maxError = 0.1f;
 	float currSetProgress = 0f;
+
+	int ticks = 0;
 	void UpdateFlyProgress() {
 		if (NetworkManager.Singleton.IsServer) {
 			flyTime.Value = BalloonManager.Flytime;
@@ -80,7 +82,6 @@ public class Balloon : NetworkBehaviour {
 			HitBase();
 			return;
 		}
-
 		localProgress = current;
 		if (NetworkManager.Singleton.IsServer) return;
 		if (Mathf.Abs(currSetProgress - current) > maxError && currSetProgress < current) {
