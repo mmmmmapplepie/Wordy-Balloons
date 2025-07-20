@@ -17,6 +17,8 @@ public class LobbyManager : MonoBehaviour {
 	public const string Dictionary = "Dictionary";
 	public const string LobbyID = "LobbyID";
 	public const string GameMode = "GameMode";
+	public const string GameEndMode = "GameEndMode";
+	public const string GameEndTime = "GameEndTime";
 	public const string PlayerName = "PlayerName";
 
 	public static LobbyManager Instance;
@@ -171,7 +173,7 @@ public class LobbyManager : MonoBehaviour {
 
 
 	#region  lobbyCreation
-	public async void CreateLobby(string lobbyName, string mode, int lobbyMaxPlayerNumber, DictionaryMode dictionary) {
+	public async void CreateLobby(string lobbyName, string mode, int lobbyMaxPlayerNumber, DictionaryMode dictionary, GameEndingMode endMode, float time) {
 		if (hostLobby != null) return;
 		LobbyCreationBegin?.Invoke();
 		if (NGOConnected()) {
@@ -187,7 +189,9 @@ public class LobbyManager : MonoBehaviour {
 				Data = new Dictionary<string, DataObject> {
 					{GameMode, new DataObject(DataObject.VisibilityOptions.Public, mode)},
 					{RelayCode, new DataObject(DataObject.VisibilityOptions.Member, RelayCode)},
-					{Dictionary, new DataObject(DataObject.VisibilityOptions.Public, dictionary.ToString())}
+					{Dictionary, new DataObject(DataObject.VisibilityOptions.Public, dictionary.ToString())},
+					{GameEndMode, new DataObject(DataObject.VisibilityOptions.Public, endMode.ToString())},
+					{GameEndTime, new DataObject(DataObject.VisibilityOptions.Public, time.ToString())}
 				}
 			};
 			hostLobby = await TaskTimeout.AddTimeout<Lobby>(LobbyService.Instance.CreateLobbyAsync(lobbyName, lobbyMaxPlayerNumber, lobbyDetails));

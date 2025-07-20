@@ -36,10 +36,11 @@ public class GameEndingModifierManager : NetworkBehaviour {
 	void GameStarted() {
 		if (GameData.GameEndingMode == GameEndingMode.Endurance) return;
 		gameEndModeOn = false;
-		GameEndModeOnEvent?.Invoke();
+		GameEndModeOnEvent?.Invoke(false);
 	}
 	float t = 0;
-	public static event System.Action GameEndModeOnEvent, EndingModulated;
+	public static event System.Action EndingModulated;
+	public static event System.Action<bool> GameEndModeOnEvent;
 	void Update() {
 		if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer || gameEndModeOn == null) return;
 		t += Time.deltaTime;
@@ -48,7 +49,7 @@ public class GameEndingModifierManager : NetworkBehaviour {
 			GameModeOnClientRpc();
 			Modify();
 			t -= GameData.GameEndingModulationTime * 60f;
-		} else if (t > timerPeriod) {
+		} else if (gameEndModeOn == true && t > timerPeriod) {
 			t -= timerPeriod;
 			Modify();
 		}
@@ -102,7 +103,7 @@ public class GameEndingModifierManager : NetworkBehaviour {
 	[ClientRpc]
 	void GameModeOnClientRpc() {
 		SetUpdatePeriod();
-		GameEndModeOnEvent?.Invoke();
+		GameEndModeOnEvent?.Invoke(true);
 	}
 
 

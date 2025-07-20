@@ -9,12 +9,6 @@ using System;
 using Unity.Netcode;
 [DefaultExecutionOrder(-100)]
 public class LobbyUI : MonoBehaviour {
-
-	void Awake() {
-		SetGameModeDropdown();
-	}
-
-
 	#region subscribing/unsubscribing to events;
 
 	// having the // comment at the end of the event sub means that i have checked the things are correctly fired (only once) for the situation.
@@ -24,6 +18,7 @@ public class LobbyUI : MonoBehaviour {
 		MyLobby.SceneLoadingError += LoadingSceneError;
 		MyLobby.LoadingCountdown.OnValueChanged += LoadingCountdown;
 		MyLobby.LoadingSceneBool.OnValueChanged += LoadingSceneStateChange;
+		MyLobby.LobbyCreatedEvent += LobbyCreationSuccess;
 
 		LobbyManager.AuthenticationBegin += OpenLoadingPanel;
 		LobbyManager.AuthenticationSuccess += CloseAllPanels;
@@ -32,7 +27,6 @@ public class LobbyUI : MonoBehaviour {
 		InternetConnectivityCheck.ConnectedStateEvent += NetworkConnectionState;
 
 		LobbyManager.LobbyCreationBegin += OpenLoadingPanel;
-		MyLobby.LobbyCreatedEvent += LobbyCreationSuccess;
 		LobbyManager.LobbyCreationFailure += LobbyCreationFail;
 
 		LobbyManager.HearbeatFailure += HearbeatFail;
@@ -54,6 +48,7 @@ public class LobbyUI : MonoBehaviour {
 		MyLobby.SceneLoadingError -= LoadingSceneError;
 		MyLobby.LoadingCountdown.OnValueChanged -= LoadingCountdown;
 		MyLobby.LoadingSceneBool.OnValueChanged -= LoadingSceneStateChange;
+		MyLobby.LobbyCreatedEvent -= LobbyCreationSuccess;
 
 		LobbyManager.AuthenticationBegin -= OpenLoadingPanel;
 		LobbyManager.AuthenticationSuccess -= CloseAllPanels;
@@ -62,7 +57,6 @@ public class LobbyUI : MonoBehaviour {
 		InternetConnectivityCheck.ConnectedStateEvent -= NetworkConnectionState;
 
 		LobbyManager.LobbyCreationBegin -= OpenLoadingPanel;
-		MyLobby.LobbyCreatedEvent -= LobbyCreationSuccess;
 		LobbyManager.LobbyCreationFailure -= LobbyCreationFail;
 
 		LobbyManager.HearbeatFailure -= HearbeatFail;
@@ -111,24 +105,13 @@ public class LobbyUI : MonoBehaviour {
 		lobbyCreationPanel.SetActive(false);
 	}
 
-	List<string> gameModeOptions;
-	void SetGameModeDropdown() {
-		gameModeOptions = new List<string>(Enum.GetNames(typeof(GameMode)));
-		lobbyModeDropDown.SetOptions(gameModeOptions);
-	}
-
 	//imma disable changing lobby mode and name once started.
-	public string ConvertDropDownValueToGameModeString(int index) {
-		return gameModeOptions[index];
-	}
-	public GameMode ConvertDropDownValueToGameMode(int index) {
-		Enum.TryParse(gameModeOptions[index], out GameMode mode);
-		return mode;
-	}
+
 	public SliderToggle dictionaryToggle;
+	public TMP_Dropdown endMode, endTime;
 	public void CreateLobby() {
 		if (!CheckInternetConnected()) return;
-		LobbyManager.Instance.CreateLobby(lobbyName.text, ConvertDropDownValueToGameModeString(lobbyModeDropDown.value), lobbyPlayerNumDropDown.value + 2, GameData.Dictionary = dictionaryToggle.onRightSide ? DictionaryMode.Complete : DictionaryMode.Beginner);
+		LobbyManager.Instance.CreateLobby(lobbyName.text, ((GameMode)lobbyModeDropDown.value).ToString(), lobbyPlayerNumDropDown.value + 2, GameData.Dictionary = dictionaryToggle.onRightSide ? DictionaryMode.Complete : DictionaryMode.Beginner, (GameEndingMode)endMode.value, endTime.value + 1);
 	}
 	public void QuickJoin() {
 		if (!CheckInternetConnected()) return;
@@ -263,8 +246,10 @@ public class LobbyUI : MonoBehaviour {
 
 	void LobbyJoined() {
 		lobbyNameTxt.text = LobbyManager.Instance.joinedLobby.Name;
-		lobbyCodeTxt.transform.parent.gameObject.SetActive(NetworkManager.Singleton.IsServer);
-		lobbyPublicBtn.gameObject.SetActive(NetworkManager.Singleton.IsServer);
+		CanvasGroup btnGrp = lobbyPublicBtn.transform.parent.GetComponent<CanvasGroup>();
+		btnGrp.alpha = NetworkManager.Singleton.IsServer ? 1 : 0.5f;
+		btnGrp.interactable = NetworkManager.Singleton.IsServer;
+		btnGrp.blocksRaycasts = NetworkManager.Singleton.IsServer;
 		HidePanelsExceptChosen();
 		startGameBtn.interactable = false;
 		stopGameLoadBtn.SetActive(false);
@@ -274,18 +259,16 @@ public class LobbyUI : MonoBehaviour {
 		LobbyUpdate(LobbyManager.Instance.joinedLobby);
 		ToggleLobby(true);
 	}
-	[SerializeField] TextMeshProUGUI lobbyModeTxt, dictionaryModeTxt, lobbyCodeTxt;
+	[SerializeField] TextMeshProUGUI lobbyModeTxt, dictionaryModeTxt, lobbyCodeTxt, gameEndModeTxt;
 	void LobbyUpdate(Lobby lobby) {
 		if (lobby == null) return;
-		lobbyModeTxt.text = lobby.Data[LobbyManager.GameMode].Value;
+		lobbyModeTxt.text = lobby.Data[LobbyManager.GameMode].Value == ((GameMode)2).ToString() ? "Own Enemy" : lobby.Data[LobbyManager.GameMode].Value;
 		string dictionaryMode = lobby.Data[LobbyManager.Dictionary].Value;
 		dictionaryModeTxt.text = dictionaryMode;
+		gameEndModeTxt.text = lobby.Data[LobbyManager.GameEndMode].Value + " (" + lobby.Data[LobbyManager.GameEndTime].Value + ")";
+		if (lobby.Data[LobbyManager.GameEndMode].Value == "Endurance") gameEndModeTxt.text = "Endurance";
 		Enum.TryParse<DictionaryMode>(dictionaryMode, out GameData.Dictionary);
-		if (LobbyManager.Instance.hostLobby != null) {
-			lobbyCodeTxt.text = lobby.LobbyCode;
-		}
-
-
+		lobbyCodeTxt.text = lobby.LobbyCode;
 	}
 
 	void HearbeatFail() {

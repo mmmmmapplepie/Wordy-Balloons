@@ -21,7 +21,7 @@ public class GameModeInputManager : MonoBehaviour {
 			case GameMode.Eraser:
 				wrongInputAction = Eraser;
 				break;
-			case GameMode.Own_Enemy:
+			case GameMode.OwnEnemy:
 				wrongInputAction = OwnEnemy;
 				break;
 		}

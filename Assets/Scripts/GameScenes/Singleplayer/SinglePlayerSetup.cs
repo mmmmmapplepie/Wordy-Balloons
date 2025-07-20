@@ -11,6 +11,7 @@ using UnityEngine.UI;
 public class SinglePlayerSetup : NetworkBehaviour {
 	public Slider speedSlider;
 	public TextMeshProUGUI sliderValue;
+	public TMP_Dropdown endMode, endTime;
 	void Start() {
 		if (PlayerPrefs.HasKey(AISpeed)) {
 			SetAISpeed(PlayerPrefs.GetInt(AISpeed));
@@ -72,6 +73,8 @@ public class SinglePlayerSetup : NetworkBehaviour {
 		GameData.team2.Add(computerID);
 
 		GameData.PlayMode = PlayModeEnum.BasicPVE;
+		GameData.GameEndingMode = (GameEndingMode)endMode.value;
+		GameData.GameEndingModulationTime = endTime.value + 1;
 
 		NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
 	}

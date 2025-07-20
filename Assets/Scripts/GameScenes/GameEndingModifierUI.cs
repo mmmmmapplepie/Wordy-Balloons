@@ -20,11 +20,11 @@ public class GameEndingModifierUI : MonoBehaviour {
 	public GameObject endModeUI;
 	public Slider slider;
 	public GameEndingModifierManager endingManager;
-	void EndModeOn() {
+	void EndModeOn(bool endMode) {
 		started = true;
 		t = 0f;
 		endModeUI.SetActive(true);
-		period = endingManager.gameEndModeOn == false ? GameData.GameEndingModulationTime * 60f : endingManager.timerPeriod;
+		period = endMode == false ? GameData.GameEndingModulationTime * 60f : endingManager.timerPeriod;
 		SetText();
 	}
 	bool started = false;

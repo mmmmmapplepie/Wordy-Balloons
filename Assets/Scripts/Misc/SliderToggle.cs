@@ -35,7 +35,7 @@ public class SliderToggle : MonoBehaviour {
 		text.text = onRightSide ? rightText : leftText;
 
 		float t = 0;
-		while (t <= p) {
+		while (t < p) {
 			t += Time.unscaledDeltaTime;
 			float r = Mathf.SmoothStep(0, 1f, t / p);
 			sliderObj.transform.localPosition = Vector3.Lerp(sPos, tarPos, r);

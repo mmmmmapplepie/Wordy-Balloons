@@ -187,6 +187,8 @@ public class MyLobby : NetworkBehaviour {
 	void ClientStartedSuccess() {
 		// Debug.LogWarning("Client started");
 		if (LobbyManager.Instance.joinedLobby == null) { LeaveLobby(); return; }
+		Enum.TryParse<GameEndingMode>(LobbyManager.Instance.joinedLobby.Data[LobbyManager.GameEndMode].Value, false, out GameData.GameEndingMode);
+		float.TryParse(LobbyManager.Instance.joinedLobby.Data[LobbyManager.GameEndTime].Value, out GameData.GameEndingModulationTime);
 		SendLobbyJoinConfirmationServerRPC(AuthenticationService.Instance.PlayerId, NetworkManager.Singleton.LocalClientId, LobbyManager.playerName);
 	}
 
