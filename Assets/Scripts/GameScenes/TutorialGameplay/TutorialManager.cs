@@ -374,7 +374,7 @@ public class TutorialManager : MonoBehaviour {
 		if (currIndex == 3) currIndex++;
 		inputManager.SetNewTargetText(typeWordsList[currIndex]);
 	}
-	void GameSet(GameStateManager.GameResult result) {
+	void GameSet(GameResult result) {
 		StopAllCoroutines();
 		gameObject.SetActive(false);
 	}

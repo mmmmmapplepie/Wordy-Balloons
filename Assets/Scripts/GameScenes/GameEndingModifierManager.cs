@@ -44,11 +44,11 @@ public class GameEndingModifierManager : NetworkBehaviour {
 	void Update() {
 		if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer || gameEndModeOn == null) return;
 		t += Time.deltaTime;
-		if (gameEndModeOn == false && t > GameData.GameEndingModulationTime * 60f) {
+		if (gameEndModeOn == false && t > GameData.GameDecidingChangesStartTime * 60f) {
 			gameEndModeOn = true;
 			GameModeOnClientRpc();
 			Modify();
-			t -= GameData.GameEndingModulationTime * 60f;
+			t -= GameData.GameDecidingChangesStartTime * 60f;
 		} else if (gameEndModeOn == true && t > timerPeriod) {
 			t -= timerPeriod;
 			Modify();

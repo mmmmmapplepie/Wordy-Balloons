@@ -69,9 +69,10 @@ public class MainMenuUI : MonoBehaviour {
 		GameData.allColorOptions = colors;
 
 		GameData.ClientID_KEY_ColorIndex_VAL.Clear();
-		GameData.ClientID_KEY_LobbyID_VAL.Clear();
 		GameData.ClientID_KEY_ColorIndex_VAL.Add(selfID, 0);
 		GameData.ClientID_KEY_ColorIndex_VAL.Add(computerID, 1);
+		GameData.ClientID_KEY_LobbyID_VAL.Clear();
+		GameData.ClientID_KEY_LobbyID_NAME.Clear();
 
 		GameData.team1.Clear();
 		GameData.team1.Add(selfID);

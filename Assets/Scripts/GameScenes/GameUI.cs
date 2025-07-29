@@ -88,7 +88,7 @@ public class GameUI : MonoBehaviour {
 		guidePanel.SetActive(!guidePanel.activeInHierarchy);
 	}
 	public void GoToScene(string s) {
-		if (GameStateManager.CurrGameResult == GameStateManager.GameResult.Undecided) {
+		if (GameStateManager.CurrGameResult == GameResult.Undecided) {
 			SaveData?.Invoke();
 		}
 		NetworkManager.Singleton.Shutdown();
@@ -103,28 +103,31 @@ public class GameUI : MonoBehaviour {
 
 	#region Game Finish
 	[Header("Game Finish")] public GameObject menuBtn;
-	public GameObject connectionLost, victoryPanel, defeatPanel, endingPanel, gameplayUI;
-	void GameResultSet(GameStateManager.GameResult result) {
+	public GameObject drawPanel, victoryPanel, defeatPanel, disconnectPanel, endingPanel, gameplayUI;
+	void GameResultSet(GameResult result) {
+		if (result == GameResult.Undecided) return;
 		gameNotPausedTxt.transform.parent.gameObject.SetActive(false);
-		menuBtn.SetActive(false);
 		gameplayUI.SetActive(false);
+		menuBtn.SetActive(false);
 		menusPanel.SetActive(false);
-		if (result == GameStateManager.GameResult.Draw) {
-			menusPanel.SetActive(true);
-			connectionLost.SetActive(true);
-			return;
-		}
 		StartCoroutine(DelayedUIShow(result));
 	}
-	IEnumerator DelayedUIShow(GameStateManager.GameResult result) {
-		yield return new WaitForSeconds(BaseManager.BaseDestroyAnimationTime);
+	IEnumerator DelayedUIShow(GameResult result) {
+		if (result != GameResult.Disconnect) yield return new WaitForSeconds(BaseManager.BaseDestroyAnimationTime);
 		endingPanel.SetActive(true);
 		menusPanel.SetActive(true);
 		gameNotPausedTxt.transform.parent.gameObject.SetActive(false);
-		DisplayTeamWinning(result == GameStateManager.GameResult.Team1Win ? Team.t1 : Team.t2);
+		if (result == GameResult.Disconnect) {
+			disconnectPanel.SetActive(true);
+			yield break;
+		} else if (result == GameResult.Draw) {
+			drawPanel.SetActive(true);
+			endingPanel.GetComponent<Animator>().Play("Draw");
+			yield break;
+		} else {
+			DisplayTeamWinning(result == GameResult.Team1Win ? Team.t1 : Team.t2);
+		}
 	}
-
-
 
 	void DisplayTeamWinning(Team t) {
 		bool victory = t == BalloonManager.team;
@@ -140,10 +143,10 @@ public class GameUI : MonoBehaviour {
 
 
 
+
 	#endregion
-
-
-
-
-
 }
+
+
+
+

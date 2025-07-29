@@ -59,7 +59,6 @@ public class Balloon : NetworkBehaviour {
 	float maxError = 0.1f;
 	float currSetProgress = 0f;
 
-	int ticks = 0;
 	void UpdateFlyProgress() {
 		if (NetworkManager.Singleton.IsServer) {
 			flyTime.Value = BalloonManager.Flytime;
@@ -183,7 +182,7 @@ public class Balloon : NetworkBehaviour {
 	}
 
 
-	void GameSet(GameStateManager.GameResult r) {
+	void GameSet(GameResult r) {
 		if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer) return;
 		DestroyBalloon();
 	}

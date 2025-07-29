@@ -96,6 +96,7 @@ public class MyLobby : NetworkBehaviour {
 	#region LobbyVariables
 	Dictionary<ulong, int> ClientID_KEY_ColorIndex_VAL = new Dictionary<ulong, int>();
 	Dictionary<ulong, string> ClientID_KEY_LobbyID_VAL = new Dictionary<ulong, string>();
+	Dictionary<ulong, string> ClientID_KEY_LobbyID_NAME = new Dictionary<ulong, string>();
 	HashSet<ulong> team1 = new HashSet<ulong>(), team2 = new HashSet<ulong>();
 	List<LobbyPlayer> playersObjects = new List<LobbyPlayer>();
 	int teamMax = 3;
@@ -129,6 +130,7 @@ public class MyLobby : NetworkBehaviour {
 	void ResetLobbyVariables() {
 		ClientID_KEY_ColorIndex_VAL.Clear();
 		ClientID_KEY_LobbyID_VAL.Clear();
+		ClientID_KEY_LobbyID_NAME.Clear();
 		team1.Clear();
 		team2.Clear();
 		playersObjects.Clear();
@@ -158,11 +160,11 @@ public class MyLobby : NetworkBehaviour {
 			return;
 		}
 
-		StopTimeout(id);
+		StopLobbyJoinTimeout(id);
 		Coroutine newJoinTimeout = StartCoroutine(nameof(JoinConfirmationTimeout), id);
 		tempJoinedList.Add((id, newJoinTimeout));
 	}
-	bool StopTimeout(string id) {
+	bool StopLobbyJoinTimeout(string id) {
 		int inx = tempJoinedList.FindIndex(x => x.id == id);
 		if (inx != -1) {
 			StopCoroutine(tempJoinedList[inx].timeout);
@@ -188,14 +190,15 @@ public class MyLobby : NetworkBehaviour {
 		// Debug.LogWarning("Client started");
 		if (LobbyManager.Instance.joinedLobby == null) { LeaveLobby(); return; }
 		Enum.TryParse<GameEndingMode>(LobbyManager.Instance.joinedLobby.Data[LobbyManager.GameEndMode].Value, false, out GameData.GameEndingMode);
-		float.TryParse(LobbyManager.Instance.joinedLobby.Data[LobbyManager.GameEndTime].Value, out GameData.GameEndingModulationTime);
+		float.TryParse(LobbyManager.Instance.joinedLobby.Data[LobbyManager.GameEndTime].Value, out GameData.GameDecidingChangesStartTime);
 		SendLobbyJoinConfirmationServerRPC(AuthenticationService.Instance.PlayerId, NetworkManager.Singleton.LocalClientId, LobbyManager.playerName);
 	}
 
 	[ServerRpc(RequireOwnership = false)]
 	void SendLobbyJoinConfirmationServerRPC(string lobbyID, ulong clientID, string playerName) {
-		if (!StopTimeout(lobbyID)) return;//for disabling ppl joining once scene loading is started.
+		if (!StopLobbyJoinTimeout(lobbyID)) return;//for disabling ppl joining once scene loading is started.
 		if (!ClientID_KEY_LobbyID_VAL.ContainsKey(clientID)) ClientID_KEY_LobbyID_VAL.Add(clientID, lobbyID);
+		if (!ClientID_KEY_LobbyID_NAME.ContainsKey(clientID)) ClientID_KEY_LobbyID_NAME.Add(clientID, playerName);
 		LobbyPlayer playerObj = FindPlayerFromClientID(clientID);
 		if (playerObj != null) playerObj.ConfirmJoin(playerName);
 		CheckIfPlayersFilled();
@@ -230,6 +233,7 @@ public class MyLobby : NetworkBehaviour {
 		string lobbyID = null;
 		if (ClientID_KEY_LobbyID_VAL.ContainsKey(id)) lobbyID = ClientID_KEY_LobbyID_VAL[id];
 		ClientID_KEY_LobbyID_VAL.Remove(id);
+		ClientID_KEY_LobbyID_NAME.Remove(id);
 		RemovePlayer(id);
 		CheckIfPlayersFilled();
 
@@ -450,6 +454,7 @@ public class MyLobby : NetworkBehaviour {
 			GameData.allColorOptions = allColorOptions;
 			GameData.ClientID_KEY_ColorIndex_VAL = ClientID_KEY_ColorIndex_VAL;
 			GameData.ClientID_KEY_LobbyID_VAL = ClientID_KEY_LobbyID_VAL;
+			GameData.ClientID_KEY_LobbyID_NAME = ClientID_KEY_LobbyID_NAME;
 			GameData.team1 = team1; GameData.team2 = team2;
 		}
 	}

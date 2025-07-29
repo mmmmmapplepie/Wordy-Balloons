@@ -254,9 +254,8 @@ public class GameplayDataUI : NetworkBehaviour {
 	public TextMeshProUGUI mySpeed;
 	public TextMeshProUGUI myAccuracy, ourPoints, ourWrongEntries;
 	public TextMeshProUGUI opposingPoints, opposingWrongEntries;
-	void GameResultChange(GameStateManager.GameResult result) {
+	void GameResultChange(GameResult result) {
 		UpdateStats(result);
-		if (result == GameStateManager.GameResult.Draw) return;
 		mySpeed.text = avgSpeedTxt.text;
 		myAccuracy.text = accuracyTxt.text;
 		ourPoints.text = (BalloonManager.team == Team.t1 ? team1Points.Value : team2Points.Value).ToString() + " (" + pointsContributedByMe.ToString() + ")";
@@ -265,13 +264,14 @@ public class GameplayDataUI : NetworkBehaviour {
 		opposingPoints.text = (BalloonManager.team == Team.t1 ? team2Points.Value : team1Points.Value).ToString();
 		opposingWrongEntries.text = (BalloonManager.team == Team.t1 ? team2WrongEntries.Value : team1WrongEntries.Value).ToString();
 	}
+	//always gives loss
 	void UpdateStats() {
-		GameStateManager.GameResult loss = GameStateManager.GameResult.Team1Win;
-		if (BalloonManager.team == Team.t1) loss = GameStateManager.GameResult.Team2Win;
+		GameResult loss = GameResult.Team1Win;
+		if (BalloonManager.team == Team.t1) loss = GameResult.Team2Win;
 		UpdateStats(loss);
 	}
 	bool dataUpdated = false;
-	void UpdateStats(GameStateManager.GameResult r) {
+	void UpdateStats(GameResult r) {
 		if (dataUpdated) return;
 		dataUpdated = true;
 		if (GameData.PlayMode == PlayModeEnum.Tutorial) return;
@@ -298,9 +298,9 @@ public class GameplayDataUI : NetworkBehaviour {
 
 		Stats.SetData();
 	}
-	int GetWinDrawLossResult(GameStateManager.GameResult result) {
-		if (GameStateManager.GameResult.Draw == result) return 0;
-		else if (result == GameStateManager.GameResult.Team1Win && BalloonManager.team == Team.t1 || result == GameStateManager.GameResult.Team2Win && BalloonManager.team == Team.t2) return 1;
+	int GetWinDrawLossResult(GameResult result) {
+		if (GameResult.Draw == result || GameResult.Disconnect == result) return 0;
+		else if (result == GameResult.Team1Win && BalloonManager.team == Team.t1 || result == GameResult.Team2Win && BalloonManager.team == Team.t2) return 1;
 		else return -1;
 	}
 

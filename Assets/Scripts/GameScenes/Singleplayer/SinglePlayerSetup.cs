@@ -61,9 +61,10 @@ public class SinglePlayerSetup : NetworkBehaviour {
 		GameData.allColorOptions = colors;
 
 		GameData.ClientID_KEY_ColorIndex_VAL.Clear();
-		GameData.ClientID_KEY_LobbyID_VAL.Clear();
 		GameData.ClientID_KEY_ColorIndex_VAL.Add(selfID, 0);
 		GameData.ClientID_KEY_ColorIndex_VAL.Add(computerID, 1);
+		GameData.ClientID_KEY_LobbyID_VAL.Clear();
+		GameData.ClientID_KEY_LobbyID_NAME.Clear();
 
 		GameData.Dictionary = dictionaryToggle.onRightSide ? DictionaryMode.Complete : DictionaryMode.Beginner;
 
@@ -74,7 +75,7 @@ public class SinglePlayerSetup : NetworkBehaviour {
 
 		GameData.PlayMode = PlayModeEnum.BasicPVE;
 		GameData.GameEndingMode = (GameEndingMode)endMode.value;
-		GameData.GameEndingModulationTime = endTime.value + 1;
+		GameData.GameDecidingChangesStartTime = endTime.value + 1;
 
 		NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
 	}

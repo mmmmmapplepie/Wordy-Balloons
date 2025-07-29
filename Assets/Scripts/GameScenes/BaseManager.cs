@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class BaseManager : NetworkBehaviour {
 
-	const int DefaultMaxHP = 100, TutorialMaxHP = 15;
+	const int DefaultMaxHP = 1, TutorialMaxHP = 15;
 	public static NetworkVariable<int> team1HP = new NetworkVariable<int>(DefaultMaxHP);
 	public static NetworkVariable<int> team2HP = new NetworkVariable<int>
 	(DefaultMaxHP);
@@ -116,11 +116,16 @@ public class BaseManager : NetworkBehaviour {
 	public Sprite baseMain_Destroyed, basePipe_Destroyed, baseCannon_Destroyed;
 	public AudioClip baseDestroySound, popSound, finalDestroySound;
 
-	void ResultChanged(GameStateManager.GameResult result) {
-		if (result == GameStateManager.GameResult.Undecided || result == GameStateManager.GameResult.Draw) return;
+	void ResultChanged(GameResult result) {
+		if (result == GameResult.Undecided || result == GameResult.Disconnect) return;
+		if (result == GameResult.Draw) {
+			StartCoroutine(BaseDestroyAnimation(homeBase));
+			StartCoroutine(BaseDestroyAnimation(awayBase));
+			return;
+		}
 		Transform losingBase = homeBase;
-		if (result == GameStateManager.GameResult.Team1Win && BalloonManager.team == Team.t1) losingBase = awayBase;
-		if (result == GameStateManager.GameResult.Team2Win && BalloonManager.team == Team.t2) losingBase = awayBase;
+		if (result == GameResult.Team1Win && BalloonManager.team == Team.t1) losingBase = awayBase;
+		if (result == GameResult.Team2Win && BalloonManager.team == Team.t2) losingBase = awayBase;
 		StartCoroutine(BaseDestroyAnimation(losingBase));
 	}
 	public CameraShaker camShaker;

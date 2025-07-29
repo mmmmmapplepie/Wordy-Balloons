@@ -24,7 +24,7 @@ public class GameEndingModifierUI : MonoBehaviour {
 		started = true;
 		t = 0f;
 		endModeUI.SetActive(true);
-		period = endMode == false ? GameData.GameEndingModulationTime * 60f : endingManager.timerPeriod;
+		period = endMode == false ? GameData.GameDecidingChangesStartTime * 60f : endingManager.timerPeriod;
 		SetText();
 	}
 	bool started = false;

@@ -24,12 +24,13 @@ public class InternetConnectivityCheck : MonoBehaviour {
 			UnityWebRequest ping = UnityWebRequest.Get(targetURL);
 			ping.downloadHandler = null;
 			ping.timeout = timeoutTime;
+			float sendTime = Time.unscaledTime;
 			yield return ping.SendWebRequest();
 
 			ConnectedStateEvent?.Invoke(!(ping.result == UnityWebRequest.Result.ConnectionError));
 			connected = !(ping.result == UnityWebRequest.Result.ConnectionError);
 
-			yield return new WaitForSecondsRealtime(timeoutTime);
+			yield return new WaitForSecondsRealtime(Mathf.Max(0.01f, timeoutTime - (Time.unscaledTime - sendTime)));
 		}
 
 	}

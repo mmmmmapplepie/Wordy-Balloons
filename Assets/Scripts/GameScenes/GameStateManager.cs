@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 
 public class GameStateManager : NetworkBehaviour {
 	void Awake() {
-		// GameRunning = GameData.InSinglePlayerMode;
 		CountdownFinished = false;
 		CurrGameResult = GameResult.Undecided;
 	}
@@ -17,7 +16,8 @@ public class GameStateManager : NetworkBehaviour {
 
 		BaseManager.TeamLose += TeamLoss;
 
-		IngameNetcodeAndSceneManager.GameResultChangeByConnection += SetGameResult;
+		IngameNetcodeAndSceneManager.DisconnectingEvent += Disconnected;
+		IngameNetcodeAndSceneManager.TeamEmptyEvent += TeamEmpty;
 	}
 	public override void OnNetworkDespawn() {
 		if (NetworkManager.SceneManager != null) NetworkManager.SceneManager.OnLoadEventCompleted -= SceneLoadedForAll;
@@ -25,23 +25,30 @@ public class GameStateManager : NetworkBehaviour {
 
 		BaseManager.TeamLose -= TeamLoss;
 
-		IngameNetcodeAndSceneManager.GameResultChangeByConnection -= SetGameResult;
+		IngameNetcodeAndSceneManager.DisconnectingEvent -= Disconnected;
+		IngameNetcodeAndSceneManager.TeamEmptyEvent -= TeamEmpty;
 		base.OnNetworkDespawn();
 	}
 
 	const int countDownTime = 3;
 	private void SceneLoadedForAll(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut) {
-		if (NetworkManager.Singleton.IsServer) StartCoroutine(StartCountDown());
+		if (NetworkManager.Singleton.IsServer) {
+			print("players timeout on loading " + clientsTimedOut.Count);
+			foreach (ulong id in clientsTimedOut) {
+				NetworkManager.Singleton.DisconnectClient(id);
+			}
+			StartCoroutine(StartCountDown());
+		}
 	}
 
 	NetworkVariable<int> countDown_NV = new NetworkVariable<int>(countDownTime + 1);
 	IEnumerator StartCountDown() {
-		if (GameStateManager.CurrGameResult != GameStateManager.GameResult.Undecided) yield break;
+		if (GameStateManager.CurrGameResult != GameResult.Undecided) yield break;
 		yield return new WaitForSeconds(0.3f);
 		int t = countDownTime;
 		// countDown_NV.Value = 0;
 		while (t > 0) {
-			if (GameStateManager.CurrGameResult != GameStateManager.GameResult.Undecided) yield break;
+			if (GameStateManager.CurrGameResult != GameResult.Undecided) yield break;
 			countDown_NV.Value = t;
 			t--;
 			yield return new WaitForSeconds(1);
@@ -83,15 +90,27 @@ public class GameStateManager : NetworkBehaviour {
 
 	[ClientRpc]
 	void GameResultSetClientRpc(GameResult r) {
+		print("Game Set from RPC: " + r.ToString());
 		SetGameResult(r);
 	}
 	void SetGameResult(GameResult r) {
 		if (CurrGameResult != GameResult.Undecided) return;
 		CurrGameResult = r;
 		GameResultSetEvent?.Invoke(r);
-		// IngameNetcodeAndSceneManager.ShutDownNetwork();
 	}
 
 
-	public enum GameResult { Undecided, Team1Win, Team2Win, Draw }
+	void Disconnected() {
+		SetGameResult(GameResult.Disconnect);
+	}
+
+	void TeamEmpty(Team nonEmptyTeam) {
+		if (nonEmptyTeam == Team.t1) {
+			GameResultSetClientRpc(GameResult.Team1Win);
+		} else {
+			GameResultSetClientRpc(GameResult.Team2Win);
+		}
+	}
 }
+
+

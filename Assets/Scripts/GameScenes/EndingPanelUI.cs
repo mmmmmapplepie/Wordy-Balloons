@@ -5,15 +5,19 @@ public class EndingPanelUI : MonoBehaviour {
 	void Awake() {
 		AudioPlayer.Instance.AddNewSound(victorySound);
 		AudioPlayer.Instance.AddNewSound(defeatSound);
+		AudioPlayer.Instance.AddNewSound(drawSound);
 	}
-	public Sound victorySound, defeatSound;
-	public void PlaySound(bool victory) {
-		AudioPlayer.Instance.PlaySound(victory ? victorySound.Name : defeatSound.Name, VolumeControl.GetEffectVol());
+	public Sound victorySound, defeatSound, drawSound;
+	public void PlaySound(Sound s) {
+		AudioPlayer.Instance.PlaySound(s.Name, VolumeControl.GetEffectVol());
 	}
 	public void PlayVictory() {
-		PlaySound(true);
+		PlaySound(victorySound);
 	}
 	public void PlayDefeat() {
-		PlaySound(false);
+		PlaySound(defeatSound);
+	}
+	public void PlayDraw() {
+		PlaySound(drawSound);
 	}
 }
