@@ -33,10 +33,6 @@ public class GameStateManager : NetworkBehaviour {
 	const int countDownTime = 3;
 	private void SceneLoadedForAll(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut) {
 		if (NetworkManager.Singleton.IsServer) {
-			print("players timeout on loading " + clientsTimedOut.Count);
-			foreach (ulong id in clientsTimedOut) {
-				NetworkManager.Singleton.DisconnectClient(id);
-			}
 			StartCoroutine(StartCountDown());
 		}
 	}

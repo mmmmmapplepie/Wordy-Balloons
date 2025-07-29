@@ -4,6 +4,7 @@ using System.Linq;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using WebSocketSharp;
 
 public class IngameNetcodeAndSceneManager : NetworkBehaviour {
@@ -14,7 +15,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		base.OnNetworkSpawn();
 		NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
 		InternetConnectivityCheck.ConnectedStateEvent += ConnectionChanged;
-
+		NetworkManager.SceneManager.OnLoadEventCompleted += SceneLoaded;
 		if (NetworkManager.IsServer) {
 			UpdateConnectedPlayers();
 		}
@@ -24,6 +25,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		if (NetworkManager.Singleton == null) return;
 		NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnectCallback;
 		InternetConnectivityCheck.ConnectedStateEvent -= ConnectionChanged;
+		NetworkManager.SceneManager.OnLoadEventCompleted -= SceneLoaded;
 
 	}
 	public override void OnDestroy() {
@@ -52,7 +54,6 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		if (clientID == NetworkManager.Singleton.LocalClientId) {
 			disconnectIssueTxt.text = "Disconnected from session";
 			DisconnectingEvent?.Invoke();
-			ShutDownNetwork();
 		}
 	}
 	void UpdateConnectedPlayers() {
@@ -65,6 +66,15 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 			LCID.Remove(pair.Key);
 		}
 		CheckTeamEmpty();
+	}
+	private void SceneLoaded(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut) {
+		if (NetworkManager.Singleton.IsServer) {
+			print("players timeout on loading " + clientsTimedOut.Count);
+			foreach (ulong id in clientsTimedOut) {
+				OnClientDisconnectCallback(id);
+				NetworkManager.Singleton.DisconnectClient(id);
+			}
+		}
 	}
 	void CheckTeamEmpty() {
 		Team? teamRemaining = null;
@@ -90,7 +100,6 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 			if (connectionFalseTicks == 2) {
 				disconnectIssueTxt.text = "Internet unavailable";
 				DisconnectingEvent?.Invoke();
-				ShutDownNetwork();
 			}
 		}
 	}
@@ -138,7 +147,6 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 			disconnectIssueTxt.text = "Host Timeout";
 			ChangeReconnectionState(false);
 			DisconnectingEvent?.Invoke();
-			ShutDownNetwork();
 		}
 	}
 	List<ulong> idsPendingWithPendingReplies = new List<ulong>();
