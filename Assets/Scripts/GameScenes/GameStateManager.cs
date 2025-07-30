@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public class GameStateManager : NetworkBehaviour {
 	void Awake() {
 		CountdownFinished = false;
-		CurrGameResult = GameResult.Undecided;
+		CurrGameState = GameState.Countdown;
 	}
 	public override void OnNetworkSpawn() {
 		base.OnNetworkSpawn();
@@ -39,12 +39,12 @@ public class GameStateManager : NetworkBehaviour {
 
 	NetworkVariable<int> countDown_NV = new NetworkVariable<int>(countDownTime + 1);
 	IEnumerator StartCountDown() {
-		if (GameStateManager.CurrGameResult != GameResult.Undecided) yield break;
+		if (GameStateManager.CurrGameState != GameState.Countdown) yield break;
 		yield return new WaitForSeconds(0.3f);
 		int t = countDownTime;
 		// countDown_NV.Value = 0;
 		while (t > 0) {
-			if (GameStateManager.CurrGameResult != GameResult.Undecided) yield break;
+			if (GameStateManager.CurrGameState != GameState.Countdown) yield break;
 			countDown_NV.Value = t;
 			t--;
 			yield return new WaitForSeconds(1);
@@ -53,58 +53,61 @@ public class GameStateManager : NetworkBehaviour {
 	}
 	public static event System.Action<int> countDownChanged;
 	public static event System.Action GameStartEvent;
-	public static event System.Action<GameResult> GameResultSetEvent;
+	public static event System.Action<GameState> GameResultSetEvent;
 	public static bool CountdownFinished { get; private set; }
-	public static GameResult CurrGameResult;
+	public static GameState CurrGameState;
 	void CountDownChanged(int prev, int newVal) {
-		if (CurrGameResult != GameResult.Undecided) {
+		if (CurrGameState != GameState.Countdown) {
 			StopAllCoroutines();
 			return;
 		}
 		countDownChanged?.Invoke(newVal);
 		if (newVal == 0) {
 			CountdownFinished = true;
+			GameStateManager.CurrGameState = GameState.InPlay;
 			GameStartEvent?.Invoke();
 		}
 	}
 	void Update() {
-		if (CountdownFinished == false && countDown_NV.Value == 0 && IsGameRunning()) {
+		if (CountdownFinished == false && countDown_NV.Value <= 0 && !GameData.GamePaused && CurrGameState == GameState.Countdown) {
 			CountdownFinished = true;
+			GameStateManager.CurrGameState = GameState.InPlay;
 			GameStartEvent?.Invoke();
 		}
 	}
 	public static bool IsGameRunning() {
-		return CurrGameResult == GameResult.Undecided && !GameData.GamePaused;
+		return CurrGameState == GameState.InPlay && !GameData.GamePaused;
 	}
 
 	void TeamLoss(Team? t) {
-		if (t == null) GameResultSetClientRpc(GameResult.Draw);
-		GameResult r = GameResult.Team1Win;
-		if (t == Team.t1) r = GameResult.Team2Win;
+		if (t == null) GameResultSetClientRpc(GameState.Draw);
+		GameState r = GameState.Team1Win;
+		if (t == Team.t1) r = GameState.Team2Win;
 		GameResultSetClientRpc(r);
 	}
 
 	[ClientRpc]
-	void GameResultSetClientRpc(GameResult r) {
+	void GameResultSetClientRpc(GameState r) {
 		print("Game Set from RPC: " + r.ToString());
 		SetGameResult(r);
 	}
-	void SetGameResult(GameResult r) {
-		if (CurrGameResult != GameResult.Undecided) return;
-		CurrGameResult = r;
+	void SetGameResult(GameState r) {
+		if (CurrGameState != GameState.InPlay && CurrGameState != GameState.Countdown) return;
+		CurrGameState = r;
+		print("game result set: " + r.ToString());
 		GameResultSetEvent?.Invoke(r);
 	}
 
 
 	void Disconnected() {
-		SetGameResult(GameResult.Disconnect);
+		SetGameResult(GameState.Disconnect);
 	}
 
 	void TeamEmpty(Team nonEmptyTeam) {
 		if (nonEmptyTeam == Team.t1) {
-			GameResultSetClientRpc(GameResult.Team1Win);
+			GameResultSetClientRpc(GameState.Team1Win);
 		} else {
-			GameResultSetClientRpc(GameResult.Team2Win);
+			GameResultSetClientRpc(GameState.Team2Win);
 		}
 	}
 }

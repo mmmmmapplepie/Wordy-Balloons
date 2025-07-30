@@ -25,7 +25,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		if (NetworkManager.Singleton == null) return;
 		NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnectCallback;
 		InternetConnectivityCheck.ConnectedStateEvent -= ConnectionChanged;
-		NetworkManager.SceneManager.OnLoadEventCompleted -= SceneLoaded;
+		if (NetworkManager.SceneManager != null) NetworkManager.SceneManager.OnLoadEventCompleted -= SceneLoaded;
 
 	}
 	public override void OnDestroy() {
@@ -35,10 +35,10 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		base.OnDestroy();
 		Time.timeScale = 1f;
 	}
-	void GameResultSet(GameResult r) {
+	void GameResultSet(GameState r) {
 		ChangeReconnectionState(false);
-		ShutDownNetwork();
-		// Invoke(nameof(ShutDownNetwork), BaseManager.BaseDestroyAnimationTime);
+		// ShutDownNetwork();
+		if (r != GameState.Disconnect) Invoke(nameof(ShutDownNetwork), BaseManager.BaseDestroyAnimationTime);
 	}
 
 	void OnClientDisconnectCallback(ulong clientID) {
@@ -52,7 +52,12 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 			UpdateConnectedPlayers();
 		}
 		if (clientID == NetworkManager.Singleton.LocalClientId) {
+			print("self disconnect");
 			disconnectIssueTxt.text = "Disconnected from session";
+			DisconnectingEvent?.Invoke();
+		} else if (clientID == NetworkManager.ServerClientId) {
+			print("host disconnect");
+			disconnectIssueTxt.text = "Host disconnected";
 			DisconnectingEvent?.Invoke();
 		}
 	}
@@ -94,7 +99,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 
 	int connectionFalseTicks = 0;
 	void ConnectionChanged(bool connected) {
-		print("connection state of: " + connected);
+		// print("connection state of: " + connected);
 		if (connected) { connectionFalseTicks = 0; } else {
 			connectionFalseTicks++;
 			if (connectionFalseTicks == 2) {
@@ -110,11 +115,12 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 
 
 	#region connectionHandlingPinging
-	float pingInterval = 3f;
-	float pingWaitTime = 8f;
+	const float pingInterval = 3f, pingWaitTime = 8f;
+	const int pauseMisses = 2, disconnectMisses = 4;
+
 	void Update() {
 		if (GameData.PlayMode != PlayModeEnum.Multiplayer) return;
-		if (GameStateManager.CurrGameResult != GameResult.Undecided) return;
+		if (GameStateManager.CurrGameState != GameState.InPlay) return;
 
 		if (NetworkManager.Singleton.IsHost) {
 			PingClientsForConnection();
@@ -137,8 +143,9 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	public GameObject reconnectingPanel;
 	public TextMeshProUGUI disconnectIssueTxt, waitingForPlayersTxt;
 
-	float latestServerPingReceivedTime = 0f;
+	float latestServerPingReceivedTime = -100f;
 	void CheckServerUnresponsive() {
+		if (latestServerPingReceivedTime < 0) latestServerPingReceivedTime = Time.unscaledTime;
 		if (Time.unscaledTime - latestServerPingReceivedTime > pingInterval * 1.5f) {
 			waitingForPlayersTxt.text = "Host Unresponsive";
 			ChangeReconnectionState(true);
@@ -161,9 +168,9 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 			}
 			reconnectingClients.Add(id);
 		}
-		foreach (ulong id in reconnectingClients) {
-			print("reconnecting to: id-" + id);
-		}
+		// foreach (ulong id in reconnectingClients) {
+		// 	print("reconnecting to: id-" + id);
+		// }
 		if (reconnectingClients.Count > 0) {
 			List<string> nameslist = new List<string>();
 			foreach (ulong id in reconnectingClients) {
@@ -199,13 +206,13 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	void PauseGameClientRpc(string names) {
 		string displayString = names.Replace(NameSeparator, "\n");
 		waitingForPlayersTxt.text = "PLAYER(S) TRYING TO RECONNECT:\n" + displayString;
-		if (GameStateManager.CurrGameResult == GameResult.Undecided) {
+		if (GameStateManager.CurrGameState == GameState.InPlay) {
 			ChangeReconnectionState(true);
 		}
 	}
 	[ClientRpc]
 	void ResumeGameClientRpc() {
-		if (GameStateManager.CurrGameResult == GameResult.Undecided) {
+		if (GameStateManager.CurrGameState == GameState.InPlay) {
 			ChangeReconnectionState(false);
 		}
 	}

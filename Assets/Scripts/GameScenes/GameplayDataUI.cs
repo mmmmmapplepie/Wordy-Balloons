@@ -254,7 +254,7 @@ public class GameplayDataUI : NetworkBehaviour {
 	public TextMeshProUGUI mySpeed;
 	public TextMeshProUGUI myAccuracy, ourPoints, ourWrongEntries;
 	public TextMeshProUGUI opposingPoints, opposingWrongEntries;
-	void GameResultChange(GameResult result) {
+	void GameResultChange(GameState result) {
 		UpdateStats(result);
 		mySpeed.text = avgSpeedTxt.text;
 		myAccuracy.text = accuracyTxt.text;
@@ -266,12 +266,12 @@ public class GameplayDataUI : NetworkBehaviour {
 	}
 	//always gives loss
 	void UpdateStats() {
-		GameResult loss = GameResult.Team1Win;
-		if (BalloonManager.team == Team.t1) loss = GameResult.Team2Win;
+		GameState loss = GameState.Team1Win;
+		if (BalloonManager.team == Team.t1) loss = GameState.Team2Win;
 		UpdateStats(loss);
 	}
 	bool dataUpdated = false;
-	void UpdateStats(GameResult r) {
+	void UpdateStats(GameState r) {
 		if (dataUpdated) return;
 		dataUpdated = true;
 		if (GameData.PlayMode == PlayModeEnum.Tutorial) return;
@@ -298,9 +298,9 @@ public class GameplayDataUI : NetworkBehaviour {
 
 		Stats.SetData();
 	}
-	int GetWinDrawLossResult(GameResult result) {
-		if (GameResult.Draw == result || GameResult.Disconnect == result) return 0;
-		else if (result == GameResult.Team1Win && BalloonManager.team == Team.t1 || result == GameResult.Team2Win && BalloonManager.team == Team.t2) return 1;
+	int GetWinDrawLossResult(GameState result) {
+		if (GameState.Draw == result || GameState.Disconnect == result) return 0;
+		else if (result == GameState.Team1Win && BalloonManager.team == Team.t1 || result == GameState.Team2Win && BalloonManager.team == Team.t2) return 1;
 		else return -1;
 	}
 

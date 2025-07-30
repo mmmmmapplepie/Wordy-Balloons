@@ -64,8 +64,8 @@ public class TypedBallloonManager : MonoBehaviour {
 		prevTypedSize = -1;
 	}
 
-	private void GameResultSet(GameResult result) {
-		if (result == GameResult.Undecided) return;
+	private void GameResultSet(GameState result) {
+		if (result == GameState.InPlay) return;
 		if (balloonInControl != null) Destroy(balloonInControl.gameObject);
 	}
 

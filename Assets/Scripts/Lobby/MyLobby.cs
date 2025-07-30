@@ -155,7 +155,6 @@ public class MyLobby : NetworkBehaviour {
 		if (!NetworkManager.Singleton.IsServer) return;
 
 		if (LoadingSceneBool.Value == true) {
-			//kick player
 			LobbyManager.Instance.KickFromLobby(id);
 			return;
 		}
@@ -196,7 +195,7 @@ public class MyLobby : NetworkBehaviour {
 
 	[ServerRpc(RequireOwnership = false)]
 	void SendLobbyJoinConfirmationServerRPC(string lobbyID, ulong clientID, string playerName) {
-		if (!StopLobbyJoinTimeout(lobbyID)) return;//for disabling ppl joining once scene loading is started.
+		if (!StopLobbyJoinTimeout(lobbyID)) return;
 		if (!ClientID_KEY_LobbyID_VAL.ContainsKey(clientID)) ClientID_KEY_LobbyID_VAL.Add(clientID, lobbyID);
 		if (!ClientID_KEY_LobbyID_NAME.ContainsKey(clientID)) ClientID_KEY_LobbyID_NAME.Add(clientID, playerName);
 		LobbyPlayer playerObj = FindPlayerFromClientID(clientID);
@@ -228,6 +227,8 @@ public class MyLobby : NetworkBehaviour {
 		LeaveLobby();
 	}
 	void ClientDisconnected(ulong id) {
+		if (id == NetworkManager.ServerClientId) { LeaveLobby(); return; }
+
 		if (!NetworkManager.Singleton.IsServer) return;
 		StopSceneLoading();
 		string lobbyID = null;
@@ -534,7 +535,10 @@ public class MyLobby : NetworkBehaviour {
 
 		if (loadTimeoutRoutine != null) StopCoroutine(loadTimeoutRoutine);
 		loadTimeoutRoutine = null;
-		if (NetworkManager.Singleton.IsServer) LoadingSceneBool.Value = false;
+		if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer && NetworkManager.Singleton.IsConnectedClient) {
+			LoadingSceneBool.Value = false;
+		}
+
 	}
 
 	//this one is in case the server crashes or just leaves unceremoniously and so client gets stuck in limbo without getting to leave the lobby as the leave lobby button is blacked out.

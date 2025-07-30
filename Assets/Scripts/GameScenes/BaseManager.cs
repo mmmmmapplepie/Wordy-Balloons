@@ -84,6 +84,7 @@ public class BaseManager : NetworkBehaviour {
 	}
 
 	void LateUpdate() {
+		if (!NetworkManager.Singleton.IsServer || GameStateManager.CurrGameState != GameState.InPlay) return;
 		CheckLoss();
 	}
 	void CheckLoss() {
@@ -116,16 +117,16 @@ public class BaseManager : NetworkBehaviour {
 	public Sprite baseMain_Destroyed, basePipe_Destroyed, baseCannon_Destroyed;
 	public AudioClip baseDestroySound, popSound, finalDestroySound;
 
-	void ResultChanged(GameResult result) {
-		if (result == GameResult.Undecided || result == GameResult.Disconnect) return;
-		if (result == GameResult.Draw) {
+	void ResultChanged(GameState result) {
+		if (result == GameState.InPlay || result == GameState.Disconnect) return;
+		if (result == GameState.Draw) {
 			StartCoroutine(BaseDestroyAnimation(homeBase));
 			StartCoroutine(BaseDestroyAnimation(awayBase));
 			return;
 		}
 		Transform losingBase = homeBase;
-		if (result == GameResult.Team1Win && BalloonManager.team == Team.t1) losingBase = awayBase;
-		if (result == GameResult.Team2Win && BalloonManager.team == Team.t2) losingBase = awayBase;
+		if (result == GameState.Team1Win && BalloonManager.team == Team.t1) losingBase = awayBase;
+		if (result == GameState.Team2Win && BalloonManager.team == Team.t2) losingBase = awayBase;
 		StartCoroutine(BaseDestroyAnimation(losingBase));
 	}
 	public CameraShaker camShaker;

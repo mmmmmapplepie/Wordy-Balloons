@@ -24,7 +24,7 @@ public class InputManager : MonoBehaviour {
 		SetNewTargetText();
 		canTakeInput = true;
 	}
-	void GameResultSet(GameResult result) {
+	void GameResultSet(GameState result) {
 		canTakeInput = false;
 	}
 	public static event Action InputProcessFinished;

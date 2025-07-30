@@ -88,7 +88,7 @@ public class GameUI : MonoBehaviour {
 		guidePanel.SetActive(!guidePanel.activeInHierarchy);
 	}
 	public void GoToScene(string s) {
-		if (GameStateManager.CurrGameResult == GameResult.Undecided) {
+		if (GameStateManager.CurrGameState == GameState.InPlay) {
 			SaveData?.Invoke();
 		}
 		NetworkManager.Singleton.Shutdown();
@@ -104,28 +104,28 @@ public class GameUI : MonoBehaviour {
 	#region Game Finish
 	[Header("Game Finish")] public GameObject menuBtn;
 	public GameObject drawPanel, victoryPanel, defeatPanel, disconnectPanel, endingPanel, gameplayUI;
-	void GameResultSet(GameResult result) {
-		if (result == GameResult.Undecided) return;
+	void GameResultSet(GameState result) {
+		if (result == GameState.InPlay) return;
 		gameNotPausedTxt.transform.parent.gameObject.SetActive(false);
 		gameplayUI.SetActive(false);
 		menuBtn.SetActive(false);
 		menusPanel.SetActive(false);
 		StartCoroutine(DelayedUIShow(result));
 	}
-	IEnumerator DelayedUIShow(GameResult result) {
-		if (result != GameResult.Disconnect) yield return new WaitForSeconds(BaseManager.BaseDestroyAnimationTime);
+	IEnumerator DelayedUIShow(GameState result) {
+		if (result != GameState.Disconnect) yield return new WaitForSeconds(BaseManager.BaseDestroyAnimationTime);
 		endingPanel.SetActive(true);
 		menusPanel.SetActive(true);
 		gameNotPausedTxt.transform.parent.gameObject.SetActive(false);
-		if (result == GameResult.Disconnect) {
+		if (result == GameState.Disconnect) {
 			disconnectPanel.SetActive(true);
 			yield break;
-		} else if (result == GameResult.Draw) {
+		} else if (result == GameState.Draw) {
 			drawPanel.SetActive(true);
 			endingPanel.GetComponent<Animator>().Play("Draw");
 			yield break;
 		} else {
-			DisplayTeamWinning(result == GameResult.Team1Win ? Team.t1 : Team.t2);
+			DisplayTeamWinning(result == GameState.Team1Win ? Team.t1 : Team.t2);
 		}
 	}
 

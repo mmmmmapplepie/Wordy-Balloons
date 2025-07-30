@@ -27,6 +27,6 @@ public enum GameMode { Normal, Eraser, OwnEnemy }
 public enum DictionaryMode { Beginner, Complete }
 public enum PlayModeEnum { Multiplayer, Tutorial, BasicPVE }
 public enum GameEndingMode { Endurance, Drain, SuddenDeath, Speedup, Damageup }
-public enum GameResult { Undecided, Team1Win, Team2Win, Draw, Disconnect }
+public enum GameState { Countdown, InPlay, Team1Win, Team2Win, Draw, Disconnect }
 
 

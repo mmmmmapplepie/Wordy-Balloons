@@ -27,7 +27,7 @@ public class GameTime : MonoBehaviour {
 		endGameTime.text = txt.text;
 	}
 
-	void GameResultSet(GameResult result) {
+	void GameResultSet(GameState result) {
 		startT = -1;
 	}
 }

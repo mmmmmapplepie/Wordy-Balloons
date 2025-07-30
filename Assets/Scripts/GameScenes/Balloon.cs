@@ -182,7 +182,7 @@ public class Balloon : NetworkBehaviour {
 	}
 
 
-	void GameSet(GameResult r) {
+	void GameSet(GameState r) {
 		if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer) return;
 		DestroyBalloon();
 	}
