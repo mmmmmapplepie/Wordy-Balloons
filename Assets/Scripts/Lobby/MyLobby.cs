@@ -122,8 +122,10 @@ public class MyLobby : NetworkBehaviour {
 
 	void InitializeNewLobby() {
 		ResetLobbyVariables();
-		ulong clientID = NetworkManager.Singleton.LocalClientId;
-		LobbyPlayer p = AddPlayerToLobby(clientID);
+		ulong id = NetworkManager.Singleton.LocalClientId;
+		LobbyPlayer p = AddPlayerToLobby(id);
+		if (!ClientID_KEY_LobbyID_VAL.ContainsKey(id)) ClientID_KEY_LobbyID_VAL.Add(id, AuthenticationService.Instance.PlayerId);
+		if (!ClientID_KEY_LobbyID_NAME.ContainsKey(id)) ClientID_KEY_LobbyID_NAME.Add(id, LobbyManager.playerName);
 		p.ConfirmJoin(LobbyManager.playerName);
 	}
 
@@ -186,7 +188,6 @@ public class MyLobby : NetworkBehaviour {
 		}
 	}
 	void ClientStartedSuccess() {
-		// Debug.LogWarning("Client started");
 		if (LobbyManager.Instance.joinedLobby == null) { LeaveLobby(); return; }
 		Enum.TryParse<GameEndingMode>(LobbyManager.Instance.joinedLobby.Data[LobbyManager.GameEndMode].Value, false, out GameData.GameEndingMode);
 		float.TryParse(LobbyManager.Instance.joinedLobby.Data[LobbyManager.GameEndTime].Value, out GameData.GameDecidingChangesStartTime);
@@ -207,7 +208,6 @@ public class MyLobby : NetworkBehaviour {
 		if (!NetworkManager.Singleton.IsServer) return;
 		if (id == NetworkManager.Singleton.LocalClientId) return;
 		AddPlayerToLobby(id);
-		// Debug.LogWarning(id.ToString() + " : client started. Total connected: " + NetworkManager.Singleton.ConnectedClients.Count);
 	}
 	#endregion
 

@@ -41,13 +41,24 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	void GameResultSet(GameState r) {
 		ChangeReconnectionState(false);
 		StopAllCoroutines();
-		print("game decided stopping all routines");
-		// ShutDownNetwork();
 		if (r != GameState.Disconnect) Invoke(nameof(ShutDownNetwork), BaseManager.BaseDestroyAnimationTime);
+		else ShutDownNetwork();
 	}
 
 	void OnClientDisconnectCallback(ulong clientID) {
-		print("client disconnected:" + clientID);
+		// print("client disconnected:" + clientID);
+		if (clientID == NetworkManager.Singleton.LocalClientId) {
+			print("self disconnect");
+			disconnectIssueTxt.text = "Disconnected from session";
+			DisconnectingEvent?.Invoke();
+			return;
+		}
+		if (clientID == NetworkManager.ServerClientId) {
+			print("host disconnect");
+			disconnectIssueTxt.text = "Host disconnected";
+			DisconnectingEvent?.Invoke();
+			return;
+		}
 		if (NetworkManager.Singleton.IsServer) {
 			GameData.team1.Remove(clientID);
 			GameData.team2.Remove(clientID);
@@ -55,15 +66,6 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 			GameData.ClientID_KEY_LobbyID_NAME.Remove(clientID);
 			UpdatePinglistForGivenDisconnect(clientID);
 			UpdateConnectedPlayers();
-		}
-		if (clientID == NetworkManager.Singleton.LocalClientId) {
-			print("self disconnect");
-			disconnectIssueTxt.text = "Disconnected from session";
-			DisconnectingEvent?.Invoke();
-		} else if (clientID == NetworkManager.ServerClientId) {
-			print("host disconnect");
-			disconnectIssueTxt.text = "Host disconnected";
-			DisconnectingEvent?.Invoke();
 		}
 	}
 	void UpdateConnectedPlayers() {
@@ -158,7 +160,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 				}
 			}
 			PingClientsForConnectionClientRpc();
-			yield return new WaitForSeconds(pingInterval);
+			yield return new WaitForSecondsRealtime(pingInterval);
 		}
 	}
 	void AddClientToPingRecipient(ulong id, float time) {
@@ -180,9 +182,6 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		if (latePlayers.Count == 0) ResumeGameClientRpc();
 	}
 	List<(string, ulong)> GetPlayersLateOnPing(float timeout) {
-		foreach (KeyValuePair<ulong, string> p in GameData.ClientID_KEY_LobbyID_NAME) {
-			Debug.LogWarning(p.Value);
-		}
 		List<(string, ulong)> latePlayersNameAndId = new List<(string, ulong)>();
 		foreach (ulong id in NetworkManager.Singleton.ConnectedClientsIds) {
 			if (latestPingAnswerTimes.ContainsKey(id) && (Time.unscaledTime - latestPingAnswerTimes[id]) > timeout) {
@@ -201,6 +200,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		}
 	}
 	void ChangeReconnectionState(bool waitingForReconnection) {
+		if (GameStateManager.CurrGameState != GameState.InPlay && waitingForReconnection) return;
 		reconnectingPanel.SetActive(waitingForReconnection);
 		Time.timeScale = waitingForReconnection ? 0f : 1f;
 	}
@@ -227,6 +227,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	void CheckClientsUpdated() {
 		List<ulong> nonActivePlayers = latestPingAnswerTimes.Keys.Except(NetworkManager.Singleton.ConnectedClientsIds).ToList();
 		foreach (ulong id in nonActivePlayers) {
+			print("removing playaha as theyre non active");
 			latestPingAnswerTimes.Remove(id);
 		}
 		foreach (ulong id in NetworkManager.Singleton.ConnectedClientsIds) {
@@ -237,7 +238,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 
 		List<(string, ulong)> timeoutPlayersToDisconnect = GetPlayersLateOnPing(disconnectTimeout);
 		foreach ((string, ulong) player in timeoutPlayersToDisconnect) {
-			latestPingAnswerTimes.Remove(player.Item2);
+			OnClientDisconnectCallback(player.Item2);
 			NetworkManager.Singleton.DisconnectClient(player.Item2);
 		}
 
