@@ -41,6 +41,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	void GameResultSet(GameState r) {
 		ChangeReconnectionState(false);
 		StopAllCoroutines();
+		print("game decided stopping all routines");
 		// ShutDownNetwork();
 		if (r != GameState.Disconnect) Invoke(nameof(ShutDownNetwork), BaseManager.BaseDestroyAnimationTime);
 	}
@@ -153,12 +154,16 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 			if (latestPingAnswerTimes == null) {
 				latestPingAnswerTimes = new Dictionary<ulong, float>();
 				foreach (ulong id in NetworkManager.Singleton.ConnectedClientsIds) {
-					latestPingAnswerTimes.Add(id, Time.unscaledTime);
+					AddClientToPingRecipient(id, Time.unscaledTime);
 				}
 			}
 			PingClientsForConnectionClientRpc();
 			yield return new WaitForSeconds(pingInterval);
 		}
+	}
+	void AddClientToPingRecipient(ulong id, float time) {
+		if (latestPingAnswerTimes.ContainsKey(id)) return;
+		latestPingAnswerTimes.Add(id, time);
 	}
 	[ClientRpc]
 	void PingClientsForConnectionClientRpc() {
@@ -167,6 +172,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	}
 	[ServerRpc(RequireOwnership = false)]
 	void PingReceivedReplyServerRpc(ulong id) {
+		if (!PingCheckRequired()) return;
 		if (latestPingAnswerTimes.ContainsKey(id)) {
 			latestPingAnswerTimes[id] = Time.unscaledTime;
 		}
@@ -174,12 +180,16 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		if (latePlayers.Count == 0) ResumeGameClientRpc();
 	}
 	List<(string, ulong)> GetPlayersLateOnPing(float timeout) {
+		foreach (KeyValuePair<ulong, string> p in GameData.ClientID_KEY_LobbyID_NAME) {
+			Debug.LogWarning(p.Value);
+		}
 		List<(string, ulong)> latePlayersNameAndId = new List<(string, ulong)>();
 		foreach (ulong id in NetworkManager.Singleton.ConnectedClientsIds) {
 			if (latestPingAnswerTimes.ContainsKey(id) && (Time.unscaledTime - latestPingAnswerTimes[id]) > timeout) {
-				latePlayersNameAndId.Add((GameData.ClientID_KEY_LobbyID_NAME[id], id));
+				string name = GameData.ClientID_KEY_LobbyID_NAME.ContainsKey(id) ? GameData.ClientID_KEY_LobbyID_NAME[id] : id.ToString();
+				latePlayersNameAndId.Add((name, id));
 			} else {
-				latestPingAnswerTimes.Add(id, Time.unscaledTime);
+				AddClientToPingRecipient(id, Time.unscaledTime);
 			}
 		}
 		return latePlayersNameAndId;
@@ -195,6 +205,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		Time.timeScale = waitingForReconnection ? 0f : 1f;
 	}
 	void UpdatePinglistForGivenDisconnect(ulong id) {
+		if (!PingCheckRequired()) return;
 		if (latestPingAnswerTimes.ContainsKey(id)) latestPingAnswerTimes.Remove(id);
 		List<(string, ulong)> latePlayers = GetPlayersLateOnPing(lackOfPingAnswerTimeout);
 		if (latePlayers.Count == 0) ResumeGameClientRpc();
@@ -220,7 +231,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		}
 		foreach (ulong id in NetworkManager.Singleton.ConnectedClientsIds) {
 			if (!latestPingAnswerTimes.ContainsKey(id)) {
-				latestPingAnswerTimes.Add(id, Time.unscaledTime);
+				AddClientToPingRecipient(id, Time.unscaledTime);
 			}
 		}
 
