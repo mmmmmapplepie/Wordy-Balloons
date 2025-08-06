@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class GameData : NetworkBehaviour {
+public class GameData {
 	public static PlayModeEnum PlayMode = PlayModeEnum.Multiplayer;
 	public static GameMode gameMode = default;
 	public static List<Color> allColorOptions;

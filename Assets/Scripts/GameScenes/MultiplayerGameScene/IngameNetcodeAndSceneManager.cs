@@ -80,6 +80,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 		CheckTeamEmpty();
 	}
 	private void SceneLoaded(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut) {
+		print("load complete");
 		if (NetworkManager.Singleton.IsServer) {
 			print("players timeout on loading " + clientsTimedOut.Count);
 			foreach (ulong id in clientsTimedOut) {

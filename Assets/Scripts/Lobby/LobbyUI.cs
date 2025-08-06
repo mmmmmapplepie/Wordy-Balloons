@@ -32,7 +32,7 @@ public class LobbyUI : MonoBehaviour {
 		LobbyManager.HearbeatFailure += HearbeatFail;
 
 		LobbyManager.LobbyJoinBegin += OpenLoadingPanel;
-		LobbyNetcodeManager.ClientStartSuccess += LobbyJoined;
+		NetcodeManager.ClientStartSuccess += LobbyJoined;
 		LobbyManager.LobbyJoinFailure += LobbyJoinFail;
 
 		LobbyManager.LeaveLobbyBegin += LeaveLobbyBegin;
@@ -62,7 +62,7 @@ public class LobbyUI : MonoBehaviour {
 		LobbyManager.HearbeatFailure -= HearbeatFail;
 
 		LobbyManager.LobbyJoinBegin -= OpenLoadingPanel;
-		LobbyNetcodeManager.ClientStartSuccess -= LobbyJoined;
+		NetcodeManager.ClientStartSuccess -= LobbyJoined;
 		LobbyManager.LobbyJoinFailure -= LobbyJoinFail;
 
 		LobbyManager.LeaveLobbyBegin -= LeaveLobbyBegin;

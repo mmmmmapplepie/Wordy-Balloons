@@ -18,7 +18,6 @@ public class TaskTimeout : MonoBehaviour {
 	public static async Task AddTimeout(Task task, TimeSpan? time = null) {
 		Task delayTask = Task.Delay(time == null ? myTimeout : (TimeSpan)time);
 		Task completedTask = await Task.WhenAny(task, delayTask);
-
 		if (completedTask == delayTask)
 			throw new TimeoutException("The operation timed out.");
 

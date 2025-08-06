@@ -25,7 +25,7 @@ public class LobbyManager : MonoBehaviour {
 	void Awake() {
 		Instance = this;
 		InternetConnectivityCheck.ConnectedStateEvent += ConnectionChanged;
-		LobbyNetcodeManager.TransportFailureEvent += TransportFail;
+		NetcodeManager.TransportFailureEvent += TransportFail;
 	}
 	public void Start() {
 		Authenticate();
@@ -174,10 +174,15 @@ public class LobbyManager : MonoBehaviour {
 
 	#region  lobbyCreation
 	public async void CreateLobby(string lobbyName, string mode, int lobbyMaxPlayerNumber, DictionaryMode dictionary, GameEndingMode endMode, float time) {
-		if (hostLobby != null) return;
+		if (hostLobby != null || joinedLobby != null || leavingLobby) { LobbyCreationFailure?.Invoke(); return; }
 		LobbyCreationBegin?.Invoke();
-		if (NGOConnected()) {
+		bool? ngoConnected = NGOConnected();
+		if (ngoConnected == null) {
+			print("No NGO Manager");
+			return;
+		} else if (ngoConnected == true) {
 			LeaveLobby();
+			NetcodeManager.Instance.ShutDownNetwork();
 			LobbyCreationFailure?.Invoke();
 			return;
 		}
@@ -208,6 +213,8 @@ public class LobbyManager : MonoBehaviour {
 				}
 			}), TimeSpan.FromSeconds(5));
 			joinedLobby = hostLobby;
+			print(joinedLobby.Data[RelayCode].Value);
+			print(hostLobby.Data[RelayCode].Value);
 			await TaskTimeout.AddTimeout(SubscribeToLobbyEvents(), TimeSpan.FromSeconds(5));
 			CreatedLobbyEvent?.Invoke();
 		} catch (Exception e) {
@@ -303,6 +310,7 @@ public class LobbyManager : MonoBehaviour {
 		}
 	}
 	public async Task<JoinAllocation> JoinRelay(string relayCode) {
+		print(relayCode);
 		try {
 			JoinAllocation allocation = await RelayService.Instance.JoinAllocationAsync(relayCode);
 			return allocation;
@@ -318,10 +326,13 @@ public class LobbyManager : MonoBehaviour {
 
 	#region joiningLobby
 	public async void JoinLobbyByID(string lobbyID) {
-		if (joinedLobby != null) { LobbyJoinFailure?.Invoke(); return; }
+		if (joinedLobby != null || hostLobby != null || leavingLobby) { LobbyJoinFailure?.Invoke(); return; }
 		LobbyJoinBegin?.Invoke();
 		try {
-			if (NGOConnected()) {
+			bool? ngoConnected = NGOConnected();
+			if (ngoConnected == null) {
+				throw new Exception("No NGO manager");
+			} else if (ngoConnected == true) {
 				throw new Exception("NGO still connected");
 			}
 			JoinLobbyByIdOptions options = new JoinLobbyByIdOptions {
@@ -338,18 +349,19 @@ public class LobbyManager : MonoBehaviour {
 	}
 
 	public async void JoinLobbyByCode(string code) {
-		if (joinedLobby != null) { LobbyJoinFailure?.Invoke(); return; }
+		if (joinedLobby != null || hostLobby != null || leavingLobby) { LobbyJoinFailure?.Invoke(); return; }
 		LobbyJoinBegin?.Invoke();
 		try {
-			if (NGOConnected()) {
+			bool? ngoConnected = NGOConnected();
+			if (ngoConnected == null) {
+				throw new Exception("No NGO manager");
+			} else if (ngoConnected == true) {
 				throw new Exception("NGO still connected");
 			}
 			JoinLobbyByCodeOptions options = new JoinLobbyByCodeOptions {
 				Player = GetNewPlayer(playerName)
 			};
-
 			joinedLobby = await TaskTimeout.AddTimeout<Lobby>(Lobbies.Instance.JoinLobbyByCodeAsync(code, options));
-
 			await TaskTimeout.AddTimeout(JoinLobby());
 		} catch (Exception e) {
 			print(e);
@@ -359,10 +371,13 @@ public class LobbyManager : MonoBehaviour {
 	}
 
 	public async void QuickJoinLobby() {
-		if (joinedLobby != null) { LobbyJoinFailure?.Invoke(); return; }
+		if (joinedLobby != null || hostLobby != null || leavingLobby) { LobbyJoinFailure?.Invoke(); return; }
 		LobbyJoinBegin?.Invoke();
 		try {
-			if (NGOConnected()) {
+			bool? ngoConnected = NGOConnected();
+			if (ngoConnected == null) {
+				throw new Exception("No NGO manager");
+			} else if (ngoConnected == true) {
 				throw new Exception("NGO still connected");
 			}
 			QuickJoinLobbyOptions options = new QuickJoinLobbyOptions {
@@ -382,6 +397,7 @@ public class LobbyManager : MonoBehaviour {
 			JoinAllocation joinRelayAlloc = await JoinRelay(relayCode);
 			await SubscribeToLobbyEvents();
 			NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinRelayAlloc, "dtls"));
+			print("lobby joined");
 			JoinedLobby?.Invoke();
 		} catch (Exception e) {
 			print(e);
@@ -415,7 +431,11 @@ public class LobbyManager : MonoBehaviour {
 		LeaveLobby(authenticationID, SendEvents);
 	}
 	List<string> lobbiesToCleanup = new List<string>();
+	bool leavingLobby = false;
 	public async void LeaveLobby(string authenticationID, bool SendEvents = true) {
+		if (leavingLobby) return;
+		print("leaving lobby");
+		leavingLobby = true;
 		if (SendEvents) LeaveLobbyBegin?.Invoke();
 		try {
 			await UnsubscribeFromLobbyEvents();
@@ -432,8 +452,10 @@ public class LobbyManager : MonoBehaviour {
 		} catch (Exception e) {
 			print(e);
 		}
-		joinedLobby = null;
 		hostLobby = null;
+		joinedLobby = null;
+		leavingLobby = false;
+		print("done leaving");
 		if (SendEvents) LeaveLobbyComplete?.Invoke();
 	}
 	async void DeleteLobby() {
@@ -453,10 +475,6 @@ public class LobbyManager : MonoBehaviour {
 		LeaveLobby();
 	}
 	#endregion
-
-
-
-
 
 
 	#region otherLobbyMethods
@@ -499,15 +517,15 @@ public class LobbyManager : MonoBehaviour {
 
 	void OnDestroy() {
 		InternetConnectivityCheck.ConnectedStateEvent -= ConnectionChanged;
-		LobbyNetcodeManager.TransportFailureEvent -= TransportFail;
+		NetcodeManager.TransportFailureEvent -= TransportFail;
 		Instance = null;
 		DeleteLobby();
 		if (MyLobby.LoadingSceneBool.Value != true) LeaveLobby();
 	}
 
-	bool NGOConnected() {
-		NetworkManager nm = NetworkManager.Singleton;
-		return nm.ShutdownInProgress || nm.IsClient || nm.IsServer;
+	bool? NGOConnected() {
+		if (NetcodeManager.Instance == null) return null;
+		return NetcodeManager.Instance.InConnectedSession();
 	}
 }
 

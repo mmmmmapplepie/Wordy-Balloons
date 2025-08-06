@@ -5,7 +5,6 @@ using TMPro;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using UnityEngine;
-using UnityEngine.UI;
 using Newtonsoft.Json;
 
 public class MyLobby : NetworkBehaviour {
@@ -39,22 +38,22 @@ public class MyLobby : NetworkBehaviour {
 		//creating lobby
 		LobbyManager.AuthenticationSuccess += AuthenticationDone;
 		LobbyManager.CreatedLobbyEvent += LobbyCreated;
-		LobbyNetcodeManager.ServerStartSuccess += ServerStartedSuccess;
-		LobbyNetcodeManager.ServerStartFail += ServerStartedFail;
+		NetcodeManager.ServerStartSuccess += ServerStartedSuccess;
+		NetcodeManager.ServerStartFail += ServerStartedFail;
 
 		//joining lobby
 		LobbyManager.JoinedLobby += JoinedLobby;
 		LobbyManager.PlayerJoinedLobby += JoinedLobbyTemp;
-		LobbyNetcodeManager.ClientStartSuccess += ClientStartedSuccess;
-		LobbyNetcodeManager.ClientConnected += ClientConnected;
+		NetcodeManager.ClientStartSuccess += ClientStartedSuccess;
+		NetcodeManager.ClientConnected += ClientConnected;
 
 		//leaving lobby
 		LobbyManager.LeaveLobbyComplete += LeaveLobby;
 		LobbyManager.KickedFromLobbyEvent += LeaveLobby;
-		LobbyNetcodeManager.ServerStoppedEvent += ServerStopped;
-		LobbyNetcodeManager.TransportFailureEvent += ServerStopped;
-		LobbyNetcodeManager.ClientDisconnected += ClientDisconnected;
-		LobbyNetcodeManager.ClientStoppedEvent += ClientStopped;
+		NetcodeManager.ServerStoppedEvent += ServerStopped;
+		NetcodeManager.TransportFailureEvent += ServerStopped;
+		NetcodeManager.ClientDisconnected += ClientDisconnected;
+		NetcodeManager.ClientStoppedEvent += ClientStopped;
 
 		InternetConnectivityCheck.ConnectedStateEvent += CheckInternetState;
 
@@ -64,30 +63,32 @@ public class MyLobby : NetworkBehaviour {
 
 	public override void OnDestroy() {
 		OnNetworkDespawn();
+		print("destroying mylobby");
 		//creating lobby
 		LobbyManager.AuthenticationSuccess -= AuthenticationDone;
 		LobbyManager.CreatedLobbyEvent -= LobbyCreated;
-		LobbyNetcodeManager.ServerStartSuccess -= ServerStartedSuccess;
-		LobbyNetcodeManager.ServerStartFail -= ServerStartedFail;
+		NetcodeManager.ServerStartSuccess -= ServerStartedSuccess;
+		NetcodeManager.ServerStartFail -= ServerStartedFail;
 
 		//joining lobby
 		LobbyManager.JoinedLobby -= JoinedLobby;
 		LobbyManager.PlayerJoinedLobby -= JoinedLobbyTemp;
-		LobbyNetcodeManager.ClientStartSuccess -= ClientStartedSuccess;
-		LobbyNetcodeManager.ClientConnected -= ClientConnected;
+		NetcodeManager.ClientStartSuccess -= ClientStartedSuccess;
+		NetcodeManager.ClientConnected -= ClientConnected;
 
 		//leaving lobby
 		LobbyManager.LeaveLobbyComplete -= LeaveLobby;
 		LobbyManager.KickedFromLobbyEvent -= LeaveLobby;
-		LobbyNetcodeManager.ServerStoppedEvent -= ServerStopped;
-		LobbyNetcodeManager.TransportFailureEvent -= ServerStopped;
-		LobbyNetcodeManager.ClientDisconnected -= ClientDisconnected;
-		LobbyNetcodeManager.ClientStoppedEvent -= ClientStopped;
+		NetcodeManager.ServerStoppedEvent -= ServerStopped;
+		NetcodeManager.TransportFailureEvent -= ServerStopped;
+		NetcodeManager.ClientDisconnected -= ClientDisconnected;
+		NetcodeManager.ClientStoppedEvent -= ClientStopped;
 
 		InternetConnectivityCheck.ConnectedStateEvent -= CheckInternetState;
 
 		LobbyPlayer.TeamChangeEvent -= ChangeTeam;
 		TeamBox.TeamChangeEvent -= ChangeTeam;
+		Instance = null;
 		base.OnDestroy();
 
 	}
@@ -107,7 +108,7 @@ public class MyLobby : NetworkBehaviour {
 	#region  LobbyCreation
 	void LobbyCreated() {
 		// Debug.LogWarning("Lobby Created");
-		LobbyNetcodeManager.Instance.StartHost();
+		NetcodeManager.Instance.StartHost();
 	}
 	void ServerStartedFail() {
 		// Debug.LogWarning("Server start fail");
@@ -150,7 +151,7 @@ public class MyLobby : NetworkBehaviour {
 
 	#region  LobbyJoining
 	void JoinedLobby() {
-		LobbyNetcodeManager.Instance.StartClient();
+		NetcodeManager.Instance.StartClient();
 	}
 	List<(string id, Coroutine timeout)> tempJoinedList = new List<(string id, Coroutine timeout)>();
 	void JoinedLobbyTemp(string id) {
@@ -188,7 +189,9 @@ public class MyLobby : NetworkBehaviour {
 		}
 	}
 	void ClientStartedSuccess() {
+		print("client started in my lobby");
 		if (LobbyManager.Instance.joinedLobby == null) { LeaveLobby(); return; }
+		print("lobby not null");
 		Enum.TryParse<GameEndingMode>(LobbyManager.Instance.joinedLobby.Data[LobbyManager.GameEndMode].Value, false, out GameData.GameEndingMode);
 		float.TryParse(LobbyManager.Instance.joinedLobby.Data[LobbyManager.GameEndTime].Value, out GameData.GameDecidingChangesStartTime);
 		SendLobbyJoinConfirmationServerRPC(AuthenticationService.Instance.PlayerId, NetworkManager.Singleton.LocalClientId, LobbyManager.playerName);
@@ -218,15 +221,18 @@ public class MyLobby : NetworkBehaviour {
 
 	#region  LobbyLeaving
 	void LeaveLobby() {
-		if (LobbyNetcodeManager.Instance == null) return;
-		LobbyNetcodeManager.Instance.ShutDownNetwork();
+		if (NetcodeManager.Instance != null) {
+			NetcodeManager.Instance.ShutDownNetwork();
+		}
 		if (LobbyManager.Instance == null) return;
-		if (LobbyManager.Instance.joinedLobby != null) LobbyManager.Instance.LeaveLobby();
+		if (LobbyManager.Instance.joinedLobby != null || LobbyManager.Instance.hostLobby != null) LobbyManager.Instance.LeaveLobby();
 	}
 	void ServerStopped() {
 		LeaveLobby();
 	}
 	void ClientDisconnected(ulong id) {
+		print("client disconnected: " + id);
+		print(NetworkManager.ServerClientId);
 		if (id == NetworkManager.ServerClientId) { LeaveLobby(); return; }
 
 		if (!NetworkManager.Singleton.IsServer) return;

@@ -32,11 +32,11 @@ public class LobbyChat : NetworkBehaviour {
 
 	void Start() {
 		hexColor = ColorUtility.ToHtmlStringRGB(nameColor);
-		LobbyNetcodeManager.ClientStartSuccess += JoinedLobby;
+		NetcodeManager.ClientStartSuccess += JoinedLobby;
 	}
 	public override void OnDestroy() {
 		base.OnDestroy();
-		LobbyNetcodeManager.ClientStartSuccess -= JoinedLobby;
+		NetcodeManager.ClientStartSuccess -= JoinedLobby;
 	}
 
 	void JoinedLobby() {
