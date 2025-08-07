@@ -99,10 +99,8 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	public static event Action DisconnectingEvent;
 	public static event Action<Team> TeamEmptyEvent;
 	public void ShutDownNetwork() {
-		print("shutting down network");
-		if (NetworkManager.Singleton != null && !NetworkManager.Singleton.ShutdownInProgress) {
-			NetworkManager.Singleton.Shutdown();
-		}
+		if (NetcodeManager.Instance == null) return;
+		NetcodeManager.Instance.ShutDownNetwork();
 	}
 
 	int connectionFalseTicks = 0;

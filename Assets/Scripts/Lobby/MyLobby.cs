@@ -54,6 +54,7 @@ public class MyLobby : NetworkBehaviour {
 		NetcodeManager.TransportFailureEvent += ServerStopped;
 		NetcodeManager.ClientDisconnected += ClientDisconnected;
 		NetcodeManager.ClientStoppedEvent += ClientStopped;
+		NetcodeManager.ClientStartedEvent += ClientStarted;
 
 		InternetConnectivityCheck.ConnectedStateEvent += CheckInternetState;
 
@@ -83,6 +84,7 @@ public class MyLobby : NetworkBehaviour {
 		NetcodeManager.TransportFailureEvent -= ServerStopped;
 		NetcodeManager.ClientDisconnected -= ClientDisconnected;
 		NetcodeManager.ClientStoppedEvent -= ClientStopped;
+		NetcodeManager.ClientStartedEvent -= ClientStarted;
 
 		InternetConnectivityCheck.ConnectedStateEvent -= CheckInternetState;
 
@@ -175,7 +177,7 @@ public class MyLobby : NetworkBehaviour {
 		}
 		return false;
 	}
-	const float JoinConfirmationTimeoutTime = 15f;
+	const float JoinConfirmationTimeoutTime = 20f;
 	IEnumerator JoinConfirmationTimeout(string id) {
 		yield return new WaitForSeconds(JoinConfirmationTimeoutTime);
 		print("Kicking " + id + " from timeout.");
@@ -191,7 +193,8 @@ public class MyLobby : NetworkBehaviour {
 	void ClientStartedSuccess() {
 		print("client started in my lobby");
 		if (LobbyManager.Instance.joinedLobby == null) { LeaveLobby(); return; }
-		print("lobby not null");
+		print("stopping timeout and sending reply");
+		if (timeoutForClientConnection != null) StopCoroutine(timeoutForClientConnection);
 		Enum.TryParse<GameEndingMode>(LobbyManager.Instance.joinedLobby.Data[LobbyManager.GameEndMode].Value, false, out GameData.GameEndingMode);
 		float.TryParse(LobbyManager.Instance.joinedLobby.Data[LobbyManager.GameEndTime].Value, out GameData.GameDecidingChangesStartTime);
 		SendLobbyJoinConfirmationServerRPC(AuthenticationService.Instance.PlayerId, NetworkManager.Singleton.LocalClientId, LobbyManager.playerName);
@@ -221,6 +224,7 @@ public class MyLobby : NetworkBehaviour {
 
 	#region  LobbyLeaving
 	void LeaveLobby() {
+		if (timeoutForClientConnection != null) StopCoroutine(timeoutForClientConnection);
 		if (NetcodeManager.Instance != null) {
 			NetcodeManager.Instance.ShutDownNetwork();
 		}
@@ -232,7 +236,6 @@ public class MyLobby : NetworkBehaviour {
 	}
 	void ClientDisconnected(ulong id) {
 		print("client disconnected: " + id);
-		print(NetworkManager.ServerClientId);
 		if (id == NetworkManager.ServerClientId) { LeaveLobby(); return; }
 
 		if (!NetworkManager.Singleton.IsServer) return;
@@ -247,6 +250,17 @@ public class MyLobby : NetworkBehaviour {
 		if (lobbyID != null) LobbyManager.Instance.KickFromLobby(lobbyID);
 	}
 	void ClientStopped(bool b) {
+		LeaveLobby();
+	}
+	Coroutine timeoutForClientConnection = null;
+	void ClientStarted(bool isHost) {
+		if (isHost) return;
+		if (timeoutForClientConnection != null) StopCoroutine(timeoutForClientConnection);
+		timeoutForClientConnection = StartCoroutine(WaitForConnection());
+	}
+
+	IEnumerator WaitForConnection() {
+		yield return new WaitForSeconds(JoinConfirmationTimeoutTime);
 		LeaveLobby();
 	}
 

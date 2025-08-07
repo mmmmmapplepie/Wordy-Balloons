@@ -8,7 +8,7 @@ public class NetcodeManager : MonoBehaviour {
 	public static event Action ServerStartSuccess, ServerStartFail, ServerStoppedEvent, ShuttingDownNetwork, TransportFailureEvent;
 	public static event Action ClientStartSuccess, ClientStartFail;
 	public static event Action<ulong> ClientConnected, ClientDisconnected;
-	public static event Action<bool> ClientStoppedEvent;
+	public static event Action<bool> ClientStoppedEvent, ClientStartedEvent;
 
 	public static NetcodeManager Instance = null;
 	void Start() {
@@ -27,6 +27,7 @@ public class NetcodeManager : MonoBehaviour {
 
 		NetworkManager.Singleton.OnClientDisconnectCallback += ClientDisconnectedFromNGO;
 		NetworkManager.Singleton.OnClientStopped += ClientStopped;
+		NetworkManager.Singleton.OnClientStarted += ClientStarted;
 	}
 
 	public void OnDestroy() {
@@ -38,6 +39,7 @@ public class NetcodeManager : MonoBehaviour {
 			NetworkManager.Singleton.OnTransportFailure -= TransportFailure;
 			NetworkManager.Singleton.OnClientDisconnectCallback -= ClientDisconnectedFromNGO;
 			NetworkManager.Singleton.OnClientStopped -= ClientStopped;
+			NetworkManager.Singleton.OnClientStarted -= ClientStarted;
 		}
 		Instance = null;
 	}
@@ -70,7 +72,6 @@ public class NetcodeManager : MonoBehaviour {
 		ShuttingDownNetwork?.Invoke();
 		if (NetworkManager.Singleton == null) { shuttingDown = false; yield break; }
 		NetworkManager.Singleton.Shutdown();
-		print(NetworkManager.Singleton.ShutdownInProgress);
 		while (true) {
 			if (NetworkManager.Singleton == null) break;
 			if (!NetworkManager.Singleton.ShutdownInProgress && !NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsServer) break;
@@ -95,27 +96,13 @@ public class NetcodeManager : MonoBehaviour {
 	void ServerStopped(bool stopped) {
 		ServerStoppedEvent?.Invoke();
 	}
+	void ClientStarted() {
+		print("clientStarted");
+		ClientStartedEvent?.Invoke(NetworkManager.Singleton.IsHost);
+	}
 	void ClientStopped(bool wasHost) {
 		print("clientStopped");
 		ClientStoppedEvent?.Invoke(wasHost);
-		// DespawnAllNetworkObjectsWithoutDestroying();
-	}
-	void DespawnAllNetworkObjectsWithoutDestroying() {
-		foreach (NetworkObject netObj in FindObjectsOfType<NetworkObject>()) {
-			if (netObj == null)
-				continue;
-
-			print(netObj.gameObject.name);
-
-			// if (netObj.IsSpawned && !netObj.IsOwner && netObj.IsSceneObject != false)
-			// 	continue; // Clients can't despawn remote non-scene objects
-
-			if (netObj.IsSpawned) {
-				// Despawn but don't destroy the GameObject
-				netObj.Despawn(false);
-				Debug.Log($"Despawned (kept): {netObj.name}");
-			}
-		}
 	}
 	void TransportFailure() {
 		TransportFailureEvent?.Invoke();

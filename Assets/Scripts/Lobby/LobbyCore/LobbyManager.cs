@@ -394,7 +394,9 @@ public class LobbyManager : MonoBehaviour {
 	async Task JoinLobby() {
 		string relayCode = joinedLobby.Data[RelayCode].Value;
 		try {
+			print("joining relay");
 			JoinAllocation joinRelayAlloc = await JoinRelay(relayCode);
+			print("subbing to events");
 			await SubscribeToLobbyEvents();
 			NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinRelayAlloc, "dtls"));
 			print("lobby joined");
