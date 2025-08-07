@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using UnityEngine.UI;
 using System;
 using Unity.Netcode;
+using Unity.Services.Lobbies;
 [DefaultExecutionOrder(-100)]
 public class LobbyUI : MonoBehaviour {
 	#region subscribing/unsubscribing to events;
@@ -24,6 +25,10 @@ public class LobbyUI : MonoBehaviour {
 		LobbyManager.AuthenticationSuccess += CloseAllPanels;
 		LobbyManager.AuthenticationSuccess += ListLobbyRefresh;
 		LobbyManager.AuthenticationFailure += AuthenticationFail;
+		LobbyManager.LobbyChangedEvent += LobbyChanged;
+		LobbyManager.LobbyUpdateFailure += LobbyUpdateFail;
+		LobbyManager.LobbyUpdateSuccess += LobbyUpdateSuccess;
+
 		InternetConnectivityCheck.ConnectedStateEvent += NetworkConnectionState;
 
 		LobbyManager.LobbyCreationBegin += OpenLoadingPanel;
@@ -41,7 +46,6 @@ public class LobbyUI : MonoBehaviour {
 		LobbyManager.ListLobbySuccess += LobbyListFound;
 		LobbyManager.ListLobbyFailure += ListLobbiesFail;
 
-		lobbyPublicBtn.ButtonStateChanged += LobbyPublicityChanged;
 	}
 	void OnDestroy() {
 		MyLobby.LobbyFull -= LobbyFull;
@@ -54,6 +58,10 @@ public class LobbyUI : MonoBehaviour {
 		LobbyManager.AuthenticationSuccess -= CloseAllPanels;
 		LobbyManager.AuthenticationSuccess -= ListLobbyRefresh;
 		LobbyManager.AuthenticationFailure -= AuthenticationFail;
+		LobbyManager.LobbyChangedEvent -= LobbyChanged;
+		LobbyManager.LobbyUpdateFailure -= LobbyUpdateFail;
+		LobbyManager.LobbyUpdateSuccess -= LobbyUpdateSuccess;
+
 		InternetConnectivityCheck.ConnectedStateEvent -= NetworkConnectionState;
 
 		LobbyManager.LobbyCreationBegin -= OpenLoadingPanel;
@@ -71,7 +79,6 @@ public class LobbyUI : MonoBehaviour {
 		LobbyManager.ListLobbySuccess -= LobbyListFound;
 		LobbyManager.ListLobbyFailure -= ListLobbiesFail;
 
-		lobbyPublicBtn.ButtonStateChanged -= LobbyPublicityChanged;
 	}
 
 
@@ -153,10 +160,61 @@ public class LobbyUI : MonoBehaviour {
 	}
 
 	public FancyButton lobbyPublicBtn;
-	void LobbyPublicityChanged() {
-		//switch lobby to whatever is required.
-		bool makepublic = lobbyPublicBtn.publicVersion;
-		LobbyManager.Instance.MakeLobbyPublic(makepublic);
+	void LobbyChanged(ILobbyChanges changes) {
+		if (changes.IsPrivate.Changed) {
+			waitingForLobbyPublicityChange = false;
+			try {
+				if (!MyLobby.LoadingSceneBool.Value && NetworkManager.Singleton.IsServer) {
+					ChangePublicityBtnInteractability(true);
+				}
+			} catch (Exception e) {
+				print(e);
+			}
+			if (!lobbyPublicBtn.publicVersion != changes.IsPrivate.Value) {
+				lobbyPublicBtn.Clicked();
+			}
+		}
+	}
+	void LobbyUpdateFail() {
+		if (LobbyManager.Instance.hostLobby == null) return;
+		waitingForLobbyPublicityChange = false;
+		try {
+			if (!MyLobby.LoadingSceneBool.Value && NetworkManager.Singleton.IsServer) {
+				ChangePublicityBtnInteractability(true);
+			}
+		} catch (Exception e) {
+			print(e);
+		}
+		if (!lobbyPublicBtn.publicVersion != LobbyManager.Instance.hostLobby.IsPrivate) {
+			lobbyPublicBtn.Clicked();
+		}
+	}
+	void LobbyUpdateSuccess() {
+		if (LobbyManager.Instance.hostLobby == null) return;
+		waitingForLobbyPublicityChange = false;
+		try {
+			if (!MyLobby.LoadingSceneBool.Value && NetworkManager.Singleton.IsServer) {
+				ChangePublicityBtnInteractability(true);
+			}
+		} catch (Exception e) {
+			print(e);
+		}
+		if (!lobbyPublicBtn.publicVersion != LobbyManager.Instance.hostLobby.IsPrivate) {
+			lobbyPublicBtn.Clicked();
+		}
+	}
+	bool waitingForLobbyPublicityChange = false;
+	void ChangePublicityBtnInteractability(bool makeInteractable) {
+		CanvasGroup btnGrp = lobbyPublicBtn.transform.parent.GetComponent<CanvasGroup>();
+		btnGrp.alpha = makeInteractable ? 1 : 0.5f;
+		btnGrp.interactable = makeInteractable;
+		btnGrp.blocksRaycasts = makeInteractable;
+	}
+	public void ChangeLobbyPublicity() {
+		if (LobbyManager.Instance.hostLobby == null) return;
+		waitingForLobbyPublicityChange = true;
+		ChangePublicityBtnInteractability(false);
+		LobbyManager.Instance.ChangeLobbyPublicity(LobbyManager.Instance.hostLobby.IsPrivate);
 	}
 
 
@@ -246,10 +304,8 @@ public class LobbyUI : MonoBehaviour {
 
 	void LobbyJoined() {
 		lobbyNameTxt.text = LobbyManager.Instance.joinedLobby.Name;
-		CanvasGroup btnGrp = lobbyPublicBtn.transform.parent.GetComponent<CanvasGroup>();
-		btnGrp.alpha = NetworkManager.Singleton.IsServer ? 1 : 0.5f;
-		btnGrp.interactable = NetworkManager.Singleton.IsServer;
-		btnGrp.blocksRaycasts = NetworkManager.Singleton.IsServer;
+		waitingForLobbyPublicityChange = false;
+		ChangePublicityBtnInteractability(NetworkManager.Singleton.IsServer);
 		HidePanelsExceptChosen();
 		startGameBtn.interactable = false;
 		stopGameLoadBtn.SetActive(false);
@@ -332,8 +388,12 @@ public class LobbyUI : MonoBehaviour {
 	void ChangeToLoadingSceneMode(bool loadingScene) {
 		if (NetworkManager.Singleton.IsServer) {
 			startGameBtn.interactable = !loadingScene;
-			Button b = lobbyPublicBtn.transform.GetComponentInChildren<Button>();
-			b.interactable = !loadingScene;
+			if (loadingScene) ChangePublicityBtnInteractability(!loadingScene);
+			else {
+				if (!waitingForLobbyPublicityChange) {
+					ChangePublicityBtnInteractability(!loadingScene);
+				}
+			}
 		}
 		stopGameLoadBtn.SetActive(loadingScene);
 		stopGameLoadBtn.GetComponent<Button>().interactable = NetworkManager.Singleton.IsServer;

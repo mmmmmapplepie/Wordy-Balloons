@@ -10515,9 +10515,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 821302472}
-        m_TargetAssemblyTypeName: FancyButton, Assembly-CSharp
-        m_MethodName: Clicked
+      - m_Target: {fileID: 765375948}
+        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
+        m_MethodName: PlayOneshotClip
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10527,9 +10527,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 765375948}
-        m_TargetAssemblyTypeName: OneshotSound, Assembly-CSharp
-        m_MethodName: PlayOneshotClip
+      - m_Target: {fileID: 431179776}
+        m_TargetAssemblyTypeName: LobbyUI, Assembly-CSharp
+        m_MethodName: ChangeLobbyPublicity
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

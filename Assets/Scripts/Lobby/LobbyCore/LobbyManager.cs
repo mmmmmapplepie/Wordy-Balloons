@@ -123,7 +123,7 @@ public class LobbyManager : MonoBehaviour {
 	ILobbyEvents LobbyEvents = null;
 	LobbyEventCallbacks lobbyCallback = null;
 	public static event Action<ILobbyChanges> LobbyChangedEvent;
-	public static event Action LobbyUpdateFailure;
+	public static event Action LobbyUpdateFailure, LobbyUpdateSuccess;
 	public static event Action HearbeatFailure;
 
 	//leaving lobby
@@ -213,8 +213,6 @@ public class LobbyManager : MonoBehaviour {
 				}
 			}), TimeSpan.FromSeconds(5));
 			joinedLobby = hostLobby;
-			print(joinedLobby.Data[RelayCode].Value);
-			print(hostLobby.Data[RelayCode].Value);
 			await TaskTimeout.AddTimeout(SubscribeToLobbyEvents(), TimeSpan.FromSeconds(5));
 			CreatedLobbyEvent?.Invoke();
 		} catch (Exception e) {
@@ -310,7 +308,6 @@ public class LobbyManager : MonoBehaviour {
 		}
 	}
 	public async Task<JoinAllocation> JoinRelay(string relayCode) {
-		print(relayCode);
 		try {
 			JoinAllocation allocation = await RelayService.Instance.JoinAllocationAsync(relayCode);
 			return allocation;
@@ -394,12 +391,9 @@ public class LobbyManager : MonoBehaviour {
 	async Task JoinLobby() {
 		string relayCode = joinedLobby.Data[RelayCode].Value;
 		try {
-			print("joining relay");
 			JoinAllocation joinRelayAlloc = await JoinRelay(relayCode);
-			print("subbing to events");
 			await SubscribeToLobbyEvents();
 			NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinRelayAlloc, "dtls"));
-			print("lobby joined");
 			JoinedLobby?.Invoke();
 		} catch (Exception e) {
 			print(e);
@@ -436,7 +430,6 @@ public class LobbyManager : MonoBehaviour {
 	bool leavingLobby = false;
 	public async void LeaveLobby(string authenticationID, bool SendEvents = true) {
 		if (leavingLobby) return;
-		print("leaving lobby");
 		leavingLobby = true;
 		if (SendEvents) LeaveLobbyBegin?.Invoke();
 		try {
@@ -457,7 +450,6 @@ public class LobbyManager : MonoBehaviour {
 		hostLobby = null;
 		joinedLobby = null;
 		leavingLobby = false;
-		print("done leaving");
 		if (SendEvents) LeaveLobbyComplete?.Invoke();
 	}
 	async void DeleteLobby() {
@@ -501,12 +493,14 @@ public class LobbyManager : MonoBehaviour {
 			ListLobbyFailure?.Invoke(null);
 		}
 	}
-	public async void MakeLobbyPublic(bool makePublic = true) {
+	public async void ChangeLobbyPublicity(bool makePublic = true) {
 		try {
 			hostLobby = await Lobbies.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions {
 				IsPrivate = !makePublic
 			});
+			await Task.Delay(2000);
 			joinedLobby = hostLobby;
+			LobbyUpdateSuccess?.Invoke();
 		} catch (LobbyServiceException e) {
 			print(e.Reason);
 			LeaveLobby();

@@ -64,7 +64,6 @@ public class MyLobby : NetworkBehaviour {
 
 	public override void OnDestroy() {
 		OnNetworkDespawn();
-		print("destroying mylobby");
 		//creating lobby
 		LobbyManager.AuthenticationSuccess -= AuthenticationDone;
 		LobbyManager.CreatedLobbyEvent -= LobbyCreated;
@@ -120,7 +119,7 @@ public class MyLobby : NetworkBehaviour {
 		// Debug.LogWarning("Server started");
 		LobbyCreatedEvent?.Invoke();
 		InitializeNewLobby();
-		LobbyManager.Instance.MakeLobbyPublic();
+		LobbyManager.Instance.ChangeLobbyPublicity();
 	}
 
 	void InitializeNewLobby() {
@@ -180,7 +179,7 @@ public class MyLobby : NetworkBehaviour {
 	const float JoinConfirmationTimeoutTime = 20f;
 	IEnumerator JoinConfirmationTimeout(string id) {
 		yield return new WaitForSeconds(JoinConfirmationTimeoutTime);
-		print("Kicking " + id + " from timeout.");
+		// print("Kicking " + id + " from timeout.");
 		KickDueToTimeout(id);
 	}
 	void KickDueToTimeout(string id) {
@@ -191,9 +190,7 @@ public class MyLobby : NetworkBehaviour {
 		}
 	}
 	void ClientStartedSuccess() {
-		print("client started in my lobby");
 		if (LobbyManager.Instance.joinedLobby == null) { LeaveLobby(); return; }
-		print("stopping timeout and sending reply");
 		if (timeoutForClientConnection != null) StopCoroutine(timeoutForClientConnection);
 		Enum.TryParse<GameEndingMode>(LobbyManager.Instance.joinedLobby.Data[LobbyManager.GameEndMode].Value, false, out GameData.GameEndingMode);
 		float.TryParse(LobbyManager.Instance.joinedLobby.Data[LobbyManager.GameEndTime].Value, out GameData.GameDecidingChangesStartTime);
@@ -235,7 +232,7 @@ public class MyLobby : NetworkBehaviour {
 		LeaveLobby();
 	}
 	void ClientDisconnected(ulong id) {
-		print("client disconnected: " + id);
+		// print("client disconnected: " + id);
 		if (id == NetworkManager.ServerClientId) { LeaveLobby(); return; }
 
 		if (!NetworkManager.Singleton.IsServer) return;
