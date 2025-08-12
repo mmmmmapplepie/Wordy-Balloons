@@ -37,25 +37,25 @@ public class NetcodeManager : MonoBehaviour {
 			NetworkManager.Singleton.OnServerStarted -= ServerStarted;
 			NetworkManager.Singleton.OnServerStopped -= ServerStopped;
 			NetworkManager.Singleton.OnTransportFailure -= TransportFailure;
+
 			NetworkManager.Singleton.OnClientDisconnectCallback -= ClientDisconnectedFromNGO;
 			NetworkManager.Singleton.OnClientStopped -= ClientStopped;
 			NetworkManager.Singleton.OnClientStarted -= ClientStarted;
 		}
 		Instance = null;
 	}
-	public void StartHost() {
-		if (!NetworkManager.Singleton.StartHost()) ServerStartFail?.Invoke();
+	public bool StartHost() {
+		bool success = NetworkManager.Singleton.StartHost();
+		if (!success) ServerStartFail?.Invoke();
+		return success;
 	}
 	void ServerStarted() {
 		ServerStartSuccess?.Invoke();
 	}
-	public void StartClient() {
-		print("starting client");
-
-		if (!NetworkManager.Singleton.StartClient()) {
-			print("client start fail"); ClientStartFail?.Invoke();
-		}
-		print("finish starting client");
+	public bool StartClient() {
+		bool success = NetworkManager.Singleton.StartClient();
+		if (!success) ClientStartFail?.Invoke();
+		return success;
 	}
 
 	public void ShutDownNetwork() {
@@ -64,13 +64,13 @@ public class NetcodeManager : MonoBehaviour {
 	public bool shuttingDown { get; private set; } = false;
 	readonly object shutdownLock = new object();
 	IEnumerator ShutdownRoutine() {
-		print("Shutdown NGO");
 		lock (shutdownLock) {
 			if (shuttingDown) yield break;
 			shuttingDown = true;
 		}
 		ShuttingDownNetwork?.Invoke();
 		if (NetworkManager.Singleton == null) { shuttingDown = false; yield break; }
+		print("Shutdown NGO");
 		NetworkManager.Singleton.Shutdown();
 		while (true) {
 			if (NetworkManager.Singleton == null) break;

@@ -170,7 +170,7 @@ public class LobbyUI : MonoBehaviour {
 			} catch (Exception e) {
 				print(e);
 			}
-			if (!lobbyPublicBtn.publicVersion != changes.IsPrivate.Value) {
+			if (!lobbyPublicBtn.isPublic != changes.IsPrivate.Value) {
 				lobbyPublicBtn.Clicked();
 			}
 		}
@@ -185,7 +185,7 @@ public class LobbyUI : MonoBehaviour {
 		} catch (Exception e) {
 			print(e);
 		}
-		if (!lobbyPublicBtn.publicVersion != LobbyManager.Instance.hostLobby.IsPrivate) {
+		if (!lobbyPublicBtn.isPublic != LobbyManager.Instance.hostLobby.IsPrivate) {
 			lobbyPublicBtn.Clicked();
 		}
 	}
@@ -199,7 +199,7 @@ public class LobbyUI : MonoBehaviour {
 		} catch (Exception e) {
 			print(e);
 		}
-		if (!lobbyPublicBtn.publicVersion != LobbyManager.Instance.hostLobby.IsPrivate) {
+		if (!lobbyPublicBtn.isPublic != LobbyManager.Instance.hostLobby.IsPrivate) {
 			lobbyPublicBtn.Clicked();
 		}
 	}
@@ -298,7 +298,12 @@ public class LobbyUI : MonoBehaviour {
 	}
 
 	void ResetPublicLobbyBtn() {
-		if (!lobbyPublicBtn.publicVersion) lobbyPublicBtn.Clicked(0f, false);
+		if (NetworkManager.Singleton.IsServer) {
+			if (!lobbyPublicBtn.isPublic) lobbyPublicBtn.Clicked(0f);
+		} else {
+			if (!lobbyPublicBtn.isPublic != LobbyManager.Instance.joinedLobby.IsPrivate)
+				lobbyPublicBtn.Clicked(0f);
+		}
 	}
 
 
@@ -307,6 +312,7 @@ public class LobbyUI : MonoBehaviour {
 		waitingForLobbyPublicityChange = false;
 		ChangePublicityBtnInteractability(NetworkManager.Singleton.IsServer);
 		HidePanelsExceptChosen();
+		leaveBtn.interactable = true;
 		startGameBtn.interactable = false;
 		stopGameLoadBtn.SetActive(false);
 		Button b = lobbyPublicBtn.transform.GetComponentInChildren<Button>();

@@ -117,9 +117,9 @@ public class MyLobby : NetworkBehaviour {
 	}
 	void ServerStartedSuccess() {
 		// Debug.LogWarning("Server started");
-		LobbyCreatedEvent?.Invoke();
 		InitializeNewLobby();
 		LobbyManager.Instance.ChangeLobbyPublicity();
+		LobbyCreatedEvent?.Invoke();
 	}
 
 	void InitializeNewLobby() {
@@ -426,11 +426,12 @@ public class MyLobby : NetworkBehaviour {
 	public static NetworkVariable<int> LoadingCountdown = new NetworkVariable<int>();
 
 	void LoadingSceneBoolChanged(bool previous, bool loading) {
+		if (NetworkManager.Singleton.IsServer) return;
 		if (loadTimeoutRoutine != null) StopCoroutine(loadTimeoutRoutine);
 		if (loading) loadTimeoutRoutine = StartCoroutine(LoadTimeoutRoutine());
 	}
 	Coroutine loadingSceneRoutine = null, loadTimeoutRoutine = null;
-	const int sceneLoadTimer = 3, sceneLoadTimeout = 10;
+	const int sceneLoadTimer = 3, sceneLoadTimeout = 15;
 	public void CheckIfPlayersFilled() {
 		LobbyFull?.Invoke(team1.Count > 0 && team2.Count > 0);
 	}

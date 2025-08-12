@@ -4,29 +4,25 @@ using TMPro;
 using UnityEngine;
 
 public class FancyButton : MonoBehaviour {
-	public bool publicVersion = true;
+	public bool isPublic = true;
 	float clickT = -100f;
 	Coroutine animRoutine;
 	public void Clicked() {
 		Clicked(-1);
 	}
-	public void Clicked(float animPeriod = -1, bool soundEvent = true, bool ignoreTime = false) {
-		if (!ignoreTime && Time.unscaledTime - clickT < reclickTime) return;
+	public void Clicked(float animPeriod = -1) {
 		clickT = Time.unscaledTime;
-		publicVersion = !publicVersion;
-		if (soundEvent) ButtonStateChanged?.Invoke();
+		isPublic = !isPublic;
 		if (animRoutine != null) StopCoroutine(animRoutine);
 		animRoutine = StartCoroutine(ClickedRoutine(animPeriod));
 	}
-	public event System.Action ButtonStateChanged;
 	public Transform btnSpinVisualObj;
 	public TextMeshProUGUI publicTxt, privateTxt;
 	public Color activeColor, inactiveColor;
 	public float period = 1f;
-	public float reclickTime = 2f;
 	IEnumerator ClickedRoutine(float animPeriod = -1) {
-		bool targetPos = publicVersion;
-		float targetRot = publicVersion ? 0 : 180f;
+		bool targetPos = isPublic;
+		float targetRot = isPublic ? 0 : 180f;
 		float startRot = btnSpinVisualObj.localEulerAngles.z;
 		startRot %= 360f;
 		if (targetRot < startRot) targetRot += 360f;
@@ -38,12 +34,12 @@ public class FancyButton : MonoBehaviour {
 			t += Time.unscaledDeltaTime;
 			float finalRot = Mathf.Lerp(startRot, targetRot, t / animPeriod);
 			btnSpinVisualObj.rotation = Quaternion.Euler(0, 0, finalRot);
-			publicTxt.color = publicVersion ? Color.Lerp(inactiveColor, activeColor, t / animPeriod) : Color.Lerp(activeColor, inactiveColor, t / animPeriod);
-			privateTxt.color = !publicVersion ? Color.Lerp(inactiveColor, activeColor, t / animPeriod) : Color.Lerp(activeColor, inactiveColor, t / animPeriod);
+			publicTxt.color = isPublic ? Color.Lerp(inactiveColor, activeColor, t / animPeriod) : Color.Lerp(activeColor, inactiveColor, t / animPeriod);
+			privateTxt.color = !isPublic ? Color.Lerp(inactiveColor, activeColor, t / animPeriod) : Color.Lerp(activeColor, inactiveColor, t / animPeriod);
 			yield return null;
 		}
-		publicTxt.color = publicVersion ? activeColor : inactiveColor;
-		privateTxt.color = !publicVersion ? activeColor : inactiveColor;
+		publicTxt.color = isPublic ? activeColor : inactiveColor;
+		privateTxt.color = !isPublic ? activeColor : inactiveColor;
 		btnSpinVisualObj.rotation = Quaternion.Euler(0, 0, targetRot);
 	}
 }

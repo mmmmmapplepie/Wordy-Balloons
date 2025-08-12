@@ -166,17 +166,37 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1353041679975876429, guid: 1bd8cebc912b08947b9011b25884bf47, type: 3}
+      propertyPath: m_SortingLayer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1841445957136901865, guid: 1bd8cebc912b08947b9011b25884bf47, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1909625617006701891, guid: 1bd8cebc912b08947b9011b25884bf47, type: 3}
       propertyPath: m_Name
       value: BuildupBalloonSplashEffect
+      objectReference: {fileID: 0}
+    - target: {fileID: 2675437864081580253, guid: 1bd8cebc912b08947b9011b25884bf47, type: 3}
+      propertyPath: lengthInSec
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2787791249265791115, guid: 1bd8cebc912b08947b9011b25884bf47, type: 3}
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2787791249265791115, guid: 1bd8cebc912b08947b9011b25884bf47, type: 3}
+      propertyPath: m_SortingLayer
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5198973444206952503, guid: 1bd8cebc912b08947b9011b25884bf47, type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5198973444206952503, guid: 1bd8cebc912b08947b9011b25884bf47, type: 3}
+      propertyPath: m_SortingLayer
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

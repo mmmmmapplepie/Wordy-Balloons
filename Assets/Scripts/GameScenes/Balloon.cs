@@ -27,7 +27,6 @@ public class Balloon : NetworkBehaviour {
 	public override void OnNetworkSpawn() {
 		base.OnNetworkSpawn();
 		power.OnValueChanged += PowerChanged;
-		flyProgress.OnValueChanged += ProgressChanged;
 		GameStateManager.GameResultSetEvent += GameSet;
 		if (NetworkManager.Singleton.IsServer) {
 			realFlightHeight.Value = Random.Range(BalloonManager.FlightHeightMin, BalloonManager.FlightHeightMax);
@@ -38,14 +37,12 @@ public class Balloon : NetworkBehaviour {
 			endP.Value = endPos;
 		}
 		PowerChanged(0, power.Value);
-		ProgressChanged(0f, 0f);
 		SetPosition(0);
 		UpdateScale();
 		BalloonCreated?.Invoke(balloonTeam.Value, this);
 		anim.InitilizeAnimations(balloonColor.Value);
 	}
 	public override void OnNetworkDespawn() {
-		flyProgress.OnValueChanged -= ProgressChanged;
 		power.OnValueChanged -= PowerChanged;
 		GameStateManager.GameResultSetEvent -= GameSet;
 		base.OnNetworkDespawn();
@@ -55,19 +52,15 @@ public class Balloon : NetworkBehaviour {
 		UpdateFlyProgress();
 	}
 	float localProgress = 0f;
-	float smoothingTime = 0.5f;
-	float maxError = 0.1f;
+	float smoothingSpeedMultiplier = 2f;
+	float maxError = 0.05f;
 	float currSetProgress = 0f;
 
 	void UpdateFlyProgress() {
 		if (NetworkManager.Singleton.IsServer) {
-			flyTime.Value = BalloonManager.Flytime;
-			flyProgress.Value = Mathf.Clamp01(flyProgress.Value + Time.deltaTime / flyTime.Value);
-			SetPosition(flyProgress.Value);
+			ServerPosUpdate();
 		} else {
-			localProgress = Mathf.Clamp01(localProgress + Time.deltaTime / flyTime.Value);
-			if (interpolation != null) return;
-			SetPosition(localProgress);
+			ClientPosUpdate();
 		}
 	}
 	float minScale = 0.7f, maxScale = 2f;
@@ -76,31 +69,41 @@ public class Balloon : NetworkBehaviour {
 	}
 	NetworkVariable<Vector3> startP = new NetworkVariable<Vector3>(), endP = new NetworkVariable<Vector3>();
 	[HideInInspector] public Vector3 startPos, endPos;
-	void ProgressChanged(float previous, float current) {
-		if (current >= 1) {
+	void ServerPosUpdate() {
+		flyTime.Value = BalloonManager.Flytime;
+		flyProgress.Value = Mathf.Clamp01(flyProgress.Value + Time.deltaTime / flyTime.Value);
+		SetPosition(flyProgress.Value);
+		if (flyProgress.Value >= 1f) {
 			HitBase();
-			return;
-		}
-		localProgress = current;
-		if (NetworkManager.Singleton.IsServer) return;
-		if (Mathf.Abs(currSetProgress - current) > maxError && currSetProgress < current) {
-			if (interpolation != null) StopCoroutine(interpolation);
-			SetPosition(current);
-		} else if (currSetProgress > current) {
-			if (interpolation != null) StopCoroutine(interpolation);
-			localProgress = Mathf.Clamp01(currSetProgress - Time.deltaTime / flyTime.Value);
-		} else {
-			if (interpolation != null) StopCoroutine(interpolation);
-			interpolation = StartCoroutine(InterpolatePosition());
 		}
 	}
+	void ClientPosUpdate() {
+		float deltaDiff = Time.deltaTime / flyTime.Value;
+		if (Mathf.Abs(localProgress - flyProgress.Value) > maxError) {
+			if (flyProgress.Value > localProgress) {
+				localProgress = flyProgress.Value;
+			} else {
+				deltaDiff /= (smoothingSpeedMultiplier * 1.25f);
+			}
+		} else {
+			localProgress += deltaDiff;
+		}
+		float currLocDiff = Mathf.Abs(currSetProgress - localProgress);
+		if (currLocDiff > maxError) {
+			deltaDiff *= smoothingSpeedMultiplier;
+		}
+
+		float diffMin = Mathf.Min(deltaDiff, currLocDiff);
+		SetPosition(currSetProgress + Mathf.Sign(localProgress - currSetProgress) * diffMin);
+	}
+
 	Coroutine interpolation = null;
 	IEnumerator InterpolatePosition() {
 		float t = 0;
-		while (t < smoothingTime) {
+		while (t < smoothingSpeedMultiplier) {
 			yield return null;
 			t += Time.deltaTime;
-			SetPosition(Mathf.Lerp(currSetProgress, localProgress < currSetProgress ? (localProgress + currSetProgress) / 2f : localProgress, t / smoothingTime));
+			SetPosition(Mathf.Lerp(currSetProgress, localProgress < currSetProgress ? (localProgress + currSetProgress) / 2f : localProgress, t / smoothingSpeedMultiplier));
 		}
 		SetPosition(localProgress);
 		interpolation = null;

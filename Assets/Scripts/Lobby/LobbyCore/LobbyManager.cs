@@ -187,13 +187,18 @@ public class LobbyManager : MonoBehaviour {
 			return;
 		}
 		try {
+			//assign relay
+			Allocation relayAlloc = await TaskTimeout.AddTimeout<Allocation>(AllocateRelay(lobbyMaxPlayerNumber), TimeSpan.FromSeconds(5));
+			NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(relayAlloc, "dtls"));
+			string relayCode = await TaskTimeout.AddTimeout<String>(GetRelayCode(relayAlloc), TimeSpan.FromSeconds(5));
+
 			//create lobby
 			CreateLobbyOptions lobbyDetails = new CreateLobbyOptions {
 				IsPrivate = true,
 				Player = GetNewPlayer(playerName),
 				Data = new Dictionary<string, DataObject> {
 					{GameMode, new DataObject(DataObject.VisibilityOptions.Public, mode)},
-					{RelayCode, new DataObject(DataObject.VisibilityOptions.Member, RelayCode)},
+					{RelayCode, new DataObject(DataObject.VisibilityOptions.Member, relayCode)},
 					{Dictionary, new DataObject(DataObject.VisibilityOptions.Public, dictionary.ToString())},
 					{GameEndMode, new DataObject(DataObject.VisibilityOptions.Public, endMode.ToString())},
 					{GameEndTime, new DataObject(DataObject.VisibilityOptions.Public, time.ToString())}
@@ -201,17 +206,14 @@ public class LobbyManager : MonoBehaviour {
 			};
 			hostLobby = await TaskTimeout.AddTimeout<Lobby>(LobbyService.Instance.CreateLobbyAsync(lobbyName, lobbyMaxPlayerNumber, lobbyDetails));
 
-			//assign relay
-			Allocation relayAlloc = await TaskTimeout.AddTimeout<Allocation>(AllocateRelay(lobbyMaxPlayerNumber), TimeSpan.FromSeconds(5));
-			NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(relayAlloc, "dtls"));
-			string relayCode = await TaskTimeout.AddTimeout<String>(GetRelayCode(relayAlloc), TimeSpan.FromSeconds(5));
 
 			//update lobby with relay
-			hostLobby = await TaskTimeout.AddTimeout<Lobby>(LobbyService.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions {
-				Data = new Dictionary<string, DataObject> {
-					{RelayCode, new DataObject(DataObject.VisibilityOptions.Member, relayCode)}
-				}
-			}), TimeSpan.FromSeconds(5));
+			// hostLobby = await TaskTimeout.AddTimeout<Lobby>(LobbyService.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions {
+			// 	Data = new Dictionary<string, DataObject> {
+			// 		{RelayCode, new DataObject(DataObject.VisibilityOptions.Member, relayCode)}
+			// 	}
+			// }), TimeSpan.FromSeconds(5));
+
 			joinedLobby = hostLobby;
 			await TaskTimeout.AddTimeout(SubscribeToLobbyEvents(), TimeSpan.FromSeconds(5));
 			CreatedLobbyEvent?.Invoke();
@@ -498,7 +500,6 @@ public class LobbyManager : MonoBehaviour {
 			hostLobby = await Lobbies.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions {
 				IsPrivate = !makePublic
 			});
-			await Task.Delay(2000);
 			joinedLobby = hostLobby;
 			LobbyUpdateSuccess?.Invoke();
 		} catch (LobbyServiceException e) {

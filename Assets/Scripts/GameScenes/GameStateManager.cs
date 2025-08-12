@@ -68,13 +68,13 @@ public class GameStateManager : NetworkBehaviour {
 			GameStartEvent?.Invoke();
 		}
 	}
-	void Update() {
-		if (CountdownFinished == false && countDown_NV.Value <= 0 && !GameData.GamePaused && CurrGameState == GameState.Countdown) {
-			CountdownFinished = true;
-			GameStateManager.CurrGameState = GameState.InPlay;
-			GameStartEvent?.Invoke();
-		}
-	}
+	// void Update() {
+	// 	if (CountdownFinished == false && countDown_NV.Value <= 0 && !GameData.GamePaused && CurrGameState == GameState.Countdown) {
+	// 		CountdownFinished = true;
+	// 		GameStateManager.CurrGameState = GameState.InPlay;
+	// 		GameStartEvent?.Invoke();
+	// 	}
+	// }
 	public static bool IsGameRunning() {
 		return CurrGameState == GameState.InPlay && !GameData.GamePaused;
 	}

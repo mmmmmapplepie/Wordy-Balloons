@@ -7825,14 +7825,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c5b8590ed5209742a0461b1d916497a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  publicVersion: 1
+  isPublic: 1
   btnSpinVisualObj: {fileID: 1273211891}
   publicTxt: {fileID: 1047507481}
   privateTxt: {fileID: 1915805664}
   activeColor: {r: 1, g: 0.5647059, b: 0, a: 1}
   inactiveColor: {r: 0.20784314, g: 0.20784314, b: 0.20784314, a: 0.39215687}
   period: 0.5
-  reclickTime: 1
 --- !u!114 &821302473
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21223,17 +21222,17 @@ MonoBehaviour:
   m_MaxPacketQueueSize: 128
   m_MaxPayloadSize: 6144
   m_HeartbeatTimeoutMS: 1000
-  m_ConnectTimeoutMS: 4000
+  m_ConnectTimeoutMS: 10000
   m_MaxConnectAttempts: 60
-  m_DisconnectTimeoutMS: 5000
+  m_DisconnectTimeoutMS: 10000
   ConnectionData:
     Address: 127.0.0.1
     Port: 7777
     ServerListenAddress: 127.0.0.1
   DebugSimulator:
-    PacketDelayMS: 0
-    PacketJitterMS: 0
-    PacketDropRate: 0
+    PacketDelayMS: 1000
+    PacketJitterMS: 600
+    PacketDropRate: 20
 --- !u!114 &2129996767
 MonoBehaviour:
   m_ObjectHideFlags: 0
