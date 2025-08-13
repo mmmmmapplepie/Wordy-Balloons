@@ -70,7 +70,7 @@ public class TutorialManager : MonoBehaviour {
 
 
 	#region Opening-GamePurpose
-	public GameObject menuBtn, timer;
+	public GameObject menuBtn;
 	public WelcomeIntroEffect welcomeIntro;
 	// <color=#FE25DF><b><i></color></b></i>
 	// <color=#FF4100><b></color></b>

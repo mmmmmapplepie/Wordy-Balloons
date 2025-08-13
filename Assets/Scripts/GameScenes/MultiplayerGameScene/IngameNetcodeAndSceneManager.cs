@@ -182,7 +182,7 @@ public class IngameNetcodeAndSceneManager : NetworkBehaviour {
 	void GameStart() {
 		ChangeReconnectionState(false);
 		if (connectionCheckTimeout != null) StopCoroutine(connectionCheckTimeout);
-		if (!gameStart && NetworkManager.Singleton.IsServer) StartCoroutine(ClientPingRoutine());
+		if (!gameStart && NetworkManager.Singleton.IsServer && GameData.PlayMode == PlayModeEnum.Multiplayer) StartCoroutine(ClientPingRoutine());
 		gameStart = true;
 	}
 	IEnumerator ClientPingRoutine() {

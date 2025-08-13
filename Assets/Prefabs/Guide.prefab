@@ -229,8 +229,8 @@ MonoBehaviour:
     basic game mode. No effects when attempting
     to launch a wrong word balloon'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -422,8 +422,8 @@ MonoBehaviour:
     skip charges replenish when you successfully
     launch balloons.'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -706,8 +706,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Get list of words starting with a specific letter
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -920,8 +920,8 @@ MonoBehaviour:
 
     click on the word for its meaning'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1285,8 +1285,8 @@ MonoBehaviour:
 
     use the button above to copy current word'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1423,8 +1423,8 @@ MonoBehaviour:
 
     game will pause in single player mode'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1634,8 +1634,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: search specific word
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1768,8 +1768,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: dictionary
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1987,8 +1987,8 @@ MonoBehaviour:
     A
     launched balloon will have equal power to the length of the word you typed.'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2427,8 +2427,8 @@ MonoBehaviour:
     the base gets damaged when
     hit by a balloon.'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3254,8 +3254,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Game Modes
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3688,8 +3688,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Some statistics get saved locally after each game
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 7ad206f1d2d75d54f9db3cdc029fd5cf, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 7ad206f1d2d75d54f9db3cdc029fd5cf, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3822,8 +3822,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: lobby details
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4200,8 +4200,8 @@ MonoBehaviour:
 
     (these can''t be changed from within the lobby)'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4343,8 +4343,8 @@ MonoBehaviour:
     (dropping
     on another player will swap the players)'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4479,8 +4479,8 @@ MonoBehaviour:
 
     tutorial'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4504,7 +4504,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 32.55
+  m_fontSize: 38.2
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -4517,7 +4517,7 @@ MonoBehaviour:
   m_characterSpacing: 0
   m_wordSpacing: 0
   m_lineSpacing: 0
-  m_lineSpacingMax: 0
+  m_lineSpacingMax: -30
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
   m_enableWordWrapping: 0
@@ -4616,8 +4616,8 @@ MonoBehaviour:
     launching an incorrect word balloon
     will damage your own base'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4758,8 +4758,8 @@ MonoBehaviour:
     (others can only join private lobbies
     through lobby code)'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4892,8 +4892,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: internet connection state
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -5027,8 +5027,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: word meaning
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -5771,8 +5771,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: typing accuracy
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -6062,8 +6062,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: lobby general chat
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -6276,8 +6276,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: set your name
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -6413,8 +6413,8 @@ MonoBehaviour:
     attempting to launch an incorrect word
     balloon will erase current typed progress'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -6699,8 +6699,8 @@ MonoBehaviour:
 
     join lobby'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -7220,8 +7220,8 @@ MonoBehaviour:
 
     (your contribution in team - right)'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -7432,8 +7432,8 @@ MonoBehaviour:
 
     (current speed - below)'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -7642,8 +7642,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Gameplay
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -8003,8 +8003,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Inside lobby
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -8144,8 +8144,8 @@ MonoBehaviour:
     <color=red>beginner</color>:around 3000 of the more commonly
     used words'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -8278,8 +8278,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Game statistics
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -8599,8 +8599,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: multiplayer
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -8739,8 +8739,8 @@ MonoBehaviour:
     refresh available lobbies
     using the button above'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -8949,8 +8949,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Lobby - creation
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -9160,8 +9160,8 @@ MonoBehaviour:
   m_text: "set (characters-per-minute) speed for computer.\n <color=red>(single player
     mode only)</color>"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
+  m_sharedMaterial: {fileID: 4129766685831736077, guid: 5468b9c0db10e614789a625ec638f945, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
