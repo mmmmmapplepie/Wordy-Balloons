@@ -90,7 +90,7 @@ public class NetcodeManager : MonoBehaviour {
 		if (clientID == NetworkManager.Singleton.LocalClientId) ClientStartSuccess?.Invoke();
 	}
 	void ClientDisconnectedFromNGO(ulong clientID) {
-		print("disconnected");
+		// print("disconnected");
 		ClientDisconnected?.Invoke(clientID);
 	}
 	void ServerStopped(bool stopped) {
@@ -101,7 +101,7 @@ public class NetcodeManager : MonoBehaviour {
 		ClientStartedEvent?.Invoke(NetworkManager.Singleton.IsHost);
 	}
 	void ClientStopped(bool wasHost) {
-		print("clientStopped");
+		// print("clientStopped");
 		ClientStoppedEvent?.Invoke(wasHost);
 	}
 	void TransportFailure() {

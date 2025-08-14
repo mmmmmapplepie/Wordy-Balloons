@@ -64,7 +64,6 @@ public class LobbyManager : MonoBehaviour {
 			try {
 				await TaskTimeout.AddTimeout(lobbyEventsToCleanup[i].UnsubscribeAsync());
 				lobbyEventsToCleanup.RemoveAt(i);
-				print("cleanedup lobby event link");
 			} catch (Exception e) {
 				print(e);
 				i++;
@@ -74,7 +73,6 @@ public class LobbyManager : MonoBehaviour {
 			try {
 				await LobbyService.Instance.RemovePlayerAsync(lobbiesToCleanup[i], authenticationID);
 				lobbiesToCleanup.RemoveAt(i);
-				print("cleaned up lobby link");
 			} catch (Exception e) {
 				print(e);
 				i++;
@@ -191,7 +189,6 @@ public class LobbyManager : MonoBehaviour {
 			Allocation relayAlloc = await TaskTimeout.AddTimeout<Allocation>(AllocateRelay(lobbyMaxPlayerNumber), TimeSpan.FromSeconds(5));
 			NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(relayAlloc, "dtls"));
 			string relayCode = await TaskTimeout.AddTimeout<String>(GetRelayCode(relayAlloc), TimeSpan.FromSeconds(5));
-
 			//create lobby
 			CreateLobbyOptions lobbyDetails = new CreateLobbyOptions {
 				IsPrivate = true,
@@ -206,13 +203,17 @@ public class LobbyManager : MonoBehaviour {
 			};
 			hostLobby = await TaskTimeout.AddTimeout<Lobby>(LobbyService.Instance.CreateLobbyAsync(lobbyName, lobbyMaxPlayerNumber, lobbyDetails));
 
-
-			//update lobby with relay
+			// //assign relay
+			// Allocation relayAlloc = await TaskTimeout.AddTimeout<Allocation>(AllocateRelay(lobbyMaxPlayerNumber), TimeSpan.FromSeconds(5));
+			// NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(relayAlloc, "dtls"));
+			// string relayCode = await TaskTimeout.AddTimeout<String>(GetRelayCode(relayAlloc), TimeSpan.FromSeconds(5));
+			// // update lobby with relay
 			// hostLobby = await TaskTimeout.AddTimeout<Lobby>(LobbyService.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions {
 			// 	Data = new Dictionary<string, DataObject> {
 			// 		{RelayCode, new DataObject(DataObject.VisibilityOptions.Member, relayCode)}
 			// 	}
 			// }), TimeSpan.FromSeconds(5));
+			print(relayCode);
 
 			joinedLobby = hostLobby;
 			await TaskTimeout.AddTimeout(SubscribeToLobbyEvents(), TimeSpan.FromSeconds(5));
@@ -310,6 +311,7 @@ public class LobbyManager : MonoBehaviour {
 		}
 	}
 	public async Task<JoinAllocation> JoinRelay(string relayCode) {
+		print(relayCode);
 		try {
 			JoinAllocation allocation = await RelayService.Instance.JoinAllocationAsync(relayCode);
 			return allocation;
@@ -391,10 +393,10 @@ public class LobbyManager : MonoBehaviour {
 		}
 	}
 	async Task JoinLobby() {
-		string relayCode = joinedLobby.Data[RelayCode].Value;
 		try {
-			JoinAllocation joinRelayAlloc = await JoinRelay(relayCode);
 			await SubscribeToLobbyEvents();
+			string relayCode = joinedLobby.Data[RelayCode].Value;
+			JoinAllocation joinRelayAlloc = await JoinRelay(relayCode);
 			NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinRelayAlloc, "dtls"));
 			JoinedLobby?.Invoke();
 		} catch (Exception e) {
@@ -412,6 +414,7 @@ public class LobbyManager : MonoBehaviour {
 	#region Kick/LeavingLobby
 
 	public async void KickFromLobby(string id) {
+		print("kicking:" + id);
 		if (hostLobby != null) {
 			try {
 				await LobbyService.Instance.RemovePlayerAsync(hostLobby.Id, id);

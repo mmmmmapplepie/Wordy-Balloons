@@ -154,7 +154,7 @@ public class TutorialManager : MonoBehaviour {
 		while (!playerBalloonSpawned) yield return null;
 		yield return new WaitForSecondsRealtime(0.25f);
 		Vector2 balloonPos = GetWorldPointToCanvasPoint(latestBalloon.transform.position);
-		ShowPanelWithText("good job! you have successfully launched a balloon! It's power will match the length of the <color=#FF4100><b>word you typed</color></b>.", 30f, new Vector2(100f, balloonPos.y));
+		ShowPanelWithText("good job! you have successfully launched a balloon! Its power will match the length of the <color=#FF4100><b>word you typed</color></b>.", 30f, new Vector2(100f, balloonPos.y));
 		shapeList.Clear();
 		shapeList.Add(new PinholeShape(balloonPos, GetWorldSizeInCanvasRectSize(new Vector2(1.5f, 1.5f)), 100f, PinholeShaderEditor.Shape.Ellipse));
 		SetupHighlights(shapeList);

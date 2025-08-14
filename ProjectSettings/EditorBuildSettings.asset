@@ -20,8 +20,5 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SinglePlayer.unity
     guid: dd63488e517a9cd41a4caf690fe66a46
-  - enabled: 1
-    path: Assets/Scenes/MiscTest.unity
-    guid: 3365c3be49931ed42945e5e3cead86f8
   m_configObjects:
     com.unity.renderstreaming.settings: {fileID: 11400000, guid: eaaad242393318e4f85c45e69c8837f0, type: 2}

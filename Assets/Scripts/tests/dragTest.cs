@@ -14,7 +14,9 @@ public class dragTest : MonoBehaviour {
 		scroller.OnValueChanged(ScrollValChanged);
 	}
 	public void SetScroller(List<WordHolder> data) {
+		if (data == null) return;
 		words = data;
+
 		int count = words != null ? words.Count : 0;
 		scroller.SetTotalCount(count);
 		scroller.Position = 0;
