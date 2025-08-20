@@ -17,4 +17,19 @@ public class SetFont : MonoBehaviour {
 			SetFontInTransform(newT);
 		}
 	}
+
+	public bool setBold = false;
+	[ContextMenu("set bold")]
+	void SetBoldForAllChildren() {
+		SetBoldInTransform(transform);
+	}
+
+	void SetBoldInTransform(Transform t) {
+		if (t.TryGetComponent<TMP_Text>(out TMP_Text tm)) tm.fontStyle = setBold ? FontStyles.Bold : FontStyles.Normal;
+		foreach (Transform newT in t) {
+			print(newT.name);
+			SetFontInTransform(newT);
+		}
+	}
+
 }

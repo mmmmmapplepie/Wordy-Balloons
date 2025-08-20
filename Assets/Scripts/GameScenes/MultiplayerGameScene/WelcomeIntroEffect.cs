@@ -35,6 +35,9 @@ public class WelcomeIntroEffect : MonoBehaviour {
 		blackoutImg.color = Color.black;
 		BGMManager.instance.SetBGMVolume(0);
 
+		UnityEngine.Rendering.Universal.UniversalAdditionalCameraData uac = Camera.main.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+		uac.renderPostProcessing = false;
+
 		yield return new WaitForSecondsRealtime(1f);
 
 		for (int i = 0; i < 7; i++) {
@@ -60,11 +63,14 @@ public class WelcomeIntroEffect : MonoBehaviour {
 		}
 		yield return new WaitForSecondsRealtime(2f);
 
+		uac.renderPostProcessing = true;
 		Camera.main.orthographic = false;
 
 		float expandTime = 3f;
 		t = 0;
 		bool confettiFired = false;
+
+
 		typewriter.gameObject.SetActive(false);
 		while (t < expandTime) {
 			float r = 1f - Mathf.Pow((1f - t / expandTime), 5f);
@@ -87,6 +93,7 @@ public class WelcomeIntroEffect : MonoBehaviour {
 		typewriter.gameObject.GetComponent<TextMeshProUGUI>().color = Color.clear;
 		float reduceTime = 2f;
 		t = 0;
+
 		while (t < reduceTime) {
 			float r = Mathf.Pow((1f - t / reduceTime), 3f);
 			t += Time.unscaledDeltaTime;
@@ -109,6 +116,8 @@ public class WelcomeIntroEffect : MonoBehaviour {
 		StartCoroutine(BobbingTitle());
 		Camera.main.orthographic = true;
 		t = 0;
+
+
 		while (t < blackoutTime) {
 			t += Time.unscaledDeltaTime;
 			blackoutImg.color = Color.Lerp(Color.black, Color.clear, t / blackoutTime);

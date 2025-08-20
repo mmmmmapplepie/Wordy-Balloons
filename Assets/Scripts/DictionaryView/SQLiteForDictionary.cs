@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using SQLite;
 using UnityEngine;
@@ -16,7 +17,7 @@ public class SQLiteForDictionary : MonoBehaviour {
 
 	public List<WordHolder> GetWordStartingWithString(string queryString) {
 		if (queryString.IsNullOrEmpty()) return null;
-		return conn.Table<WordHolder>().Where(p => p.Word.StartsWith(queryString, System.StringComparison.OrdinalIgnoreCase)).ToList();
+		return conn.Table<WordHolder>().Where(p => p.Word.StartsWith(queryString, System.StringComparison.OrdinalIgnoreCase)).ToList().OrderBy(p => p.Word.ToLower()).ToList();
 	}
 
 	void AddWord(DictionaryEntry entry) {
