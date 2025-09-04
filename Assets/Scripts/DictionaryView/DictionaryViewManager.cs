@@ -2,9 +2,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using WebSocketSharp;
 
 public class DictionaryViewManager : MonoBehaviour {
 	public TMP_InputField searchInput;
@@ -55,7 +53,7 @@ public class DictionaryViewManager : MonoBehaviour {
 
 
 	public void ReturnToMainMenu() {
-		SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+		SceneManagerAsync.Singleton.LoadSceneAsync("MainMenu");
 	}
 
 

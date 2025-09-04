@@ -21,7 +21,7 @@ public class MainMenuUI : MonoBehaviour {
 	}
 	public void GoToScene(string name) {
 		if (SceneManager.GetSceneByName(name) == null) return;
-		SceneManager.LoadScene(name);
+		SceneManagerAsync.Singleton.LoadSceneAsync(name);
 	}
 
 	public void ActivateObject(GameObject o) {

@@ -91,7 +91,7 @@ public class LobbyUI : MonoBehaviour {
 	public void GoToScene(string scene) {
 		if (scene == "MainMenu") GoingToMainMenu?.Invoke();
 		//have to stop NGO and lobby if main menu
-		SceneManager.LoadScene(scene);
+		SceneManagerAsync.Singleton.LoadSceneAsync(scene);
 	}
 	public void RetryAuthentication() {
 		LobbyManager.Instance.Authenticate();

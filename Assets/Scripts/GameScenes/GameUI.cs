@@ -92,7 +92,7 @@ public class GameUI : MonoBehaviour {
 			SaveData?.Invoke();
 		}
 		NetworkManager.Singleton.Shutdown();
-		SceneManager.LoadScene(s.IsNullOrEmpty() == true ? targetSceneName : s, LoadSceneMode.Single);
+		SceneManagerAsync.Singleton.LoadSceneAsync(s.IsNullOrEmpty() == true ? targetSceneName : s);
 	}
 	public static event System.Action SaveData;
 

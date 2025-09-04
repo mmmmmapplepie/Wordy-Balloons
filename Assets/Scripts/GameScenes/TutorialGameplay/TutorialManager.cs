@@ -437,6 +437,6 @@ public class TutorialManager : MonoBehaviour {
 
 	public void SkipTutorial() {
 		PlayerPrefs.SetInt(TutorialManager.TutorialClearedPlayerPrefKey, 1);
-		SceneManager.LoadScene("MainMenu");
+		SceneManagerAsync.Singleton.LoadSceneAsync("MainMenu");
 	}
 }

@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 
 public class PulseEffect : MonoBehaviour {
-	public float startScale, endScale;
+	public float startScale, endScale, yFactor = 1f;
 	public float pulsePeriod;
 	public ParticleSystem.MinMaxGradient colorOverTime;
 	TextMeshProUGUI txt;
@@ -22,7 +22,10 @@ public class PulseEffect : MonoBehaviour {
 			if (t > pulsePeriod) {
 				t = 0;
 			}
-			transform.localScale = Vector3.one * Mathf.Lerp(startScale, endScale, t / pulsePeriod);
+			float factor = Mathf.Lerp(startScale, endScale, t / pulsePeriod);
+			Vector3 tscale = Vector3.one * factor;
+			tscale.y = startScale + yFactor * (factor - startScale);
+			transform.localScale = tscale;
 			txt.color = colorOverTime.Evaluate(t / pulsePeriod);
 			yield return null;
 		}

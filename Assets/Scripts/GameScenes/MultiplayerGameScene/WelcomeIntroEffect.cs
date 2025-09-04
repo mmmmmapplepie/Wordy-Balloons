@@ -1,16 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
 public class WelcomeIntroEffect : MonoBehaviour {
 	[HideInInspector] public bool AnimationFinished = false;
 
+	float initialBloom;
 
 
 	void OnEnable() {
 		if (GameData.PlayMode == PlayModeEnum.Tutorial) StartCoroutine(StartOpeningAnimation());
+		v.profile.TryGet<Bloom>(out bloom);
+		if (bloom != null) initialBloom = bloom.intensity.value;
 	}
 
 
@@ -22,6 +28,8 @@ public class WelcomeIntroEffect : MonoBehaviour {
 	public GameObject nxtBtnExtra;
 	public List<GameObject> fireworksEffect = new List<GameObject>();
 	public Gradient g;
+	public Volume v;
+	Bloom bloom;
 
 	IEnumerator StartOpeningAnimation() {
 		float blackoutTime = 2f;
@@ -34,6 +42,8 @@ public class WelcomeIntroEffect : MonoBehaviour {
 		}
 		blackoutImg.color = Color.black;
 		BGMManager.instance.SetBGMVolume(0);
+
+		bloom.intensity.value = 0f;
 
 		UnityEngine.Rendering.Universal.UniversalAdditionalCameraData uac = Camera.main.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
 		uac.renderPostProcessing = false;
@@ -105,6 +115,7 @@ public class WelcomeIntroEffect : MonoBehaviour {
 			}
 			typewriter.gameObject.GetComponent<TextMeshProUGUI>().color = Color.Lerp(Color.clear, Color.white, t / reduceTime);
 			BGMManager.instance.SetBGMVolume(t / reduceTime);
+			bloom.intensity.value = Mathf.Lerp(1f, 0f, t / reduceTime);
 			yield return null;
 		}
 		BGMManager.instance.SetBGMVolume(1f);
@@ -122,7 +133,9 @@ public class WelcomeIntroEffect : MonoBehaviour {
 			t += Time.unscaledDeltaTime;
 			blackoutImg.color = Color.Lerp(Color.black, Color.clear, t / blackoutTime);
 			yield return null;
+			bloom.intensity.value = Mathf.Lerp(0f, initialBloom, t / blackoutTime);
 		}
+		bloom.intensity.value = initialBloom;
 		BGMManager.instance.SetBGMVolume(1f);
 		blackoutImg.color = Color.clear;
 		nxtBtnExtra.SetActive(true);
@@ -147,6 +160,7 @@ public class WelcomeIntroEffect : MonoBehaviour {
 	}
 	IEnumerator CreateCracker(Vector2 pos) {
 		yield return new WaitForSeconds(Random.Range(0, 0.2f));
+		bloom.intensity.value += 1f / 9f;
 		GameObject newEffectPrefab = fireworksEffect[Random.Range(0, fireworksEffect.Count - 1)];
 		GameObject g = Instantiate(newEffectPrefab, transform);
 		g.GetComponent<RectTransform>().anchoredPosition = pos;
@@ -169,7 +183,9 @@ public class WelcomeIntroEffect : MonoBehaviour {
 	}
 
 
-
+	void OnDestroy() {
+		if (bloom != null) bloom.intensity.value = initialBloom;
+	}
 
 	IEnumerator BobbingTitle() {
 		while (true) {
