@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TextCore.Text;
@@ -336,7 +335,7 @@ public class TutorialManager : MonoBehaviour {
 		inputManager.canTakeInput = true;
 		inputManager.canAttemptFire = true;
 		float t = 0;
-		CanvasGroup g = txtHolder.AddComponent<CanvasGroup>();
+		CanvasGroup g = txtHolder.gameObject.AddComponent<CanvasGroup>();
 		skipBtn.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "FINISH TUTORIAL";
 		while (t < 3) {
 			t += Time.deltaTime;
