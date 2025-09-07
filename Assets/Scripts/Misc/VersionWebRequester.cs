@@ -5,71 +5,84 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class VersionWebRequester : MonoBehaviour {
+public class VersionWebRequester {
 
-  public string GameVersion = "1.0";
-  const string VersionURL = "https://raw.githubusercontent.com/mmmmmapplepie/Wordy-Balloons/refs/heads/main/version.txt";
+	static string GameVersionTemp = "0.0";
+	const string VersionURL = "https://raw.githubusercontent.com/mmmmmapplepie/Wordy-Balloons/refs/heads/main/version.txt";
 
 
-  public void CheckVersionCoroutine() {
-    StartCoroutine(CheckVersionRoutine());
-  }
-  public IEnumerator CheckVersionRoutine() {
-    Debug.LogWarning("Coroutine method");
-    UnityWebRequest www = UnityWebRequest.Get(VersionURL);
-    yield return www.SendWebRequest();
 
-    if (www.result != UnityWebRequest.Result.Success) {
-      Debug.LogError("Failed to check version: " + www.error);
-      yield break;
-    }
+	public static async void CheckVersionAsync() {
+		Debug.LogWarning("async method");
+		string version = "";
+		try {
+			version = await CheckVersionAsyncMethod();
+		} catch (Exception e) {
+			Debug.Log(e);
+		}
+		Debug.Log(version);
+	}
+	public static async Task<string> CheckVersionAsyncMethod() {
+		using UnityWebRequest www = UnityWebRequest.Get(VersionURL);
+		var operation = www.SendWebRequest();
 
-    // Get the version string from the text file
-    string latestVersion = www.downloadHandler.text.Trim();
-    print(latestVersion);
+		while (!operation.isDone) await Task.Yield();
 
-    if (Application.version != latestVersion) {
-      // Disable multiplayer buttons or show update popup
-      Debug.Log($"New version available! Current: {Application.version} Latest: {latestVersion}");
-    } else {
-      Debug.Log("Version is up to date.");
-    }
-  }
+		if (www.result != UnityWebRequest.Result.Success) {
+			throw new Exception("Version check failure");
+		}
 
-  public async void CheckVersionAsync() {
-    Debug.LogWarning("async method");
-    string version = "";
-    try {
-      version = await CheckVersionAsyncMethod();
-    } catch (Exception e) {
-      print(e);
-    }
-    print(version);
-  }
-  public async Task<string> CheckVersionAsyncMethod() {
-    using UnityWebRequest www = UnityWebRequest.Get(VersionURL);
-    var operation = www.SendWebRequest();
+		string latestVersion = www.downloadHandler.text.Trim();
 
-    // Await until the request is done
-    while (!operation.isDone)
-      await Task.Yield();
+		// if (GameVersionTemp != latestVersion) {
+		// 	return "";
+		// }
+		if (Application.version != latestVersion) {
+			return "";
+		}
+		return latestVersion;
+	}
 
-    if (www.result != UnityWebRequest.Result.Success) {
-      Debug.LogError("Failed to check version: " + www.error);
-      return "";
-    }
 
-    string latestVersion = www.downloadHandler.text.Trim();
-    print(latestVersion);
 
-    if (Application.version != latestVersion) {
-      Debug.Log($"New version available! Current: {Application.version} Latest: {latestVersion}");
-      // Disable buttons or show update popup
-    } else {
-      Debug.Log("Version is up to date.");
-    }
-    return latestVersion;
-  }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// public void CheckVersionCoroutine(MonoBehaviour mono) {
+	// 	mono.StartCoroutine(CheckVersionRoutine());
+	// }
+	// public IEnumerator CheckVersionRoutine() {
+	// 	Debug.LogWarning("Coroutine method");
+	// 	UnityWebRequest www = UnityWebRequest.Get(VersionURL);
+	// 	yield return www.SendWebRequest();
+
+	// 	if (www.result != UnityWebRequest.Result.Success) {
+	// 		Debug.LogError("Failed to check version: " + www.error);
+	// 		yield break;
+	// 	}
+
+	// 	// Get the version string from the text file
+	// 	string latestVersion = www.downloadHandler.text.Trim();
+	// 	Debug.Log(latestVersion);
+
+	// 	if (Application.version != latestVersion) {
+	// 		// Disable multiplayer buttons or show update popup
+	// 		Debug.Log($"New version available! Current: {Application.version} Latest: {latestVersion}");
+	// 	} else {
+	// 		Debug.Log("Version is up to date.");
+	// 	}
+	// }
 
 }

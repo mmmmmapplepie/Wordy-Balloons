@@ -40,7 +40,7 @@ public class GameStateManager : NetworkBehaviour {
 	NetworkVariable<int> countDown_NV = new NetworkVariable<int>(countDownTime + 1);
 	IEnumerator StartCountDown() {
 		if (GameStateManager.CurrGameState != GameState.Countdown) yield break;
-		yield return new WaitForSeconds(0.3f);
+		yield return new WaitForSeconds(1f);
 		int t = countDownTime;
 		// countDown_NV.Value = 0;
 		while (t > 0) {

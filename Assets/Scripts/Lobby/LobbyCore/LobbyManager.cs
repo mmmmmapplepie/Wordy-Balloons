@@ -11,6 +11,7 @@ using System;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
+using WebSocketSharp;
 
 public class LobbyManager : MonoBehaviour {
 	public const string RelayCode = "RelayCode";
@@ -28,13 +29,10 @@ public class LobbyManager : MonoBehaviour {
 		NetcodeManager.TransportFailureEvent += TransportFail;
 	}
 	public void Start() {
-		Authenticate();
+		Verify();
 	}
 	bool attemptingToAuthenticate = false;
-	public async void Authenticate(string name = null) {
-		if (attemptingToAuthenticate) return;
-		AuthenticationBegin?.Invoke();
-		attemptingToAuthenticate = true;
+	public async Task Authenticate(string name = null) {
 		try {
 			InitializationOptions options = new InitializationOptions();
 			playerName = (name == null) ? "Player" + UnityEngine.Random.Range(0, 10000) : name;
@@ -50,13 +48,35 @@ public class LobbyManager : MonoBehaviour {
 			await TaskTimeout.AddTimeout(AuthenticationService.Instance.SignInAnonymouslyAsync());
 			authenticationID = AuthenticationService.Instance.PlayerId;
 			await TaskTimeout.AddTimeout(CleanupLobbies(true));
-			AuthenticationSuccess?.Invoke();
 		} catch (Exception e) {
 			print(e);
-			AuthenticationFailure?.Invoke();
+			throw new Exception("Failed to authenticate");
+		}
+	}
+
+	string downloadLinkID = "DownloadPage";
+	public async Task VerifyVersion() {
+		try {
+			string version = await VersionWebRequester.CheckVersionAsyncMethod();
+			if (version.IsNullOrEmpty()) throw new Exception("Version Outdated\nDownload from\n" + "<link=\"" + downloadLinkID + "\"><color=#3399FF><u>Click here</u></link>");
+		} catch (Exception e) {
+			print(e);
+			throw new Exception(e.Message);
+		}
+	}
+	public async void Verify(string name = null) {
+		if (attemptingToAuthenticate) return;
+		attemptingToAuthenticate = true;
+		try {
+			VerifyBegin?.Invoke();
+			await VerifyVersion();
+			await Authenticate();
+			VerifySuccess?.Invoke();
+		} catch (Exception e) {
+			print(e);
+			VerifyFail?.Invoke(e.Message);
 		}
 		attemptingToAuthenticate = false;
-
 	}
 
 	async Task CleanupLobbies(bool clearList = false) {
@@ -89,7 +109,7 @@ public class LobbyManager : MonoBehaviour {
 
 	void ConnectionChanged(bool connected) {
 		if (conn != connected && connected == true) {
-			Authenticate();
+			Verify();
 		}
 		conn = connected;
 	}
@@ -107,7 +127,8 @@ public class LobbyManager : MonoBehaviour {
 	#region Events
 
 	//others
-	public static event Action AuthenticationBegin, AuthenticationSuccess, AuthenticationFailure;
+	public static event Action VerifyBegin, VerifySuccess;
+	public static event Action<string> VerifyFail;
 
 	//creating lobby
 	public static event Action LobbyCreationBegin, CreatedLobbyEvent, LobbyCreationFailure;
@@ -172,6 +193,12 @@ public class LobbyManager : MonoBehaviour {
 
 	#region  lobbyCreation
 	public async void CreateLobby(string lobbyName, string mode, int lobbyMaxPlayerNumber, DictionaryMode dictionary, GameEndingMode endMode, float time) {
+		try {
+			await VerifyVersion();
+		} catch (Exception e) {
+			VerifyFail?.Invoke(e.Message);
+			return;
+		}
 		if (hostLobby != null || joinedLobby != null || leavingLobby) { LobbyCreationFailure?.Invoke(); return; }
 		LobbyCreationBegin?.Invoke();
 		bool? ngoConnected = NGOConnected();
@@ -185,6 +212,8 @@ public class LobbyManager : MonoBehaviour {
 			return;
 		}
 		try {
+
+
 			//assign relay
 			Allocation relayAlloc = await TaskTimeout.AddTimeout<Allocation>(AllocateRelay(lobbyMaxPlayerNumber), TimeSpan.FromSeconds(5));
 			NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(relayAlloc, "dtls"));
@@ -327,6 +356,12 @@ public class LobbyManager : MonoBehaviour {
 
 	#region joiningLobby
 	public async void JoinLobbyByID(string lobbyID) {
+		try {
+			await VerifyVersion();
+		} catch (Exception e) {
+			VerifyFail?.Invoke(e.Message);
+			return;
+		}
 		if (joinedLobby != null || hostLobby != null || leavingLobby) { LobbyJoinFailure?.Invoke(); return; }
 		LobbyJoinBegin?.Invoke();
 		try {
@@ -350,6 +385,12 @@ public class LobbyManager : MonoBehaviour {
 	}
 
 	public async void JoinLobbyByCode(string code) {
+		try {
+			await VerifyVersion();
+		} catch (Exception e) {
+			VerifyFail?.Invoke(e.Message);
+			return;
+		}
 		if (joinedLobby != null || hostLobby != null || leavingLobby) { LobbyJoinFailure?.Invoke(); return; }
 		LobbyJoinBegin?.Invoke();
 		try {
@@ -372,6 +413,12 @@ public class LobbyManager : MonoBehaviour {
 	}
 
 	public async void QuickJoinLobby() {
+		try {
+			await VerifyVersion();
+		} catch (Exception e) {
+			VerifyFail?.Invoke(e.Message);
+			return;
+		}
 		if (joinedLobby != null || hostLobby != null || leavingLobby) { LobbyJoinFailure?.Invoke(); return; }
 		LobbyJoinBegin?.Invoke();
 		try {

@@ -36,7 +36,7 @@ public class MyLobby : NetworkBehaviour {
 
 	void Start() {
 		//creating lobby
-		LobbyManager.AuthenticationSuccess += AuthenticationDone;
+		LobbyManager.VerifySuccess += AuthenticationDone;
 		LobbyManager.CreatedLobbyEvent += LobbyCreated;
 		NetcodeManager.ServerStartSuccess += ServerStartedSuccess;
 		NetcodeManager.ServerStartFail += ServerStartedFail;
@@ -65,7 +65,7 @@ public class MyLobby : NetworkBehaviour {
 	public override void OnDestroy() {
 		OnNetworkDespawn();
 		//creating lobby
-		LobbyManager.AuthenticationSuccess -= AuthenticationDone;
+		LobbyManager.VerifySuccess -= AuthenticationDone;
 		LobbyManager.CreatedLobbyEvent -= LobbyCreated;
 		NetcodeManager.ServerStartSuccess -= ServerStartedSuccess;
 		NetcodeManager.ServerStartFail -= ServerStartedFail;

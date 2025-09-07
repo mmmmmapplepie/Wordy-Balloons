@@ -21,10 +21,10 @@ public class LobbyUI : MonoBehaviour {
 		MyLobby.LoadingSceneBool.OnValueChanged += LoadingSceneStateChange;
 		MyLobby.LobbyCreatedEvent += LobbyCreationSuccess;
 
-		LobbyManager.AuthenticationBegin += OpenLoadingPanel;
-		LobbyManager.AuthenticationSuccess += CloseAllPanels;
-		LobbyManager.AuthenticationSuccess += ListLobbyRefresh;
-		LobbyManager.AuthenticationFailure += AuthenticationFail;
+		LobbyManager.VerifyBegin += OpenLoadingPanel;
+		LobbyManager.VerifySuccess += CloseAllPanels;
+		LobbyManager.VerifySuccess += ListLobbyRefresh;
+		LobbyManager.VerifyFail += AuthenticationFail;
 		LobbyManager.LobbyChangedEvent += LobbyChanged;
 		LobbyManager.LobbyUpdateFailure += LobbyUpdateFail;
 		LobbyManager.LobbyUpdateSuccess += LobbyUpdateSuccess;
@@ -54,10 +54,10 @@ public class LobbyUI : MonoBehaviour {
 		MyLobby.LoadingSceneBool.OnValueChanged -= LoadingSceneStateChange;
 		MyLobby.LobbyCreatedEvent -= LobbyCreationSuccess;
 
-		LobbyManager.AuthenticationBegin -= OpenLoadingPanel;
-		LobbyManager.AuthenticationSuccess -= CloseAllPanels;
-		LobbyManager.AuthenticationSuccess -= ListLobbyRefresh;
-		LobbyManager.AuthenticationFailure -= AuthenticationFail;
+		LobbyManager.VerifyBegin -= OpenLoadingPanel;
+		LobbyManager.VerifySuccess -= CloseAllPanels;
+		LobbyManager.VerifySuccess -= ListLobbyRefresh;
+		LobbyManager.VerifyFail -= AuthenticationFail;
 		LobbyManager.LobbyChangedEvent -= LobbyChanged;
 		LobbyManager.LobbyUpdateFailure -= LobbyUpdateFail;
 		LobbyManager.LobbyUpdateSuccess -= LobbyUpdateSuccess;
@@ -94,7 +94,7 @@ public class LobbyUI : MonoBehaviour {
 		SceneManagerAsync.Singleton.LoadSceneAsync(scene);
 	}
 	public void RetryAuthentication() {
-		LobbyManager.Instance.Authenticate();
+		LobbyManager.Instance.Verify();
 	}
 
 
@@ -266,8 +266,8 @@ public class LobbyUI : MonoBehaviour {
 		}
 	}
 	[SerializeField] TextMeshProUGUI ErrorTxtBx;
-	void AuthenticationFail() {
-		ErrorTxtBx.text = "Connection failed";
+	void AuthenticationFail(string failureReason) {
+		ErrorTxtBx.text = failureReason;
 		HidePanelsExceptChosen(ErrorPanel);
 		RetryAuthenticationBtn.SetActive(true);
 		CloseErrorPanelBtn.SetActive(false);
