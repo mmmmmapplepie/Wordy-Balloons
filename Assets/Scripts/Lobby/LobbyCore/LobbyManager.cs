@@ -135,8 +135,8 @@ public class LobbyManager : MonoBehaviour {
   public static event Action RelayFailure;
 
   //joining lobby
-  public static event Action LobbyJoinBegin, LobbyJoinFailure, JoinedLobby;
-  public static event Action<string> PlayerJoinedLobby;
+  public static event Action LobbyJoinBegin, JoinedLobby;
+  public static event Action<string> PlayerJoinedLobby, LobbyJoinFailure;
 
   //maintaining lobby
   ILobbyEvents LobbyEvents = null;
@@ -356,7 +356,7 @@ public class LobbyManager : MonoBehaviour {
 
   #region joiningLobby
   public async void JoinLobbyByID(string lobbyID) {
-    if (joinedLobby != null || hostLobby != null || leavingLobby) { LobbyJoinFailure?.Invoke(); return; }
+    if (joinedLobby != null || hostLobby != null || leavingLobby) { LobbyJoinFailure?.Invoke(null); return; }
     LobbyJoinBegin?.Invoke();
     try {
       await VerifyVersion();
@@ -376,16 +376,18 @@ public class LobbyManager : MonoBehaviour {
       };
 
       joinedLobby = await TaskTimeout.AddTimeout<Lobby>(Lobbies.Instance.JoinLobbyByIdAsync(lobbyID, options));
-      await TaskTimeout.AddTimeout(JoinLobby());
+      await TaskTimeout.AddTimeout(JoinLobbyRelay());
     } catch (Exception e) {
       print(e);
       LeaveLobby();
-      LobbyJoinFailure?.Invoke();
+      string failureReason = null;
+      if (e is LobbyServiceException && (e as LobbyServiceException).Reason == LobbyExceptionReason.LobbyFull) failureReason = "Lobby is full";
+      LobbyJoinFailure?.Invoke(failureReason);
     }
   }
 
   public async void JoinLobbyByCode(string code) {
-    if (joinedLobby != null || hostLobby != null || leavingLobby) { LobbyJoinFailure?.Invoke(); return; }
+    if (joinedLobby != null || hostLobby != null || leavingLobby) { LobbyJoinFailure?.Invoke(null); return; }
     LobbyJoinBegin?.Invoke();
     try {
       await VerifyVersion();
@@ -404,16 +406,18 @@ public class LobbyManager : MonoBehaviour {
         Player = GetNewPlayer(playerName)
       };
       joinedLobby = await TaskTimeout.AddTimeout<Lobby>(Lobbies.Instance.JoinLobbyByCodeAsync(code, options));
-      await TaskTimeout.AddTimeout(JoinLobby());
+      await TaskTimeout.AddTimeout(JoinLobbyRelay());
     } catch (Exception e) {
       print(e);
       LeaveLobby();
-      LobbyJoinFailure?.Invoke();
+      string failureReason = null;
+      if (e is LobbyServiceException && (e as LobbyServiceException).Reason == LobbyExceptionReason.LobbyFull) failureReason = "Lobby is full";
+      LobbyJoinFailure?.Invoke(failureReason);
     }
   }
 
   public async void QuickJoinLobby() {
-    if (joinedLobby != null || hostLobby != null || leavingLobby) { LobbyJoinFailure?.Invoke(); return; }
+    if (joinedLobby != null || hostLobby != null || leavingLobby) { LobbyJoinFailure?.Invoke(null); return; }
     LobbyJoinBegin?.Invoke();
     try {
       await VerifyVersion();
@@ -432,14 +436,16 @@ public class LobbyManager : MonoBehaviour {
         Player = GetNewPlayer(playerName)
       };
       joinedLobby = await TaskTimeout.AddTimeout<Lobby>(LobbyService.Instance.QuickJoinLobbyAsync(options));
-      await TaskTimeout.AddTimeout(JoinLobby());
+      await TaskTimeout.AddTimeout(JoinLobbyRelay());
     } catch (Exception e) {
       print(e);
       LeaveLobby();
-      LobbyJoinFailure?.Invoke();
+      string failureReason = null;
+      if (e is LobbyServiceException && (e as LobbyServiceException).Reason == LobbyExceptionReason.LobbyFull) failureReason = "Lobby is full";
+      LobbyJoinFailure?.Invoke(failureReason);
     }
   }
-  async Task JoinLobby() {
+  async Task JoinLobbyRelay() {
     try {
       await SubscribeToLobbyEvents();
       string relayCode = joinedLobby.Data[RelayCode].Value;
@@ -529,9 +535,7 @@ public class LobbyManager : MonoBehaviour {
     try {
       QueryLobbiesOptions filter = new QueryLobbiesOptions {
         Count = ListLobbyMax,
-        Filters = new List<QueryFilter> {
-          new QueryFilter(QueryFilter.FieldOptions.AvailableSlots, "0", QueryFilter.OpOptions.GT),
-          },
+
         Order = new List<QueryOrder> {
           new QueryOrder(false, QueryOrder.FieldOptions.Created)
         }

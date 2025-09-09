@@ -10,427 +10,423 @@ using Unity.Netcode;
 using Unity.Services.Lobbies;
 [DefaultExecutionOrder(-100)]
 public class LobbyUI : MonoBehaviour {
-	#region subscribing/unsubscribing to events;
-
-	// having the // comment at the end of the event sub means that i have checked the things are correctly fired (only once) for the situation.
-	// i have to make sure that error cases fire only one event until exited the situation.
-	void Start() {
-		MyLobby.LobbyFull += LobbyFull;
-		MyLobby.SceneLoadingError += LoadingSceneError;
-		MyLobby.LoadingCountdown.OnValueChanged += LoadingCountdown;
-		MyLobby.LoadingSceneBool.OnValueChanged += LoadingSceneStateChange;
-		MyLobby.LobbyCreatedEvent += LobbyCreationSuccess;
-
-		LobbyManager.VerifyBegin += OpenLoadingPanel;
-		LobbyManager.VerifySuccess += CloseAllPanels;
-		LobbyManager.VerifySuccess += ListLobbyRefresh;
-		LobbyManager.VerifyFail += AuthenticationFail;
-		LobbyManager.LobbyChangedEvent += LobbyChanged;
-		LobbyManager.LobbyUpdateFailure += LobbyUpdateFail;
-		LobbyManager.LobbyUpdateSuccess += LobbyUpdateSuccess;
-
-		InternetConnectivityCheck.ConnectedStateEvent += NetworkConnectionState;
-
-		LobbyManager.LobbyCreationBegin += OpenLoadingPanel;
-		LobbyManager.LobbyCreationFailure += LobbyCreationFail;
-
-		LobbyManager.HearbeatFailure += HearbeatFail;
-
-		LobbyManager.LobbyJoinBegin += OpenLoadingPanel;
-		NetcodeManager.ClientStartSuccess += LobbyJoined;
-		LobbyManager.LobbyJoinFailure += LobbyJoinFail;
-
-		LobbyManager.LeaveLobbyBegin += LeaveLobbyBegin;
-		LobbyManager.LeaveLobbyComplete += LeaveLobbyComplete;
-
-		LobbyManager.ListLobbySuccess += LobbyListFound;
-		LobbyManager.ListLobbyFailure += ListLobbiesFail;
-
-	}
-	void OnDestroy() {
-		MyLobby.LobbyFull -= LobbyFull;
-		MyLobby.SceneLoadingError -= LoadingSceneError;
-		MyLobby.LoadingCountdown.OnValueChanged -= LoadingCountdown;
-		MyLobby.LoadingSceneBool.OnValueChanged -= LoadingSceneStateChange;
-		MyLobby.LobbyCreatedEvent -= LobbyCreationSuccess;
-
-		LobbyManager.VerifyBegin -= OpenLoadingPanel;
-		LobbyManager.VerifySuccess -= CloseAllPanels;
-		LobbyManager.VerifySuccess -= ListLobbyRefresh;
-		LobbyManager.VerifyFail -= AuthenticationFail;
-		LobbyManager.LobbyChangedEvent -= LobbyChanged;
-		LobbyManager.LobbyUpdateFailure -= LobbyUpdateFail;
-		LobbyManager.LobbyUpdateSuccess -= LobbyUpdateSuccess;
-
-		InternetConnectivityCheck.ConnectedStateEvent -= NetworkConnectionState;
-
-		LobbyManager.LobbyCreationBegin -= OpenLoadingPanel;
-		LobbyManager.LobbyCreationFailure -= LobbyCreationFail;
-
-		LobbyManager.HearbeatFailure -= HearbeatFail;
-
-		LobbyManager.LobbyJoinBegin -= OpenLoadingPanel;
-		NetcodeManager.ClientStartSuccess -= LobbyJoined;
-		LobbyManager.LobbyJoinFailure -= LobbyJoinFail;
-
-		LobbyManager.LeaveLobbyBegin -= LeaveLobbyBegin;
-		LobbyManager.LeaveLobbyComplete -= LeaveLobbyComplete;
-
-		LobbyManager.ListLobbySuccess -= LobbyListFound;
-		LobbyManager.ListLobbyFailure -= ListLobbiesFail;
-
-	}
-
-
-
-
-	#endregion
-
-	#region Interaction functions
-	public static event System.Action GoingToMainMenu;
-	public void GoToScene(string scene) {
-		if (scene == "MainMenu") GoingToMainMenu?.Invoke();
-		//have to stop NGO and lobby if main menu
-		SceneManagerAsync.Singleton.LoadSceneAsync(scene);
-	}
-	public void RetryAuthentication() {
-		LobbyManager.Instance.Verify();
-	}
-
-
-	[SerializeField] GameObject lobbyCreationPanel;
-	public TMP_InputField lobbyName, lobbyCode;
-	public TMP_Dropdown lobbyModeDropDown, lobbyPlayerNumDropDown;
-
-	public void GoToCreateLobby() {
-		lobbyModeDropDown.Set(0);
-		lobbyPlayerNumDropDown.Set(0);
-		lobbyName.text = "New Lobby";
-		lobbyCreationPanel.SetActive(true);
-	}
-	public void CloseLobbyCreation() {
-		lobbyCreationPanel.SetActive(false);
-	}
-
-	//imma disable changing lobby mode and name once started.
-
-	public SliderToggle dictionaryToggle;
-	public TMP_Dropdown endMode, endTime;
-	public void CreateLobby() {
-		if (!CheckInternetConnected()) return;
-		LobbyManager.Instance.CreateLobby(lobbyName.text, ((GameMode)lobbyModeDropDown.value).ToString(), lobbyPlayerNumDropDown.value + 2, GameData.Dictionary = dictionaryToggle.onRightSide ? DictionaryMode.Complete : DictionaryMode.Beginner, (GameEndingMode)endMode.value, endTime.value + 1);
-	}
-	public void QuickJoin() {
-		if (!CheckInternetConnected()) return;
-		LobbyManager.Instance.QuickJoinLobby();
-	}
-	public void JoinLobbyByCode() {
-		if (!CheckInternetConnected()) return;
-		LobbyManager.Instance.JoinLobbyByCode(lobbyCode.text);
-	}
-	public void JoinLobby(Lobby lobby) {
-		if (!CheckInternetConnected()) return;
-		LobbyManager.Instance.JoinLobbyByID(lobby.Id);
-	}
-	bool CheckInternetConnected() {
-		if (!InternetConnectivityCheck.connected) {
-			ShowErrorTxt("No Internet Connection.");
-			return false;
-		}
-		return true;
-	}
-	void ShowErrorTxt(string error) {
-		ErrorTxtBx.text = error;
-		HidePanelsExceptChosen(ErrorPanel);
-	}
-
-	public void LeaveLobby() {
-		//you need to add UI stuff here as leave lobby itself i decided not to add ui stuff (as it is called EVERYWHERE)
-		LobbyManager.Instance.LeaveLobby();
-	}
-
-
-	public void ListLobbyRefresh() {
-		Task list = LobbyManager.Instance.ListLobbies();
-	}
-
-
-	public void CopyLobbyCode() {
-		GUIUtility.systemCopyBuffer = lobbyCodeTxt.text;
-	}
-
-	public FancyButton lobbyPublicBtn;
-	void LobbyChanged(ILobbyChanges changes) {
-		if (changes.IsPrivate.Changed) {
-			waitingForLobbyPublicityChange = false;
-			try {
-				if (!MyLobby.LoadingSceneBool.Value && NetworkManager.Singleton.IsServer) {
-					ChangePublicityBtnInteractability(true);
-				}
-			} catch (Exception e) {
-				print(e);
-			}
-			if (!lobbyPublicBtn.isPublic != changes.IsPrivate.Value) {
-				lobbyPublicBtn.Clicked();
-			}
-		}
-	}
-	void LobbyUpdateFail() {
-		if (LobbyManager.Instance.hostLobby == null) return;
-		waitingForLobbyPublicityChange = false;
-		try {
-			if (!MyLobby.LoadingSceneBool.Value && NetworkManager.Singleton.IsServer) {
-				ChangePublicityBtnInteractability(true);
-			}
-		} catch (Exception e) {
-			print(e);
-		}
-		if (!lobbyPublicBtn.isPublic != LobbyManager.Instance.hostLobby.IsPrivate) {
-			lobbyPublicBtn.Clicked();
-		}
-	}
-	void LobbyUpdateSuccess() {
-		if (LobbyManager.Instance.hostLobby == null) return;
-		waitingForLobbyPublicityChange = false;
-		try {
-			if (!MyLobby.LoadingSceneBool.Value && NetworkManager.Singleton.IsServer) {
-				ChangePublicityBtnInteractability(true);
-			}
-		} catch (Exception e) {
-			print(e);
-		}
-		if (!lobbyPublicBtn.isPublic != LobbyManager.Instance.hostLobby.IsPrivate) {
-			lobbyPublicBtn.Clicked();
-		}
-	}
-	bool waitingForLobbyPublicityChange = false;
-	void ChangePublicityBtnInteractability(bool makeInteractable) {
-		CanvasGroup btnGrp = lobbyPublicBtn.transform.parent.GetComponent<CanvasGroup>();
-		btnGrp.alpha = makeInteractable ? 1 : 0.5f;
-		btnGrp.interactable = makeInteractable;
-		btnGrp.blocksRaycasts = makeInteractable;
-	}
-	public void ChangeLobbyPublicity() {
-		if (LobbyManager.Instance.hostLobby == null) return;
-		waitingForLobbyPublicityChange = true;
-		ChangePublicityBtnInteractability(false);
-		LobbyManager.Instance.ChangeLobbyPublicity(LobbyManager.Instance.hostLobby.IsPrivate);
-	}
-
-
-	#endregion
-
-
-
-
-
-
-
-	#region Event Functions
-	[SerializeField] GameObject LoadingPanel, ErrorPanel;
-	[SerializeField] GameObject RetryAuthenticationBtn, CloseErrorPanelBtn;
-	void OpenLoadingPanel() {
-		HidePanelsExceptChosen(LoadingPanel);
-	}
-	public void CloseAllPanels() {
-		// if (!LobbyNetcodeManager.CanStopSceneLoading) return;
-		HidePanelsExceptChosen(null);
-	}
-	void HidePanelsExceptChosen(GameObject panelToOpen = null) {
-		if (LobbyManager.Instance == null) return;
-		//disable non basic items
-		LoadingPanel.SetActive(false);
-		ErrorPanel.SetActive(false);
-
-		RetryAuthenticationBtn.SetActive(false);
-		CloseErrorPanelBtn.SetActive(true);
-
-		//only open the one you want.
-		if (panelToOpen != null) {
-			panelToOpen.SetActive(true);
-		}
-	}
-	public TextMeshProUGUI connectedTxt;
-	public AtomAnimationController connectionAnimController;
-	void NetworkConnectionState(bool connected) {
-		if (connected) {
-			connectedTxt.text = "Connected";
-			connectedTxt.color = new Color(0, 1, 1, 1);
-			connectionAnimController.AnimateStart();
-		} else {
-			connectedTxt.text = "Disconnected";
-			connectedTxt.color = new Color(1, 0, 0, 1);
-			connectionAnimController.AnimateStop();
-
-			ChangeToLoadingSceneMode(false);
-		}
-	}
-	[SerializeField] TextMeshProUGUI ErrorTxtBx;
-	void AuthenticationFail(string failureReason) {
-		ErrorTxtBx.text = failureReason;
-		HidePanelsExceptChosen(ErrorPanel);
-		RetryAuthenticationBtn.SetActive(true);
-		CloseErrorPanelBtn.SetActive(false);
-	}
-
-	[SerializeField] CanvasGroup lobbyPanel;
-	[SerializeField] TextMeshProUGUI lobbyNameTxt;
-
-	//shoudl be called when NGO host is connected.
-	void LobbyCreationSuccess() {
-		startGameBtn.interactable = false;
-		lobbyCreationPanel.SetActive(false);
-		LobbyUpdate(LobbyManager.Instance.hostLobby);
-		ToggleLobby(true);
-		CloseAllPanels();
-	}
-	void ToggleLobby(bool interactable) {
-		if (lobbyPanel == null) return;
-		lobbyPanel.interactable = interactable;
-		lobbyPanel.blocksRaycasts = interactable;
-		lobbyPanel.alpha = interactable ? 1 : 0;
-		//reset the btn overlay for quit loading scene
-	}
-
-	void LobbyCreationFail() {
-		ErrorTxtBx.text = "Unable to create lobby.";
-		HidePanelsExceptChosen(ErrorPanel);
-	}
-
-	void ResetPublicLobbyBtn() {
-		if (NetworkManager.Singleton.IsServer) {
-			if (!lobbyPublicBtn.isPublic) lobbyPublicBtn.Clicked(0f);
-		} else {
-			if (!lobbyPublicBtn.isPublic != LobbyManager.Instance.joinedLobby.IsPrivate)
-				lobbyPublicBtn.Clicked(0f);
-		}
-	}
-
-
-	void LobbyJoined() {
-		lobbyNameTxt.text = LobbyManager.Instance.joinedLobby.Name;
-		waitingForLobbyPublicityChange = false;
-		ChangePublicityBtnInteractability(NetworkManager.Singleton.IsServer);
-		HidePanelsExceptChosen();
-		leaveBtn.interactable = true;
-		startGameBtn.interactable = false;
-		stopGameLoadBtn.SetActive(false);
-		Button b = lobbyPublicBtn.transform.GetComponentInChildren<Button>();
-		ResetPublicLobbyBtn();
-		b.interactable = true;
-		LobbyUpdate(LobbyManager.Instance.joinedLobby);
-		ToggleLobby(true);
-	}
-	[SerializeField] TextMeshProUGUI lobbyModeTxt, dictionaryModeTxt, lobbyCodeTxt, gameEndModeTxt;
-	void LobbyUpdate(Lobby lobby) {
-		if (lobby == null) return;
-		lobbyModeTxt.text = lobby.Data[LobbyManager.GameMode].Value == ((GameMode)2).ToString() ? "Own Enemy" : lobby.Data[LobbyManager.GameMode].Value;
-		string dictionaryMode = lobby.Data[LobbyManager.Dictionary].Value;
-		dictionaryModeTxt.text = dictionaryMode;
-		gameEndModeTxt.text = lobby.Data[LobbyManager.GameEndMode].Value + " (" + lobby.Data[LobbyManager.GameEndTime].Value + ")";
-		if (lobby.Data[LobbyManager.GameEndMode].Value == "Endurance") gameEndModeTxt.text = "Endurance";
-		Enum.TryParse<DictionaryMode>(dictionaryMode, out GameData.Dictionary);
-		lobbyCodeTxt.text = lobby.LobbyCode;
-	}
-
-	void HearbeatFail() {
-		ErrorTxtBx.text = "Connection failed";
-		HidePanelsExceptChosen(ErrorPanel);
-	}
-
-	void LobbyJoinFail() {
-		ErrorTxtBx.text = "Unable to join lobby";
-		HidePanelsExceptChosen(ErrorPanel);
-	}
-
-	//dont forget to start shutdown for NGO.
-	void LeaveLobbyBegin() {
-		// if (!LobbyNetcodeManager.CanStopSceneLoading) return;
-		ToggleLobby(false);
-	}
-	void LeaveLobbyComplete() {
-		if (ErrorPanel == null) return;
-		if (ErrorPanel.activeInHierarchy == true) HidePanelsExceptChosen(ErrorPanel);
-		else HidePanelsExceptChosen();
-	}
-
-	public Transform lobbiesListHolder, lobbyOptionPrefab;
-	void LobbyListFound(List<Lobby> lobbies) {
-		foreach (Transform t in lobbiesListHolder) {
-			Destroy(t.gameObject);
-		}
-		foreach (Lobby l in lobbies) {
-			Transform newOption = Instantiate(lobbyOptionPrefab, lobbiesListHolder);
-			//set the values for the script and give it a listener for the join lobby by ID thingy
-			LobbyOption lobbyOption = newOption.GetComponent<LobbyOption>();
-			Lobby inputLobby = l;
-			lobbyOption.SetOption(this, inputLobby);
-		}
-	}
-	public GameObject lobbyListingFailNotificationObject;
-	void ListLobbiesFail(List<Lobby> list) {
-		lobbyListingFailNotificationObject.SetActive(true);
-	}
-
-	#endregion
-
-
-
-
-	#region sceneLoading
-	public Button leaveBtn, startGameBtn;
-	public GameObject stopGameLoadBtn, loadCountdown;
-
-	void LoadingSceneError() {
-		ChangeToLoadingSceneMode(false);
-	}
-	void LoadingCountdown(int old, int n) {
-		loadCountdown.GetComponent<TextMeshProUGUI>().text = n.ToString();
-		if (n == 0) { OpenLoadingPanel(); }
-	}
-	void LoadingSceneStateChange(bool old, bool loadingScene) {
-		ChangeToLoadingSceneMode(loadingScene);
-	}
-	void ChangeToLoadingSceneMode(bool loadingScene) {
-		if (NetworkManager.Singleton.IsServer) {
-			startGameBtn.interactable = !loadingScene;
-			if (loadingScene) ChangePublicityBtnInteractability(!loadingScene);
-			else {
-				if (!waitingForLobbyPublicityChange) {
-					ChangePublicityBtnInteractability(!loadingScene);
-				}
-			}
-		}
-		stopGameLoadBtn.SetActive(loadingScene);
-		stopGameLoadBtn.GetComponent<Button>().interactable = NetworkManager.Singleton.IsServer;
-		stopGameLoadBtn.transform.GetChild(0).gameObject.SetActive(NetworkManager.Singleton.IsServer);
-		loadCountdown.GetComponent<TextMeshProUGUI>().text = "3";
-		leaveBtn.interactable = !loadingScene;
-	}
-	void LoadingNextScene() {
-		startGameBtn.interactable = false;
-	}
-	void DisableLeaving(bool lockOn) {
-		if (lockOn) {
-			OpenLoadingPanel();
-		} else {
-			HidePanelsExceptChosen();
-		}
-		leaveBtn.interactable = !lockOn;
-		startGameBtn.interactable = false;
-	}
-	void LobbyFull(bool full) {
-		startGameBtn.interactable = full;
-	}
-
-
-
-
-	#endregion
-
-	public void EnableObject(GameObject o) {
-		o.SetActive(true);
-	}
+  #region subscribing/unsubscribing to events;
+
+  // having the // comment at the end of the event sub means that i have checked the things are correctly fired (only once) for the situation.
+  // i have to make sure that error cases fire only one event until exited the situation.
+  void Start() {
+    MyLobby.LobbyFull += LobbyFull;
+    MyLobby.SceneLoadingError += LoadingSceneError;
+    MyLobby.LoadingCountdown.OnValueChanged += LoadingCountdown;
+    MyLobby.LoadingSceneBool.OnValueChanged += LoadingSceneStateChange;
+    MyLobby.LobbyCreatedEvent += LobbyCreationSuccess;
+
+    LobbyManager.VerifyBegin += OpenLoadingPanel;
+    LobbyManager.VerifySuccess += CloseAllPanels;
+    LobbyManager.VerifySuccess += ListLobbyRefresh;
+    LobbyManager.VerifyFail += AuthenticationFail;
+    LobbyManager.LobbyChangedEvent += LobbyChanged;
+    LobbyManager.LobbyUpdateFailure += LobbyUpdateFail;
+    LobbyManager.LobbyUpdateSuccess += LobbyUpdateSuccess;
+
+    InternetConnectivityCheck.ConnectedStateEvent += NetworkConnectionState;
+
+    LobbyManager.LobbyCreationBegin += OpenLoadingPanel;
+    LobbyManager.LobbyCreationFailure += LobbyCreationFail;
+
+    LobbyManager.HearbeatFailure += HearbeatFail;
+
+    LobbyManager.LobbyJoinBegin += OpenLoadingPanel;
+    NetcodeManager.ClientStartSuccess += LobbyJoined;
+    LobbyManager.LobbyJoinFailure += LobbyJoinFail;
+
+    LobbyManager.LeaveLobbyBegin += LeaveLobbyBegin;
+    LobbyManager.LeaveLobbyComplete += LeaveLobbyComplete;
+
+    LobbyManager.ListLobbySuccess += LobbyListFound;
+    LobbyManager.ListLobbyFailure += ListLobbiesFail;
+
+  }
+  void OnDestroy() {
+    MyLobby.LobbyFull -= LobbyFull;
+    MyLobby.SceneLoadingError -= LoadingSceneError;
+    MyLobby.LoadingCountdown.OnValueChanged -= LoadingCountdown;
+    MyLobby.LoadingSceneBool.OnValueChanged -= LoadingSceneStateChange;
+    MyLobby.LobbyCreatedEvent -= LobbyCreationSuccess;
+
+    LobbyManager.VerifyBegin -= OpenLoadingPanel;
+    LobbyManager.VerifySuccess -= CloseAllPanels;
+    LobbyManager.VerifySuccess -= ListLobbyRefresh;
+    LobbyManager.VerifyFail -= AuthenticationFail;
+    LobbyManager.LobbyChangedEvent -= LobbyChanged;
+    LobbyManager.LobbyUpdateFailure -= LobbyUpdateFail;
+    LobbyManager.LobbyUpdateSuccess -= LobbyUpdateSuccess;
+
+    InternetConnectivityCheck.ConnectedStateEvent -= NetworkConnectionState;
+
+    LobbyManager.LobbyCreationBegin -= OpenLoadingPanel;
+    LobbyManager.LobbyCreationFailure -= LobbyCreationFail;
+
+    LobbyManager.HearbeatFailure -= HearbeatFail;
+
+    LobbyManager.LobbyJoinBegin -= OpenLoadingPanel;
+    NetcodeManager.ClientStartSuccess -= LobbyJoined;
+    LobbyManager.LobbyJoinFailure -= LobbyJoinFail;
+
+    LobbyManager.LeaveLobbyBegin -= LeaveLobbyBegin;
+    LobbyManager.LeaveLobbyComplete -= LeaveLobbyComplete;
+
+    LobbyManager.ListLobbySuccess -= LobbyListFound;
+    LobbyManager.ListLobbyFailure -= ListLobbiesFail;
+
+  }
+
+
+
+
+  #endregion
+
+  #region Interaction functions
+  public static event System.Action GoingToMainMenu;
+  public void GoToScene(string scene) {
+    if (scene == "MainMenu") GoingToMainMenu?.Invoke();
+    //have to stop NGO and lobby if main menu
+    SceneManagerAsync.Singleton.LoadSceneAsync(scene);
+  }
+  public void RetryAuthentication() {
+    LobbyManager.Instance.Verify();
+  }
+
+
+  [SerializeField] GameObject lobbyCreationPanel;
+  public TMP_InputField lobbyName, lobbyCode;
+  public TMP_Dropdown lobbyModeDropDown, lobbyPlayerNumDropDown;
+
+  public void GoToCreateLobby() {
+    lobbyModeDropDown.Set(0);
+    lobbyPlayerNumDropDown.Set(0);
+    lobbyName.text = "New Lobby";
+    lobbyCreationPanel.SetActive(true);
+  }
+  public void CloseLobbyCreation() {
+    lobbyCreationPanel.SetActive(false);
+  }
+
+  //imma disable changing lobby mode and name once started.
+
+  public SliderToggle dictionaryToggle;
+  public TMP_Dropdown endMode, endTime;
+  public void CreateLobby() {
+    if (!CheckInternetConnected()) return;
+    LobbyManager.Instance.CreateLobby(lobbyName.text, ((GameMode)lobbyModeDropDown.value).ToString(), lobbyPlayerNumDropDown.value + 2, GameData.Dictionary = dictionaryToggle.onRightSide ? DictionaryMode.Complete : DictionaryMode.Beginner, (GameEndingMode)endMode.value, endTime.value + 1);
+  }
+  public void QuickJoin() {
+    if (!CheckInternetConnected()) return;
+    LobbyManager.Instance.QuickJoinLobby();
+  }
+  public void JoinLobbyByCode() {
+    if (!CheckInternetConnected()) return;
+    LobbyManager.Instance.JoinLobbyByCode(lobbyCode.text);
+  }
+  public void JoinLobby(Lobby lobby) {
+    if (!CheckInternetConnected()) return;
+    LobbyManager.Instance.JoinLobbyByID(lobby.Id);
+  }
+  bool CheckInternetConnected() {
+    if (!InternetConnectivityCheck.connected) {
+      ShowErrorTxt("No Internet Connection.");
+      return false;
+    }
+    return true;
+  }
+  void ShowErrorTxt(string error) {
+    ErrorTxtBx.text = error ?? "";
+    HidePanelsExceptChosen(ErrorPanel);
+  }
+
+  public void LeaveLobby() {
+    //you need to add UI stuff here as leave lobby itself i decided not to add ui stuff (as it is called EVERYWHERE)
+    LobbyManager.Instance.LeaveLobby();
+  }
+
+
+  public void ListLobbyRefresh() {
+    Task list = LobbyManager.Instance.ListLobbies();
+  }
+
+
+  public void CopyLobbyCode() {
+    GUIUtility.systemCopyBuffer = lobbyCodeTxt.text;
+  }
+
+  public FancyButton lobbyPublicBtn;
+  void LobbyChanged(ILobbyChanges changes) {
+    if (changes.IsPrivate.Changed) {
+      waitingForLobbyPublicityChange = false;
+      try {
+        if (!MyLobby.LoadingSceneBool.Value && NetworkManager.Singleton.IsServer) {
+          ChangePublicityBtnInteractability(true);
+        }
+      } catch (Exception e) {
+        print(e);
+      }
+      if (!lobbyPublicBtn.isPublic != changes.IsPrivate.Value) {
+        lobbyPublicBtn.Clicked();
+      }
+    }
+  }
+  void LobbyUpdateFail() {
+    if (LobbyManager.Instance.hostLobby == null) return;
+    waitingForLobbyPublicityChange = false;
+    try {
+      if (!MyLobby.LoadingSceneBool.Value && NetworkManager.Singleton.IsServer) {
+        ChangePublicityBtnInteractability(true);
+      }
+    } catch (Exception e) {
+      print(e);
+    }
+    if (!lobbyPublicBtn.isPublic != LobbyManager.Instance.hostLobby.IsPrivate) {
+      lobbyPublicBtn.Clicked();
+    }
+  }
+  void LobbyUpdateSuccess() {
+    if (LobbyManager.Instance.hostLobby == null) return;
+    waitingForLobbyPublicityChange = false;
+    try {
+      if (!MyLobby.LoadingSceneBool.Value && NetworkManager.Singleton.IsServer) {
+        ChangePublicityBtnInteractability(true);
+      }
+    } catch (Exception e) {
+      print(e);
+    }
+    if (!lobbyPublicBtn.isPublic != LobbyManager.Instance.hostLobby.IsPrivate) {
+      lobbyPublicBtn.Clicked();
+    }
+  }
+  bool waitingForLobbyPublicityChange = false;
+  void ChangePublicityBtnInteractability(bool makeInteractable) {
+    CanvasGroup btnGrp = lobbyPublicBtn.transform.parent.GetComponent<CanvasGroup>();
+    btnGrp.alpha = makeInteractable ? 1 : 0.5f;
+    btnGrp.interactable = makeInteractable;
+    btnGrp.blocksRaycasts = makeInteractable;
+  }
+  public void ChangeLobbyPublicity() {
+    if (LobbyManager.Instance.hostLobby == null) return;
+    waitingForLobbyPublicityChange = true;
+    ChangePublicityBtnInteractability(false);
+    LobbyManager.Instance.ChangeLobbyPublicity(LobbyManager.Instance.hostLobby.IsPrivate);
+  }
+
+
+  #endregion
+
+
+
+
+
+
+
+  #region Event Functions
+  [SerializeField] GameObject LoadingPanel, ErrorPanel;
+  [SerializeField] GameObject RetryAuthenticationBtn, CloseErrorPanelBtn;
+  void OpenLoadingPanel() {
+    HidePanelsExceptChosen(LoadingPanel);
+  }
+  public void CloseAllPanels() {
+    // if (!LobbyNetcodeManager.CanStopSceneLoading) return;
+    HidePanelsExceptChosen(null);
+  }
+  void HidePanelsExceptChosen(GameObject panelToOpen = null) {
+    if (LobbyManager.Instance == null) return;
+    //disable non basic items
+    LoadingPanel.SetActive(false);
+    ErrorPanel.SetActive(false);
+
+    RetryAuthenticationBtn.SetActive(false);
+    CloseErrorPanelBtn.SetActive(true);
+
+    //only open the one you want.
+    if (panelToOpen != null) {
+      panelToOpen.SetActive(true);
+    }
+  }
+  public TextMeshProUGUI connectedTxt;
+  public AtomAnimationController connectionAnimController;
+  void NetworkConnectionState(bool connected) {
+    if (connected) {
+      connectedTxt.text = "Connected";
+      connectedTxt.color = new Color(0, 1, 1, 1);
+      connectionAnimController.AnimateStart();
+    } else {
+      connectedTxt.text = "Disconnected";
+      connectedTxt.color = new Color(1, 0, 0, 1);
+      connectionAnimController.AnimateStop();
+
+      ChangeToLoadingSceneMode(false);
+    }
+  }
+  [SerializeField] TextMeshProUGUI ErrorTxtBx;
+  void AuthenticationFail(string failureReason) {
+    ShowErrorTxt(failureReason);
+    RetryAuthenticationBtn.SetActive(true);
+    CloseErrorPanelBtn.SetActive(false);
+  }
+
+  [SerializeField] CanvasGroup lobbyPanel;
+  [SerializeField] TextMeshProUGUI lobbyNameTxt;
+
+  //shoudl be called when NGO host is connected.
+  void LobbyCreationSuccess() {
+    startGameBtn.interactable = false;
+    lobbyCreationPanel.SetActive(false);
+    LobbyUpdate(LobbyManager.Instance.hostLobby);
+    ToggleLobby(true);
+    CloseAllPanels();
+  }
+  void ToggleLobby(bool interactable) {
+    if (lobbyPanel == null) return;
+    lobbyPanel.interactable = interactable;
+    lobbyPanel.blocksRaycasts = interactable;
+    lobbyPanel.alpha = interactable ? 1 : 0;
+    //reset the btn overlay for quit loading scene
+  }
+
+  void LobbyCreationFail() {
+    ShowErrorTxt("Unable to create lobby.");
+  }
+
+  void ResetPublicLobbyBtn() {
+    if (NetworkManager.Singleton.IsServer) {
+      if (!lobbyPublicBtn.isPublic) lobbyPublicBtn.Clicked(0f);
+    } else {
+      if (!lobbyPublicBtn.isPublic != LobbyManager.Instance.joinedLobby.IsPrivate)
+        lobbyPublicBtn.Clicked(0f);
+    }
+  }
+
+
+  void LobbyJoined() {
+    lobbyNameTxt.text = LobbyManager.Instance.joinedLobby.Name;
+    waitingForLobbyPublicityChange = false;
+    ChangePublicityBtnInteractability(NetworkManager.Singleton.IsServer);
+    HidePanelsExceptChosen();
+    leaveBtn.interactable = true;
+    startGameBtn.interactable = false;
+    stopGameLoadBtn.SetActive(false);
+    Button b = lobbyPublicBtn.transform.GetComponentInChildren<Button>();
+    ResetPublicLobbyBtn();
+    b.interactable = true;
+    LobbyUpdate(LobbyManager.Instance.joinedLobby);
+    ToggleLobby(true);
+  }
+  [SerializeField] TextMeshProUGUI lobbyModeTxt, dictionaryModeTxt, lobbyCodeTxt, gameEndModeTxt;
+  void LobbyUpdate(Lobby lobby) {
+    if (lobby == null) return;
+    lobbyModeTxt.text = lobby.Data[LobbyManager.GameMode].Value == ((GameMode)2).ToString() ? "Own Enemy" : lobby.Data[LobbyManager.GameMode].Value;
+    string dictionaryMode = lobby.Data[LobbyManager.Dictionary].Value;
+    dictionaryModeTxt.text = dictionaryMode;
+    gameEndModeTxt.text = lobby.Data[LobbyManager.GameEndMode].Value + " (" + lobby.Data[LobbyManager.GameEndTime].Value + ")";
+    if (lobby.Data[LobbyManager.GameEndMode].Value == "Endurance") gameEndModeTxt.text = "Endurance";
+    Enum.TryParse<DictionaryMode>(dictionaryMode, out GameData.Dictionary);
+    lobbyCodeTxt.text = lobby.LobbyCode;
+  }
+
+  void HearbeatFail() {
+    ShowErrorTxt("Connection failed");
+  }
+
+  void LobbyJoinFail(string reason) {
+    ShowErrorTxt(reason ?? "Unable to join lobby");
+  }
+
+  //dont forget to start shutdown for NGO.
+  void LeaveLobbyBegin() {
+    // if (!LobbyNetcodeManager.CanStopSceneLoading) return;
+    ToggleLobby(false);
+  }
+  void LeaveLobbyComplete() {
+    if (ErrorPanel == null) return;
+    if (ErrorPanel.activeInHierarchy == true) HidePanelsExceptChosen(ErrorPanel);
+    else HidePanelsExceptChosen();
+  }
+
+  public Transform lobbiesListHolder, lobbyOptionPrefab;
+  void LobbyListFound(List<Lobby> lobbies) {
+    foreach (Transform t in lobbiesListHolder) {
+      Destroy(t.gameObject);
+    }
+    foreach (Lobby l in lobbies) {
+      Transform newOption = Instantiate(lobbyOptionPrefab, lobbiesListHolder);
+      //set the values for the script and give it a listener for the join lobby by ID thingy
+      LobbyOption lobbyOption = newOption.GetComponent<LobbyOption>();
+      Lobby inputLobby = l;
+      lobbyOption.SetOption(this, inputLobby);
+    }
+  }
+  public GameObject lobbyListingFailNotificationObject;
+  void ListLobbiesFail(List<Lobby> list) {
+    lobbyListingFailNotificationObject.SetActive(true);
+  }
+
+  #endregion
+
+
+
+
+  #region sceneLoading
+  public Button leaveBtn, startGameBtn;
+  public GameObject stopGameLoadBtn, loadCountdown;
+
+  void LoadingSceneError() {
+    ChangeToLoadingSceneMode(false);
+  }
+  void LoadingCountdown(int old, int n) {
+    loadCountdown.GetComponent<TextMeshProUGUI>().text = n.ToString();
+    if (n == 0) { OpenLoadingPanel(); }
+  }
+  void LoadingSceneStateChange(bool old, bool loadingScene) {
+    ChangeToLoadingSceneMode(loadingScene);
+  }
+  void ChangeToLoadingSceneMode(bool loadingScene) {
+    if (NetworkManager.Singleton.IsServer) {
+      startGameBtn.interactable = !loadingScene;
+      if (loadingScene) ChangePublicityBtnInteractability(!loadingScene);
+      else {
+        if (!waitingForLobbyPublicityChange) {
+          ChangePublicityBtnInteractability(!loadingScene);
+        }
+      }
+    }
+    stopGameLoadBtn.SetActive(loadingScene);
+    stopGameLoadBtn.GetComponent<Button>().interactable = NetworkManager.Singleton.IsServer;
+    stopGameLoadBtn.transform.GetChild(0).gameObject.SetActive(NetworkManager.Singleton.IsServer);
+    loadCountdown.GetComponent<TextMeshProUGUI>().text = "3";
+    leaveBtn.interactable = !loadingScene;
+  }
+  void LoadingNextScene() {
+    startGameBtn.interactable = false;
+  }
+  void DisableLeaving(bool lockOn) {
+    if (lockOn) {
+      OpenLoadingPanel();
+    } else {
+      HidePanelsExceptChosen();
+    }
+    leaveBtn.interactable = !lockOn;
+    startGameBtn.interactable = false;
+  }
+  void LobbyFull(bool full) {
+    startGameBtn.interactable = full;
+  }
+
+
+
+
+  #endregion
+
+  public void EnableObject(GameObject o) {
+    o.SetActive(true);
+  }
 
 
 }
