@@ -1708,7 +1708,7 @@ MonoBehaviour:
   drawSound:
     audioSource: {fileID: 0}
     Name: 
-    clip: {fileID: 8300000, guid: 4cbe12847e3adf34f8991c4a8d70c78d, type: 3}
+    clip: {fileID: 8300000, guid: 6d821b803b8bf9f40a105dcca00b09a5, type: 3}
     priority: 0
     volume: 1
     pitch: 1
