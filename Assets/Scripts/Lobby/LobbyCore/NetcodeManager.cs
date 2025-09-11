@@ -70,7 +70,7 @@ public class NetcodeManager : MonoBehaviour {
     }
     ShuttingDownNetwork?.Invoke();
     if (NetworkManager.Singleton == null) { shuttingDown = false; yield break; }
-    print("Shutdown NGO");
+    // print("Shutdown NGO");
     NetworkManager.Singleton.Shutdown();
     while (true) {
       if (NetworkManager.Singleton == null) break;
@@ -84,8 +84,8 @@ public class NetcodeManager : MonoBehaviour {
 
 
   void ClientConnectedToNGO(ulong clientID) {
-    print("m local id is : " + NetworkManager.Singleton.LocalClientId);
-    print($"clinet started {clientID}");
+    // print("m local id is : " + NetworkManager.Singleton.LocalClientId);
+    // print($"clinet started {clientID}");
     ClientConnected?.Invoke(clientID);
     if (clientID == NetworkManager.Singleton.LocalClientId) ClientStartSuccess?.Invoke();
   }
@@ -97,7 +97,7 @@ public class NetcodeManager : MonoBehaviour {
     ServerStoppedEvent?.Invoke();
   }
   void ClientStarted() {
-    print("clientStarted");
+    // print("clientStarted");
     ClientStartedEvent?.Invoke(NetworkManager.Singleton.IsHost);
   }
   void ClientStopped(bool wasHost) {

@@ -113,7 +113,7 @@ public class GameUI : MonoBehaviour {
     gameplayUI.SetActive(false);
     menuBtn.SetActive(false);
     menusPanel.SetActive(false);
-    print(result);
+    // print(result);
     StartCoroutine(DelayedUIShow(result));
   }
   IEnumerator DelayedUIShow(GameState result) {

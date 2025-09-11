@@ -203,7 +203,7 @@ public class LobbyManager : MonoBehaviour {
     }
     bool? ngoConnected = NGOConnected();
     if (ngoConnected == null) {
-      print("No NGO Manager");
+      // print("No NGO Manager");
       return;
     } else if (ngoConnected == true) {
       LeaveLobby();
@@ -242,7 +242,7 @@ public class LobbyManager : MonoBehaviour {
       // 		{RelayCode, new DataObject(DataObject.VisibilityOptions.Member, relayCode)}
       // 	}
       // }), TimeSpan.FromSeconds(5));
-      print(relayCode);
+      // print(relayCode);
 
       joinedLobby = hostLobby;
       await TaskTimeout.AddTimeout(SubscribeToLobbyEvents(), TimeSpan.FromSeconds(5));
@@ -340,7 +340,7 @@ public class LobbyManager : MonoBehaviour {
     }
   }
   public async Task<JoinAllocation> JoinRelay(string relayCode) {
-    print(relayCode);
+    // print(relayCode);
     try {
       JoinAllocation allocation = await RelayService.Instance.JoinAllocationAsync(relayCode);
       return allocation;
@@ -467,7 +467,7 @@ public class LobbyManager : MonoBehaviour {
   #region Kick/LeavingLobby
 
   public async void KickFromLobby(string id) {
-    print("kicking:" + id);
+    // print("kicking:" + id);
     if (hostLobby != null) {
       try {
         await LobbyService.Instance.RemovePlayerAsync(hostLobby.Id, id);

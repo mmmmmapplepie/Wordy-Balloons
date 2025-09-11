@@ -3,137 +3,137 @@ using TMPro;
 using UnityEngine;
 
 public class BasicTextAnimation : MonoBehaviour, ITextAnimator {
-	public Color correctColor, wrongColor;
-	public float correctScale, wrongScale, wrongJiggleScale;
-	public float correctPeriod, wrongPeriod;
-	public TMP_FontAsset correctFont, wrongFont;
-	List<FontAnimation<float>> animatingText = new List<FontAnimation<float>>();
+  public Color correctColor, wrongColor;
+  public float correctScale, wrongScale, wrongJiggleScale;
+  public float correctPeriod, wrongPeriod;
+  public TMP_FontAsset correctFont, wrongFont;
+  List<FontAnimation<float>> animatingText = new List<FontAnimation<float>>();
 
-	InputManager input;
-	TMP_Text text;
+  InputManager input;
+  TMP_Text text;
 
-	public void AnimationFunction(InputManager inputManager, TMP_Text tmpText) {
-		input = inputManager;
-		text = tmpText;
+  public void AnimationFunction(InputManager inputManager, TMP_Text tmpText) {
+    input = inputManager;
+    text = tmpText;
 
-		// UpdateFontAndText();
-		ManageAnimatingText();
+    // UpdateFontAndText();
+    ManageAnimatingText();
 
-		text.ForceMeshUpdate();
+    text.ForceMeshUpdate();
 
-		TMP_TextInfo txtInfo = text.textInfo;
+    TMP_TextInfo txtInfo = text.textInfo;
 
-		int charCount = txtInfo.characterCount;
-
-
-		if (charCount == 0) return;
-		for (int i = 0; i < charCount; i++) {
-			TMP_CharacterInfo charInfo = txtInfo.characterInfo[i];
-
-			// charInfo.character = "_".ToCharArray()[0];
-			charInfo.character = '_';
+    int charCount = txtInfo.characterCount;
 
 
-			if (!charInfo.isVisible || i >= animatingText.Count) continue;
-			int charMatIndex = charInfo.materialReferenceIndex;
-			int vertStartIndex = charInfo.vertexIndex;
-			Color32[] vertCols = txtInfo.meshInfo[charMatIndex].colors32;
-			Vector3[] verts = txtInfo.meshInfo[charMatIndex].vertices;
-			FontAnimation<float> anim = animatingText[i];
-			anim.animation(anim.progress, verts, vertCols, vertStartIndex);
-			anim.progress += Time.deltaTime;
-		}
-		text.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices);
-		text.UpdateVertexData(TMP_VertexDataUpdateFlags.Colors32);
-	}
+    if (charCount == 0) return;
+    for (int i = 0; i < charCount; i++) {
+      TMP_CharacterInfo charInfo = txtInfo.characterInfo[i];
 
-	void ManageAnimatingText() {
-		string typed = input.typedString;
-		string target = input.targetString;
-		int targetTextLength = target.Length;
+      // charInfo.character = "_".ToCharArray()[0];
+      charInfo.character = '_';
 
-		for (int i = animatingText.Count; i < typed.Length; i++) {
-			FontAnimation<float> newAnim = new FontAnimation<float>();
-			newAnim.progress = 0;
-			newAnim.animation = typed[i] == target[i] ? CorrectCharacter : WrongCharacter;
-			animatingText.Add(newAnim);
-		}
 
-		while (animatingText.Count > typed.Length) {
-			animatingText.RemoveAt(typed.Length);
-		}
-	}
+      if (!charInfo.isVisible || i >= animatingText.Count) continue;
+      int charMatIndex = charInfo.materialReferenceIndex;
+      int vertStartIndex = charInfo.vertexIndex;
+      Color32[] vertCols = txtInfo.meshInfo[charMatIndex].colors32;
+      Vector3[] verts = txtInfo.meshInfo[charMatIndex].vertices;
+      FontAnimation<float> anim = animatingText[i];
+      anim.animation(anim.progress, verts, vertCols, vertStartIndex);
+      anim.progress += Time.deltaTime;
+    }
+    text.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices);
+    text.UpdateVertexData(TMP_VertexDataUpdateFlags.Colors32);
+  }
 
-	void UpdateFontAndText() {
-		string typed = input.typedString;
-		string target = input.targetString;
-		string output = "";
+  void ManageAnimatingText() {
+    string typed = input.typedString;
+    string target = input.targetString;
+    int targetTextLength = target.Length;
 
-		TMP_TextInfo txtInfo = text.textInfo;
-		// return;
+    for (int i = animatingText.Count; i < typed.Length; i++) {
+      FontAnimation<float> newAnim = new FontAnimation<float>();
+      newAnim.progress = 0;
+      newAnim.animation = typed[i] == target[i] ? CorrectCharacter : WrongCharacter;
+      animatingText.Add(newAnim);
+    }
 
-		bool? correct = null;
-		if (System.String.IsNullOrEmpty(typed)) {
-			return;
-		}
-		for (int i = 0; i < typed.Length; i++) {
-			if (typed[i] == target[i]) {
-				if (correct == true) {
-					output += target[i];
-				} else {
-					output += "<font=\"" + correctFont.name + "\">" + target[i];
-					correct = true;
-				}
-			} else {
-				string charToAdd = txtInfo.characterInfo[i].isVisible ? target[i].ToString() : "_";
-				if (correct == false) {
-					output += charToAdd;
-				} else {
-					output += "<font=\"" + wrongFont.name + "\">" + charToAdd;
-					correct = false;
-				}
-			}
-		}
-		output += "<font=\"default\">" + target.Substring(typed.Length);
-		text.text = output;
-	}
+    while (animatingText.Count > typed.Length) {
+      animatingText.RemoveAt(typed.Length);
+    }
+  }
 
-	void CorrectCharacter(float prog, Vector3[] verts, Color32[] cols, int charIndex) {
-		float p = prog / correctPeriod;
-		if (prog < correctPeriod) {
-			Vector3 center = (verts[charIndex] + verts[charIndex + 2]) / 2f;
-			for (int i = charIndex; i < charIndex + 4; i++) {
-				Vector3 diff = verts[i] - center;
-				verts[i] = center + diff * Mathf.Lerp(correctScale, 1f, p);
-			}
-		}
-		for (int i = charIndex; i < charIndex + 4; i++) {
-			cols[i] = (Color32)correctColor;
-		}
+  void UpdateFontAndText() {
+    string typed = input.typedString;
+    string target = input.targetString;
+    string output = "";
 
-		prog = prog < correctPeriod ? prog + Time.deltaTime : correctPeriod;
-	}
-	void WrongCharacter(float prog, Vector3[] verts, Color32[] cols, int charIndex) {
-		Vector3 center = (verts[charIndex] + verts[charIndex + 2]) / 2f;
-		Vector3 jiggleMagnitude = wrongJiggleScale * (verts[charIndex + 2] - center);
-		float jiggleX = jiggleMagnitude.x;
-		float jiggleY = jiggleMagnitude.y;
+    TMP_TextInfo txtInfo = text.textInfo;
+    // return;
 
-		float p = prog / wrongPeriod;
-		if (prog < wrongPeriod) {
-			for (int i = charIndex; i < charIndex + 4; i++) {
-				Vector3 diff = verts[i] - center;
-				verts[i] = center + diff * Mathf.Lerp(wrongScale, 1f, p);
-			}
-		}
-		for (int i = charIndex; i < charIndex + 4; i++) {
-			verts[i] += new Vector3(Random.Range(-jiggleX, jiggleX), Random.Range(-jiggleY, jiggleY), 0f);
-		}
-		for (int i = charIndex; i < charIndex + 4; i++) {
-			cols[i] = (Color32)wrongColor;
-		}
-		prog = prog < wrongPeriod ? prog + Time.deltaTime : wrongPeriod;
-	}
+    bool? correct = null;
+    if (System.String.IsNullOrEmpty(typed)) {
+      return;
+    }
+    for (int i = 0; i < typed.Length; i++) {
+      if (typed[i] == target[i]) {
+        if (correct == true) {
+          output += target[i];
+        } else {
+          output += "<font=\"" + correctFont.name + "\">" + target[i];
+          correct = true;
+        }
+      } else {
+        string charToAdd = txtInfo.characterInfo[i].isVisible ? target[i].ToString() : "_";
+        if (correct == false) {
+          output += charToAdd;
+        } else {
+          output += "<font=\"" + wrongFont.name + "\">" + charToAdd;
+          correct = false;
+        }
+      }
+    }
+    output += "<font=\"default\">" + target.Substring(typed.Length);
+    text.text = output;
+  }
+
+  void CorrectCharacter(float prog, Vector3[] verts, Color32[] cols, int charIndex) {
+    float p = prog / correctPeriod;
+    if (prog < correctPeriod) {
+      Vector3 center = (verts[charIndex] + verts[charIndex + 2]) / 2f;
+      for (int i = charIndex; i < charIndex + 4; i++) {
+        Vector3 diff = verts[i] - center;
+        verts[i] = center + diff * Mathf.Lerp(correctScale, 1f, p);
+      }
+    }
+    for (int i = charIndex; i < charIndex + 4; i++) {
+      cols[i] = (Color32)correctColor;
+    }
+
+    prog = prog < correctPeriod ? prog + Time.deltaTime : correctPeriod;
+  }
+  void WrongCharacter(float prog, Vector3[] verts, Color32[] cols, int charIndex) {
+    Vector3 center = (verts[charIndex] + verts[charIndex + 2]) / 2f;
+    Vector3 jiggleMagnitude = wrongJiggleScale * (verts[charIndex + 2] - center);
+    float jiggleX = jiggleMagnitude.x;
+    float jiggleY = jiggleMagnitude.y;
+
+    float p = prog / wrongPeriod;
+    if (prog < wrongPeriod) {
+      for (int i = charIndex; i < charIndex + 4; i++) {
+        Vector3 diff = verts[i] - center;
+        verts[i] = center + diff * Mathf.Lerp(wrongScale, 1f, p);
+      }
+    }
+    for (int i = charIndex; i < charIndex + 4; i++) {
+      verts[i] += new Vector3(Random.Range(-jiggleX, jiggleX), Random.Range(-jiggleY, jiggleY), 0f);
+    }
+    for (int i = charIndex; i < charIndex + 4; i++) {
+      cols[i] = (Color32)wrongColor;
+    }
+    prog = prog < wrongPeriod ? prog + Time.deltaTime : wrongPeriod;
+  }
 
 
 }
