@@ -380,8 +380,7 @@ public class LobbyManager : MonoBehaviour {
     } catch (Exception e) {
       print(e);
       LeaveLobby();
-      string failureReason = null;
-      if (e is LobbyServiceException && (e as LobbyServiceException).Reason == LobbyExceptionReason.LobbyFull) failureReason = "Lobby is full";
+      string failureReason = GetLobbyError((e as LobbyServiceException).Reason);
       LobbyJoinFailure?.Invoke(failureReason);
     }
   }
@@ -410,8 +409,7 @@ public class LobbyManager : MonoBehaviour {
     } catch (Exception e) {
       print(e);
       LeaveLobby();
-      string failureReason = null;
-      if (e is LobbyServiceException && (e as LobbyServiceException).Reason == LobbyExceptionReason.LobbyFull) failureReason = "Lobby is full";
+      string failureReason = GetLobbyError((e as LobbyServiceException).Reason);
       LobbyJoinFailure?.Invoke(failureReason);
     }
   }
@@ -440,10 +438,21 @@ public class LobbyManager : MonoBehaviour {
     } catch (Exception e) {
       print(e);
       LeaveLobby();
-      string failureReason = null;
-      if (e is LobbyServiceException && (e as LobbyServiceException).Reason == LobbyExceptionReason.LobbyFull) failureReason = "Lobby is full";
+      string failureReason = GetLobbyError((e as LobbyServiceException).Reason);
       LobbyJoinFailure?.Invoke(failureReason);
     }
+  }
+  string GetLobbyError(LobbyExceptionReason e) {
+    if (e == null) return null;
+    string failureReason = null;
+    if (e == LobbyExceptionReason.LobbyFull) {
+      failureReason = "Lobby is full";
+    } else if (e == LobbyExceptionReason.LobbyNotFound) {
+      failureReason = "Lobby not found";
+    } else if (e == LobbyExceptionReason.NoOpenLobbies) {
+      failureReason = "No Open lobbies";
+    }
+    return failureReason;
   }
   async Task JoinLobbyRelay() {
     try {
