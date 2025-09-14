@@ -18,7 +18,7 @@ public class AudioPlayer : MonoBehaviour {
     if (Singleton && Instance != this) return;
 
     SetupAudioSources();
-    SetupOneShotSoundPlayer();
+    GetOneshotSourceForPitch();
   }
   void SetupAudioSources() {
     foreach (Sound sound in sounds) {
@@ -173,6 +173,12 @@ public class AudioPlayer : MonoBehaviour {
       fadeSounds.Add(fadeSound);
     }
   }
+  public void SetPitch(string name, float pitch) {
+    Sound sound = FindSound(name);
+    if (sound == null || sound.audioSource == null) return;
+    if (!sound.audioSource.isPlaying) return;
+    sound.audioSource.pitch = pitch;
+  }
   IEnumerator VolumeRoutine(Sound sound, float FinalVol, float changeTime) {
     float InitialVol = sound.audioSource.volume;
     float VolDiff = FinalVol - InitialVol;
@@ -193,27 +199,40 @@ public class AudioPlayer : MonoBehaviour {
   }
 
   #region oneShotSound
-  static AudioSource oneShotSoundPlayer;
-  void SetupOneShotSoundPlayer() {
-    oneShotSoundPlayer = gameObject.AddComponent<AudioSource>();
+  static Dictionary<float, AudioSource> OneshotPitchPoolDictionary = new();
+  public const float MaxOneshotPitch = 10f, MinOneshotPitch = RoundingStep, RoundingStep = 0.05f;
+  static float GetProperPitchValue(float pitch) {
+    if (pitch == 1f) return 1f;
+    pitch = Mathf.Clamp(pitch, MinOneshotPitch, MaxOneshotPitch);
+    return Mathf.RoundToInt(pitch / RoundingStep) * RoundingStep;
   }
-  public static AudioSource GetOneShotPlayer() {
-    return oneShotSoundPlayer;
-  }
-  public static void SetOneshotClip(AudioClip clip) {
-    oneShotSoundPlayer.clip = clip;
-  }
-  public void PlayOneShot(AudioClip clip) {
-    PlayOneShot_Static(clip);
-  }
-  public void PlayOneShot(AudioClip clip, float volume) {
-    PlayOneShot_Static(clip, volume);
+  static AudioSource GetOneshotSourceForPitch(float targetPitch = 1f) {
+    targetPitch = GetProperPitchValue(targetPitch);
+    if (OneshotPitchPoolDictionary.ContainsKey(targetPitch)) return OneshotPitchPoolDictionary[targetPitch];
+    AudioSource audioS = Instance.gameObject.AddComponent<AudioSource>();
+    audioS.pitch = targetPitch;
+    OneshotPitchPoolDictionary.Add(targetPitch, audioS);
+    return audioS;
   }
 
-  public static void PlayOneShot_Static(AudioClip clip, float volume = 1f) {
-    if (oneShotSoundPlayer == null) return;
-    oneShotSoundPlayer.PlayOneShot(clip, volume);
+  public static void LoadClipBySettingOnOneShot(AudioClip clip) {
+    GetOneshotSourceForPitch().clip = clip;
   }
+  public static void PlayOneShot_Static(AudioClip clip, float volume = 1f, float pitch = 1f) {
+    if (clip == null) return;
+    AudioSource source = GetOneshotSourceForPitch(pitch);
+    if (source == null) return;
+    source.PlayOneShot(clip, volume);
+  }
+
+
+
+
+
+
+
+
+
 
   #endregion
 }

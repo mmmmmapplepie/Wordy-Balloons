@@ -6,17 +6,14 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
-public class WelcomeIntroEffect : MonoBehaviour
-{
+public class WelcomeIntroEffect : MonoBehaviour {
   [HideInInspector] public bool AnimationFinished = false;
 
   float initialBloom;
 
 
 
-  void OnEnable()
-
-  {
+  void OnEnable() {
 
     if (GameData.PlayMode == PlayModeEnum.Tutorial) StartCoroutine(StartOpeningAnimation());
     v.profile.TryGet<Bloom>(out bloom);
@@ -35,12 +32,10 @@ public class WelcomeIntroEffect : MonoBehaviour
   public Volume v;
   Bloom bloom;
 
-  IEnumerator StartOpeningAnimation()
-  {
+  IEnumerator StartOpeningAnimation() {
     float blackoutTime = 2f;
     float t = 0f;
-    while (t < blackoutTime)
-    {
+    while (t < blackoutTime) {
       t += Time.unscaledDeltaTime;
       blackoutImg.color = Color.Lerp(Color.clear, Color.black, t / blackoutTime);
       BGMManager.instance.SetBGMVolume((1 - t / blackoutTime));
@@ -56,16 +51,14 @@ public class WelcomeIntroEffect : MonoBehaviour
 
     yield return new WaitForSecondsRealtime(1f);
 
-    for (int i = 0; i < 7; i++)
-    {
+    for (int i = 0; i < 7; i++) {
       typewriter.AnimateNext();
       yield return new WaitForSecondsRealtime(0.05f);
       AudioPlayer.PlayOneShot_Static(typingClip, VolumeControl.GetEffectVol());
       yield return new WaitForSecondsRealtime(0.05f);
     }
     yield return new WaitForSecondsRealtime(0.5f);
-    for (int i = 0; i < 2; i++)
-    {
+    for (int i = 0; i < 2; i++) {
       typewriter.AnimateNext();
       yield return new WaitForSecondsRealtime(0.05f);
       AudioPlayer.PlayOneShot_Static(typingClip, VolumeControl.GetEffectVol());
@@ -75,8 +68,7 @@ public class WelcomeIntroEffect : MonoBehaviour
 
     yield return new WaitForSecondsRealtime(0.4f);
 
-    for (int i = 0; i < 13; i++)
-    {
+    for (int i = 0; i < 13; i++) {
       LettersHolder.GetChild(i).gameObject.SetActive(true);
       yield return new WaitForSecondsRealtime(0.25f);
     }
@@ -91,20 +83,17 @@ public class WelcomeIntroEffect : MonoBehaviour
 
 
     typewriter.gameObject.SetActive(false);
-    while (t < expandTime)
-    {
+    while (t < expandTime) {
       float r = 1f - Mathf.Pow((1f - t / expandTime), 5f);
       t += Time.unscaledDeltaTime;
       // Color targetC = Color.Lerp(Color.white, titleExpandedColor, t / expandTime);
-      for (int i = 0; i < LettersHolder.childCount; i++)
-      {
+      for (int i = 0; i < LettersHolder.childCount; i++) {
         Color targetC = Color.Lerp(Color.white, g.Evaluate((float)i / LettersHolder.childCount), r);
         LettersHolder.GetChild(i).GetComponent<WordFlylingIn>().SetBetweenPoints(r);
         LettersHolder.GetChild(i).GetComponent<TextMeshProUGUI>().color = targetC;
       }
-      if (!confettiFired && t > 0.1f)
-      {
-        AudioPlayer.Instance.PlayOneShot(titleClip, VolumeControl.GetEffectVol());
+      if (!confettiFired && t > 0.1f) {
+        AudioPlayer.PlayOneShot_Static(titleClip, VolumeControl.GetEffectVol());
         confettiFired = true;
         StartCoroutine(FirecrackerEffects());
       }
@@ -116,13 +105,11 @@ public class WelcomeIntroEffect : MonoBehaviour
     float reduceTime = 2f;
     t = 0;
 
-    while (t < reduceTime)
-    {
+    while (t < reduceTime) {
       float r = Mathf.Pow((1f - t / reduceTime), 3f);
       t += Time.unscaledDeltaTime;
 
-      for (int i = 0; i < LettersHolder.childCount; i++)
-      {
+      for (int i = 0; i < LettersHolder.childCount; i++) {
         Color targetC = Color.Lerp(Color.white, g.Evaluate((float)i / LettersHolder.childCount), r / 2f + 0.5f);
         LettersHolder.GetChild(i).GetComponent<WordFlylingIn>().SetBetweenPoints(r);
         LettersHolder.GetChild(i).GetComponent<TextMeshProUGUI>().color = targetC;
@@ -133,8 +120,7 @@ public class WelcomeIntroEffect : MonoBehaviour
       yield return null;
     }
     BGMManager.instance.SetBGMVolume(1f);
-    for (int i = 0; i < LettersHolder.childCount; i++)
-    {
+    for (int i = 0; i < LettersHolder.childCount; i++) {
       Color targetC = Color.Lerp(Color.white, g.Evaluate((float)i / LettersHolder.childCount), 0.5f);
       LettersHolder.GetChild(i).GetComponent<WordFlylingIn>().SetBetweenPoints(0);
       LettersHolder.GetChild(i).GetComponent<TextMeshProUGUI>().color = targetC;
@@ -144,8 +130,7 @@ public class WelcomeIntroEffect : MonoBehaviour
     t = 0;
 
 
-    while (t < blackoutTime)
-    {
+    while (t < blackoutTime) {
       t += Time.unscaledDeltaTime;
       blackoutImg.color = Color.Lerp(Color.black, Color.clear, t / blackoutTime);
       yield return null;
@@ -159,34 +144,30 @@ public class WelcomeIntroEffect : MonoBehaviour
     AnimationFinished = true;
   }
 
-  IEnumerator FirecrackerEffects()
-  {
+  IEnumerator FirecrackerEffects() {
     yield return new WaitForSeconds(1f);
     List<Vector2> poses = new List<Vector2>();
-    for (int i = -4; i <= 4; i++)
-    {
+    for (int i = -4; i <= 4; i++) {
       poses.Add(GetArcPoint(GetComponent<RectTransform>().rect.height * 0.3f, 0.1f + (float)(i + 4) * 0.1f) - 300f * Vector2.up);
     }
-    for (int i = 0; i < poses.Count; i++)
-    {
+    for (int i = 0; i < poses.Count; i++) {
       StartCoroutine(CreateCracker(poses[i]));
     }
     yield return new WaitForSeconds(0.2f);
-    AudioPlayer.PlayOneShot_Static(fireworkSound, VolumeControl.GetEffectVol() * Random.Range(0.6f, 1f));
-    yield return new WaitForSeconds(0.1f);
-    AudioPlayer.PlayOneShot_Static(fireworkSound, VolumeControl.GetEffectVol() * Random.Range(0.6f, 1f));
-
+    AudioPlayer.PlayOneShot_Static(fireworkSound, VolumeControl.GetEffectVol() * Random.Range(0.9f, 1f), Random.Range(0.95f, 1.1f));
+    yield return new WaitForSeconds(0.05f);
+    AudioPlayer.PlayOneShot_Static(fireworkSound, VolumeControl.GetEffectVol() * Random.Range(0.9f, 1f), Random.Range(0.95f, 1.1f));
+    yield return new WaitForSeconds(0.05f);
+    AudioPlayer.PlayOneShot_Static(fireworkSound, VolumeControl.GetEffectVol() * Random.Range(0.9f, 1f), Random.Range(0.95f, 1.1f));
   }
-  IEnumerator CreateCracker(Vector2 pos)
-  {
+  IEnumerator CreateCracker(Vector2 pos) {
     yield return new WaitForSeconds(Random.Range(0, 0.2f));
     bloom.intensity.value += 1f / 9f;
     GameObject newEffectPrefab = fireworksEffect[Random.Range(0, fireworksEffect.Count - 1)];
     GameObject g = Instantiate(newEffectPrefab, transform);
     g.GetComponent<RectTransform>().anchoredPosition = pos;
   }
-  public Vector2 GetArcPoint(float maxHeight, float t)
-  {
+  public Vector2 GetArcPoint(float maxHeight, float t) {
     t = Mathf.Clamp01(t); // Ensure t stays within [0,1]
 
     float width = GetComponent<RectTransform>().rect.width;
@@ -204,22 +185,18 @@ public class WelcomeIntroEffect : MonoBehaviour
   }
 
 
-  void OnDestroy()
-  {
+  void OnDestroy() {
     if (bloom != null) bloom.intensity.value = initialBloom;
   }
 
-  IEnumerator BobbingTitle()
-  {
-    while (true)
-    {
+  IEnumerator BobbingTitle() {
+    while (true) {
       LettersHolder.localScale = Vector3.one + Vector3.up * Mathf.Sin(Time.unscaledTime * Mathf.Deg2Rad * 180f) * 0.05f;
       yield return null;
     }
   }
 
-  public void DisableObj()
-  {
+  public void DisableObj() {
     nxtBtnExtra.SetActive(false);
   }
 

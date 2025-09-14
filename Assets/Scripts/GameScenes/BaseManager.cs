@@ -147,7 +147,7 @@ public class BaseManager : NetworkBehaviour {
       obj.transform.localScale = Vector3.one * UnityEngine.Random.Range(1f, 3f);
       created++;
       camShake.magnitude = (float)created / targetEffects;
-      if (created < 10) AudioPlayer.PlayOneShot_Static(popSound, VolumeControl.GetEffectVol() * (10 - created) / 10f);
+      if (created < 10) AudioPlayer.PlayOneShot_Static(popSound, UnityEngine.Random.Range(0.9f, 1.1f) * VolumeControl.GetEffectVol() * (10 - created) / 10f, UnityEngine.Random.Range(0.95f, 1.1f));
       if (created > 30) CancelInvoke();
       yield return new WaitForSeconds(1.006f / created);//summed up gives about 5 seconds total
     }
@@ -162,7 +162,7 @@ public class BaseManager : NetworkBehaviour {
     targetBase.GetChild(1).GetComponent<SpriteRenderer>().sprite = baseCannon_Destroyed;
   }
   void PlaySound() {
-    AudioPlayer.PlayOneShot_Static(baseDestroySound, VolumeControl.GetEffectVol());
+    AudioPlayer.PlayOneShot_Static(baseDestroySound, VolumeControl.GetEffectVol() * UnityEngine.Random.Range(0.8f, 1f), UnityEngine.Random.Range(0.95f, 1.1f));
   }
 
 }

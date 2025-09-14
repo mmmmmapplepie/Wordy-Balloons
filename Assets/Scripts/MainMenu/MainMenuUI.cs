@@ -5,12 +5,18 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Unity.Netcode.Transports.UTP;
+using TMPro;
 
 public class MainMenuUI : MonoBehaviour {
 
   public GameObject cover;
   void Start() {
     TutorialCheck();
+    SetGameVersion();
+  }
+  public TextMeshProUGUI versionTxt;
+  void SetGameVersion() {
+    versionTxt.text = "Version: " + Application.version;
   }
   void TutorialCheck() {
     if (!PlayerPrefs.HasKey(TutorialManager.TutorialClearedPlayerPrefKey)) {
@@ -45,7 +51,6 @@ public class MainMenuUI : MonoBehaviour {
     StartCoroutine(StartGameRoutine());
   }
 
-  public SliderToggle dictionaryToggle;
   void ShutdownNetwork() {
     if (NetworkManager.Singleton.IsConnectedClient && !NetworkManager.Singleton.ShutdownInProgress)
       NetworkManager.Singleton.Shutdown();

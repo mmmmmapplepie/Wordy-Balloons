@@ -443,7 +443,6 @@ public class LobbyManager : MonoBehaviour {
     }
   }
   string GetLobbyError(LobbyExceptionReason e) {
-    if (e == null) return null;
     string failureReason = null;
     if (e == LobbyExceptionReason.LobbyFull) {
       failureReason = "Lobby is full";

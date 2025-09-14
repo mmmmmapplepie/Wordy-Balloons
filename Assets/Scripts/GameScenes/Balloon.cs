@@ -160,8 +160,8 @@ public class Balloon : NetworkBehaviour {
 
   [ClientRpc]
   void DestroyEffectClientRpc(bool onBase) {
-    if (onBase) anim.BaseCollisionEffect();
-    else anim.CollisionEffect();
+    if (onBase) anim.DestroyOnBaseEffect();
+    else anim.DestroyEffect(false);
     BalloonDestroyed?.Invoke(onBase, this);
   }
 
