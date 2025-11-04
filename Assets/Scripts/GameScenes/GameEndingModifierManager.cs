@@ -64,7 +64,7 @@ public class GameEndingModifierManager : NetworkBehaviour {
         timerPeriod = float.PositiveInfinity;
         break;
       case GameEndingMode.Speedup:
-        timerPeriod = 5f;
+        timerPeriod = 10f;
         break;
       case GameEndingMode.Damageup:
         timerPeriod = 10f;
